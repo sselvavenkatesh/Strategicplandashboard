@@ -29,6 +29,10 @@ District 360 communicates a K-12 school district's strategic-plan goals, indicat
 
 The existing database schema must be inspected before schema changes are proposed.
 
+### Stakeholder ownership
+
+The live schema includes a nullable `Stakeholder ID` on `Goal_master`, `Indicator_master`, `Initiative_master`, and `Initiative_Data`. Each is a foreign key to `admin_users.id` with `ON UPDATE CASCADE` and `ON DELETE SET NULL`. The stakeholder represents the responsible administrator. Display names should be resolved from `admin_users.Name` rather than duplicated in these records. Existing records may have no stakeholder assignment.
+
 ## Roles
 
 - Default view: Public.
