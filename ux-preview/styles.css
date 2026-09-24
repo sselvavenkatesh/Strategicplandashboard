@@ -111,3 +111,9 @@ body{padding-bottom:42px!important}
 .summaryKpiValue .varianceLine{margin:0!important;height:18px!important;display:flex;align-items:center;gap:3px}
 .summaryKpiValue .varianceLabel{font-size:7px!important}
 .summaryKpiValue .variance{height:16px!important}
+/* Fix Summary LY variance arrow overflow */
+.summaryKpiValue{min-width:0;flex-wrap:nowrap}
+.summaryKpiValue .varianceLine{min-width:0;flex:0 1 auto;white-space:nowrap}
+.summaryKpiValue .variance{position:relative!important;display:inline-flex!important;align-items:center!important;gap:2px!important;max-width:100%;padding:0 5px!important;overflow:hidden!important}
+.summaryKpiValue .variance .trend{position:static!important;transform:none!important;display:inline-block!important;line-height:1!important;font-size:8px!important;margin:0!important}
+.kpi{overflow:hidden}
