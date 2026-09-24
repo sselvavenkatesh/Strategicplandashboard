@@ -70,3 +70,10 @@ footer{min-height:42px;padding:7px 3.2%;display:flex;align-items:center;justify-
 .k12Wordmark i{position:absolute;left:1px;right:0;top:0;height:2px;border-radius:50%;background:linear-gradient(90deg,#7bdc86,#48c9c6,#389ce8);transform:skewX(-28deg)}
 footer:hover{opacity:.9}
 @media(max-width:650px){footer{min-height:38px;padding-right:4%}.k12Wordmark{font-size:12px}.poweredBy{font-size:7px}}
+/* Persistent global footer */
+body{padding-bottom:44px}
+footer{position:fixed!important;left:0;right:0;bottom:0;z-index:45;height:40px!important;min-height:40px!important;padding:5px 3.2%!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;background:rgba(7,19,33,.94)!important;backdrop-filter:blur(8px);border-top:1px solid rgba(120,150,175,.08);opacity:.82!important}
+.footerBrandRight{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;width:100%!important}
+.poweredBy{font-size:8px;color:#8496a8;font-weight:500;white-space:nowrap}
+.k12MatrixLogo{display:block;width:96px;height:25px;object-fit:contain}
+@media(max-width:650px){body{padding-bottom:38px}footer{height:36px!important;min-height:36px!important;padding:4px 4%!important}.k12MatrixLogo{width:82px;height:22px}}
