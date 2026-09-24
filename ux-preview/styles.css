@@ -35,3 +35,7 @@
 .subChart{padding:1px 8px 7px}.subRow{grid-template-columns:78px 1fr;gap:5px;margin:3px 0}.subRow>span{font-size:7.5px}.subBar{height:13px}.subBar i{font-size:6.5px}.subLegend{margin:6px 0 0 83px;gap:6px;font-size:6.5px}
 .indicatorTitle{margin-top:10px}.indicatorGrid{gap:8px}.indicatorCard{padding:9px 10px}.indicatorCard>small{font-size:11px;color:#f0f4f8;font-weight:700}.indicatorValueRow{align-items:center;margin:5px 0 3px}.indicatorValue{font-size:21px}.stateAvg{font-size:10px;color:#f0f4f8;text-align:left}.stateAvg b{display:inline;margin-left:5px;color:#f0f4f8;font-size:20px}.indicatorMetric{font-size:8px;color:#8296a8;margin-bottom:2px}.indicatorValueWrap{display:flex;align-items:center;gap:6px}.indicatorValueWrap .varianceLine{margin:0}.yearBars{height:34px}.yearLabels{font-size:6.5px}
 @media(max-width:1200px){.initiativeGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.initiativeGrid{grid-template-columns:1fr}.goalPage{padding-top:68px}}
+
+/* Global subtle footer */
+footer{min-height:30px;padding:8px 4%;display:flex;align-items:center;justify-content:center;background:#050c14;border-top:1px solid rgba(120,150,175,.08);color:#607284;font-size:9px;letter-spacing:.15px;opacity:.72}
+footer:hover{opacity:.9}
