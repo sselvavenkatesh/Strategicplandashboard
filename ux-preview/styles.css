@@ -105,3 +105,9 @@ body{padding-bottom:42px!important}
 /* Clickable goal navigation cues */
 .welcomeGoal,.summary .goal,#goals .goal{cursor:pointer}
 .welcomeGoal:focus-visible,.summary .goal:focus-visible,#goals .goal:focus-visible{outline:2px solid #4aa9ec;outline-offset:2px}
+/* Summary KPI value + LY variance inline */
+.summaryKpiValue{display:flex;align-items:center;gap:7px;margin-top:4px}
+.summaryKpiValue>b{margin:0!important}
+.summaryKpiValue .varianceLine{margin:0!important;height:18px!important;display:flex;align-items:center;gap:3px}
+.summaryKpiValue .varianceLabel{font-size:7px!important}
+.summaryKpiValue .variance{height:16px!important}
