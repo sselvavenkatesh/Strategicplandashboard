@@ -1,0 +1,2 @@
+import {useEffect,useState} from 'react'
+export function useDashboard<T>(loader:()=>Promise<T>,deps:any[]=[]){const[data,setData]=useState<T|null>(null);const[error,setError]=useState('');const[loading,setLoading]=useState(true);useEffect(()=>{let live=true;setLoading(true);setError('');loader().then(x=>{if(live)setData(x)}).catch(e=>{if(live)setError(e.message||String(e))}).finally(()=>{if(live)setLoading(false)});return()=>{live=false}},deps);return{data,error,loading}}
