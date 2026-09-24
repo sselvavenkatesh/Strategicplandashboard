@@ -298,3 +298,99 @@ Next planned work:
 As the product owner supplies new prompts, requirements, corrections, chart formulas, filters, schema decisions, or implementation constraints, append or revise this document so GitHub retains a durable record of the agreed product model.
 
 Do not treat exploratory assistant suggestions as approved requirements unless the product owner accepts them.
+
+
+---
+
+## UX design review history — frozen baseline (24 Sep 2026)
+
+The product owner explicitly confirmed: **“now UX is frozen.”** The current GitHub Pages prototype is therefore the approved visual/interaction baseline. Do not change the frozen UX unless the product owner explicitly requests a later tweak.
+
+### UX prompts and decisions captured during design review
+
+1. **Goal Specific — Key Initiatives**
+   - “Show Initiative name and description.”
+   - Initiative progress bars must be shown at **Sub-Initiative level**.
+   - Show **4 Initiative tiles per desktop page/row** so Key Indicators are visible with minimal/no scrolling.
+   - Keep screens compact: trim blank space in headings and between Initiative description and chart.
+   - Initiative cards show duration, overall Done %, gauge, and Sub-Initiative 100% stacked bars for Done / In Progress / Not Started.
+
+2. **Goal Specific — Key Indicators**
+   - Indicator card visual hierarchy should match Initiative cards.
+   - Show Indicator Name followed immediately by Indicator Description, using the same compact name/description treatment as Initiative tiles.
+   - Show latest Indicator value, compact **LY Var** beside the value, Statewide Average, and School Year performance chart.
+   - Statewide Average label/value must remain readable and comparable in prominence to the KPI.
+   - Remove duplicate LY Var beneath the chart.
+   - Improve School Year label readability.
+   - On Summary Key Indicator cards, LY Var must be inline beside the KPI number; arrows must remain inside the variance pill/card.
+
+3. **Initiative Detail popup**
+   - Must open as a popup/overlay from an Initiative tile.
+   - Header shows Goal icon, Goal Name and Goal Description.
+   - Show selected Initiative identity/description.
+   - Next section: **Plan of Action timeline**.
+   - Then Initiative Overall Done % and gauge.
+   - Last section: enlarged Initiative Progress chart, using the same Sub-Initiative status logic as the Goal page.
+   - Preserve the underlying Goal page while popup is open.
+
+4. **Indicator Detail popup**
+   - Must open as a popup/overlay from an Indicator tile.
+   - Header shows Goal icon, Goal Name and Goal Description.
+   - Show selected Indicator name.
+   - Show current/latest School Year and KPI value.
+   - School Year selector defaults to latest.
+   - Main chart shows Student Group bars with values and Statewide Average horizontal reference line.
+   - Keep the visual hierarchy close to the supplied Indicator detail reference.
+
+5. **Navigation**
+   - Hamburger navigation opens from the **right**.
+   - Top-level title: **Explore the Dashboard**.
+   - Help and Filter controls live compactly at the top of the navigation pane and are not permanently visible in the page toolbar.
+   - Main navigation: **Home**, **Summary**, then individual visible Goal names.
+   - Home and Summary have icons.
+   - Clicking an individual Goal name opens the Goal Specific page with that Goal tab selected.
+   - Do not show separate Initiative Detail or Indicator Detail navigation items; these are popup experiences.
+   - Do not show “Select a page”.
+   - Include subtle **Powered By K12Matrix** branding in the navigation pane.
+   - Sign In is a compact blue oval/pill button beside the hamburger and opens a Sign In popup.
+
+6. **Cross-page navigation behavior**
+   - On Home/Welcome, clicking any Goal tile opens **Summary**.
+   - On Summary, clicking a Goal tile opens the corresponding **Goal Specific** tab.
+
+7. **Footer / K12Matrix branding**
+   - Footer is a global component applicable to all pages and popup experiences.
+   - It must be subtle and visible at the bottom of the viewport without requiring page scroll.
+   - Footer is right aligned and shows **Powered By K12Matrix**.
+   - K12Matrix logo is maintained as a separate reusable GitHub asset: `ux-preview/assets/k12matrix-logo.svg`.
+   - The current logo is a prototype/placeholder brand asset and may be replaced later by the product owner.
+
+8. **Tooltips / progressive disclosure**
+   - Charts should provide hover tooltips for values and useful descriptions.
+   - Initiative hover details should include **Start Date** and **End Date**.
+   - Where text is truncated/ellipsis or a three-dot affordance is used, hover should expose the full relevant details.
+   - UX principle: keep the default dashboard compact and reveal secondary detail through tooltips/hover rather than enlarging every card.
+
+9. **Responsive/accessibility direction**
+   - Desktop remains primary.
+   - Preserve compact tablet/mobile adaptations.
+   - Clickable cards should have clear interaction cues.
+   - Detail must not rely exclusively on hover in the eventual production implementation; keyboard/touch-accessible equivalents are required.
+
+### Frozen UX implementation locations
+
+- `ux-preview/index.html`
+- `ux-preview/styles.css`
+- `ux-preview/app.js`
+- `ux-preview/assets/k12matrix-logo.svg`
+- GitHub Pages preview: `https://sselvavenkatesh.github.io/Strategicplandashboard/`
+
+### Freeze rule
+
+The current Home, Summary, Goal Specific, Initiative Detail popup, Indicator Detail popup, right-side navigation, Sign In treatment, global footer, tooltip direction, typography, colors, spacing, card surfaces, and interaction hierarchy are the **frozen UX baseline**.
+
+Future implementation work should reproduce this baseline in React rather than redesign it. Any subsequent UX modification must be traceable to a new explicit product-owner request.
+
+## Prompt-history preservation note
+
+The requirements above preserve the product owner's UX prompts and the resulting accepted decisions from the design-review sequence. Earlier product, schema, calculation, security, school-scope, stakeholder, Initiative, Indicator, Supabase, and implementation requirements remain documented in the preceding sections of this file. Together, this document is the durable requirements/prompt-history record for the project.
