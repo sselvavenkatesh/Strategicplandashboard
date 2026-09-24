@@ -209,18 +209,57 @@ Simple presentation logic may remain in React, but reusable business calculation
 
 Do not create the final Initiative views until Indicator chart requirements have also been reviewed. The Initiative and Indicator reporting layers should use a consistent approach for Goal, School, role visibility, and dashboard filters.
 
-## Indicator reporting — pending review
+## Indicator reporting requirements
 
-Indicator charts will be supplied separately.
+### Indicator Chart 1 — Key Indicator cards
 
-Before implementing Indicator views/functions:
+For each KPI/Indicator belonging to a Goal, display one card. The displayed KPI value is `Value 3` from the most recent School Year where `Category = 'All'` and `Student Group = 'All Students'`.
 
-1. Review each supplied Indicator chart as a business requirement.
-2. Map the visual to the live `Indicator_Data` and master-table schema.
-3. Determine dimensions, measures, filters, target/benchmark logic, and latest-year rules.
-4. Decide whether existing schema is sufficient.
-5. Prefer reusable views/functions over visual-specific duplication.
-6. Do not invent missing benchmark or notification rules.
+### Indicator Chart 2 — Goal Specific KPI tile
+
+For every KPI in the Goal, display one tile containing:
+- latest KPI value using the Key Indicator rule above;
+- latest Statewide Average for the KPI, using `Category = 'Statewide Average'` and `Student Group = 'All Students'`;
+- KPI performance across available School Years using `Category = 'All'`, `Student Group = 'All Students'`, and `Value 3`.
+
+School Years must be ordered chronologically rather than by unsafe text assumptions.
+
+### Indicator Chart 3 — Indicator detail popup
+
+Clicking a KPI card opens Indicator detail.
+
+- Show Goal Name and Goal Description mapped to the Indicator.
+- Show a current-year KPI scorecard using the latest `Category = 'All'`, `Student Group = 'All Students'` `Value 3`.
+- Provide a School Year dropdown containing available years for the Indicator, defaulting to the latest year.
+- For the selected year, chart Student Group on the X axis and numeric `Value 3` on the Y axis.
+- Exclude `Category = 'Statewide Average'` from the bars.
+- Draw the selected year's Statewide Average as a horizontal reference/trend line using the `Statewide Average` / `All Students` `Value 3`.
+- Default chart type is bar. Some Indicators may later be configured as line or plot/scatter; do not invent that configuration until defined by the product owner.
+- The reporting layer should preserve both the original display form of `Value 3` and a numeric form for charts and future benchmark logic.
+
+### Indicator School scope
+
+For Indicator reporting, district-level records currently use `School IS NULL`. When a specific School is selected, Indicator calculations should use that School's rows. Statewide Average remains a statewide reference rather than a school-specific value.
+
+## Implemented reporting layer
+
+Migration `add_dashboard_reporting_layer` created:
+
+- `vw_indicator_reporting_normalized` — normalized Indicator reporting rows, including chronological School Year start and numeric `Value 3`.
+- `fn_goal_initiative_progress(goal, school)` — Goal-level Initiative status counts/percentages.
+- `fn_initiative_progress(goal, school)` — Initiative completion percentage and duration.
+- `fn_subinitiative_progress(goal, initiative, school)` — Sub-Initiative status counts/percentages.
+- `fn_indicator_key_values(goal, school)` — latest KPI values for Goal cards.
+- `fn_indicator_year_history(indicator, school)` — KPI history with same-year Statewide Average.
+- `fn_indicator_student_groups(indicator, school_year, school)` — Student Group chart rows plus Statewide Average reference-line value.
+
+Initiative functions treat a null School parameter as all applicable Initiative rows, matching the All Schools requirement. Indicator functions treat a null School parameter as district-level rows where `School IS NULL`, avoiding accidental mixing of district and future school-specific KPI rows.
+
+The reporting functions are `SECURITY INVOKER`; they do not bypass the caller's table permissions/RLS. RLS policies still need to be finalized before frontend production access.
+
+## Indicator reporting — reviewed
+
+All currently supplied Indicator charts have been reviewed against the live schema. No additional Indicator table columns were required for these visuals. Future benchmark/notification and per-Indicator chart-type rules remain intentionally undefined until specified.
 
 ## Security and backend items already identified
 
@@ -244,13 +283,15 @@ Completed:
 - Stakeholder schema migration.
 - Supabase TypeScript schema types.
 - Initiative chart/schema analysis.
+- Indicator chart/schema analysis.
+- Consolidated Supabase Initiative/Indicator reporting layer.
 
-Next planned analysis:
+Next planned work:
 
-- Review Indicator chart screenshots.
-- Complete Indicator data/calculation requirements.
-- Design the combined reusable reporting views/functions.
-- Only then proceed with reporting-layer implementation and page data wiring.
+- Finalize RLS/access policies before production frontend data access.
+- Wire the React pages to the reporting functions.
+- Validate chart output against the supplied UX references.
+- Add future chart-type and benchmark notification rules only when explicitly defined.
 
 ## Maintenance rule for this file
 
