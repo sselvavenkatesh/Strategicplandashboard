@@ -1,0 +1,21 @@
+-- Applied to Supabase as migration: add_dashboard_reporting_layer
+-- Source-of-truth documentation for the District 360 reporting API.
+--
+-- Objects:
+-- vw_indicator_reporting_normalized
+-- fn_goal_initiative_progress(p_goal_id text default null, p_school text default null)
+-- fn_initiative_progress(p_goal_id text, p_school text default null)
+-- fn_subinitiative_progress(p_goal_id text, p_initiative_id text, p_school text default null)
+-- fn_indicator_key_values(p_goal_id text, p_school text default null)
+-- fn_indicator_year_history(p_indicator_id text, p_school text default null)
+-- fn_indicator_student_groups(p_indicator_id text, p_school_year text, p_school text default null)
+--
+-- The live migration was applied through Supabase migration tooling.
+-- See docs/USER_REQUIREMENTS_AND_PROMPTS.md for the approved formulas and scope semantics.
+--
+-- IMPORTANT:
+-- * Initiative NULL school = All Schools / all applicable Initiative_Data rows.
+-- * Indicator NULL school = district KPI rows where School IS NULL.
+-- * Indicator Statewide Average is sourced from district/statewide reference rows.
+-- * Value 3 is preserved as display text and normalized to numeric in the reporting view.
+-- * Functions use SECURITY INVOKER and therefore do not bypass RLS.
