@@ -77,3 +77,21 @@ footer{position:fixed!important;left:0;right:0;bottom:0;z-index:45;height:40px!i
 .poweredBy{font-size:8px;color:#8496a8;font-weight:500;white-space:nowrap}
 .k12MatrixLogo{display:block;width:96px;height:25px;object-fit:contain}
 @media(max-width:650px){body{padding-bottom:38px}footer{height:36px!important;min-height:36px!important;padding:4px 4%!important}.k12MatrixLogo{width:82px;height:22px}}
+/* Navigation v2 + guaranteed global footer */
+.navPanel{width:300px;padding:15px 14px 58px!important;background:#081522!important}
+.navPanel .panelTitle{padding:2px 2px 11px;margin:0;border-bottom:1px solid rgba(120,150,175,.12)}
+.navUtilities{margin:10px 0 12px!important;gap:6px!important}
+.navUtilities button{flex:0 0 auto!important;width:auto!important;height:29px!important;padding:0 9px!important;border-radius:7px!important;font-size:9px!important;background:#102235!important;border:1px solid #294158!important}
+.navUtilities button span{font-size:8px!important}
+.navLinks{display:flex;flex-direction:column;gap:3px}
+.navLinks>a,.navLinks #goalNavLinks>a{display:flex!important;align-items:center;gap:8px;padding:8px 9px!important;border-radius:6px;color:#b8c6d3!important;text-decoration:none;font-size:10px!important;border:1px solid transparent!important;background:transparent!important}
+.navLinks>a:hover,.navLinks #goalNavLinks>a:hover{background:#10253a!important;color:#fff!important;border-color:#284863!important}
+.navGroupLabel{margin:12px 9px 5px;font-size:7px;letter-spacing:1.4px;color:#60798e;font-weight:800}
+#goalNavLinks{display:flex;flex-direction:column;gap:2px}
+.navGoalIcon{width:20px;height:20px;display:grid;place-items:center;flex:0 0 auto;border-radius:5px;background:#102b40;color:#69baf2;font-size:8px}
+.navPowered{position:absolute;left:14px;right:14px;bottom:12px;padding-top:9px;border-top:1px solid rgba(120,150,175,.09);display:flex;justify-content:flex-end;align-items:center;gap:6px;opacity:.66}
+.navPowered span{font-size:7px;color:#72879a}.navPowered img{width:78px;height:20px;object-fit:contain}
+#globalFooter{position:fixed!important;display:flex!important;visibility:visible!important;opacity:.8!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100%!important;height:38px!important;min-height:38px!important;z-index:55!important;margin:0!important;padding:4px 3%!important;box-sizing:border-box!important;background:#071321f2!important;transform:none!important}
+body{padding-bottom:42px!important}
+.initiativeModal,.indicatorModal{padding-bottom:50px!important}
+@media(max-width:650px){.navPanel{width:min(88vw,300px)}#globalFooter{height:34px!important;min-height:34px!important}.k12MatrixLogo{width:78px!important}body{padding-bottom:38px!important}}
