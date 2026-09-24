@@ -1,12 +1,2 @@
-import { Link } from 'react-router-dom'
-
-export function WelcomePage() {
-  return (
-    <main className="page placeholder-page">
-      <p className="eyebrow">District 360</p>
-      <h1>Strategic Plan Dashboard</h1>
-      <p>The application foundation is ready. The Welcome Page UX will be implemented from the approved product specification.</p>
-      <Link className="primary-link" to="/summary">Explore dashboard</Link>
-    </main>
-  )
-}
+import {useNavigate} from 'react-router-dom';import {getGoals,getProfile} from '../../lib/dashboard';import {useDashboard} from '../../hooks/useDashboard';
+export function WelcomePage(){const nav=useNavigate(),p=useDashboard(getProfile),g=useDashboard(getGoals);if(p.loading||g.loading)return <main className="page state">Loading district dashboard…</main>;if(p.error||g.error)return <main className="page state error">Unable to load dashboard: {p.error||g.error}</main>;const x=p.data!,goals=g.data||[];return <main className="page welcome"><section className="welcomeCopy"><p className="eyebrow">{x.planName} · {x.duration}</p><h1>Welcome to<br/><span>{x.districtName}</span></h1><p className="lead">{x.subText}</p><h2>Our Strategic Goals</h2><div className="welcomeGoals">{goals.map((a,i)=><button key={a.id} className="welcomeGoal" onClick={()=>nav('/summary')}><i>{['✦','◆','●','▲'][i%4]}</i><div><b>{a.name}</b><span>{a.description}</span></div></button>)}</div><button className="primaryBtn" onClick={()=>nav('/summary')}>Explore Full Dashboard →</button></section><aside className="statements"><article><p className="eyebrow">Mission Statement</p>{x.mission.split(/\n+/).filter(Boolean).map((t,i)=><p key={i}>{t}</p>)}</article><article><p className="eyebrow">Vision Statement</p><p className="vision">{x.vision}</p></article></aside></main>}
