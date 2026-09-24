@@ -102,3 +102,6 @@ body{padding-bottom:42px!important}
 .navMainIcon{width:22px;height:22px;display:grid;place-items:center;flex:0 0 auto;border-radius:6px;background:#102b40;color:#72bdf1;font-size:12px;font-weight:700}
 .navGroupLabel{font-size:8px!important}
 .navGoalIcon{width:22px!important;height:22px!important;font-size:9px!important}
+/* Clickable goal navigation cues */
+.welcomeGoal,.summary .goal,#goals .goal{cursor:pointer}
+.welcomeGoal:focus-visible,.summary .goal:focus-visible,#goals .goal:focus-visible{outline:2px solid #4aa9ec;outline-offset:2px}
