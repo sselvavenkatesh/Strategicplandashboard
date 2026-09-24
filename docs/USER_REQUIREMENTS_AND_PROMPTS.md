@@ -394,3 +394,23 @@ Future implementation work should reproduce this baseline in React rather than r
 ## Prompt-history preservation note
 
 The requirements above preserve the product owner's UX prompts and the resulting accepted decisions from the design-review sequence. Earlier product, schema, calculation, security, school-scope, stakeholder, Initiative, Indicator, Supabase, and implementation requirements remain documented in the preceding sections of this file. Together, this document is the durable requirements/prompt-history record for the project.
+
+
+## Critical React QA feedback — 2026-09-24
+The currently deployed React build is NOT approved for UX review. Treat this feedback as a release-blocking requirement.
+
+Observed on Summary page:
+- Approved goal/header images are missing; icon/gradient placeholders are not acceptable substitutes.
+- Indicator rendering/data validation is incomplete; all indicators from Indicator_master must render, while values must come only from valid Indicator_Data/reporting rows. Missing values display the approved unavailable state, never disappear and never use UX sample data.
+- Approved chart/value tooltips are missing.
+- Excessive blank vertical space/top spacing differs from the frozen UX.
+- Multiple frozen UX elements, proportions, interactions, chart treatments, labels and details are still missing or materially different.
+
+Release discipline:
+1. ux-preview remains frozen and is the visual/interaction source of truth.
+2. Supabase master/data tables remain the content source of truth.
+3. React must reproduce the frozen UX structure without importing UX placeholder data.
+4. Add automated smoke/unit tests for master-record rendering, missing-data states, initiative status calculations, indicator values/LY variance, image rendering/fallback behavior, tooltip presence, and critical navigation/modal interactions.
+5. Perform desktop visual parity review page-by-page against frozen UX before requesting stakeholder review.
+6. Do not call a deployment review-ready merely because it builds or deploys.
+7. A release candidate must pass code/build checks, data checks, interaction checks, and visual-parity checks.
