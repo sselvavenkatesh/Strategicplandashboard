@@ -1,15 +1,2 @@
-import { Moon, Sun } from 'lucide-react'
-import { Outlet } from 'react-router-dom'
-import { useTheme } from '../../app/ThemeProvider'
-
-export function AppShell() {
-  const { theme, toggleTheme } = useTheme()
-  return (
-    <div className="app-shell">
-      <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle color theme">
-        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-      </button>
-      <Outlet />
-    </div>
-  )
-}
+import {Menu,X} from 'lucide-react';import {useState} from 'react';import {Link,Outlet} from 'react-router-dom';import {getGoals,getProfile} from '../../lib/dashboard';import {useDashboard} from '../../hooks/useDashboard';
+export function AppShell(){const[open,setOpen]=useState(false);const p=useDashboard(getProfile),g=useDashboard(getGoals);return <div className="app-shell"><header className="topbar"><Link to="/" className="brand">{p.data?.logo?<img src={p.data.logo} alt="District logo"/>:<span className="brandMark">D360</span>}<b>{p.data?.districtName||'District 360'}</b></Link><div className="tools"><button className="signInBtn">Sign In</button><button className="menuBtn" onClick={()=>setOpen(true)} aria-label="Open navigation"><Menu size={20}/></button></div></header><Outlet/><footer id="globalFooter"><span>Powered By</span><b>K12<span>Matrix</span></b></footer><div className={'scrim '+(open?'on':'')} onClick={()=>setOpen(false)}/><aside className={'navPanel '+(open?'open':'')}><div className="navTitle"><b>Explore the Dashboard</b><button onClick={()=>setOpen(false)}><X size={18}/></button></div><div className="navUtilities"><button>?</button><span>Help</span><button>⚙</button><span>Filters</span></div><nav><Link to="/" onClick={()=>setOpen(false)}>⌂ <span>Home</span></Link><Link to="/summary" onClick={()=>setOpen(false)}>▦ <span>Summary</span></Link><small>GOALS</small>{g.data?.map((x,i)=><Link to={'/goals/'+x.id} onClick={()=>setOpen(false)} key={x.id}><i>{['✦','◆','●','▲'][i%4]}</i><span>{x.name}</span></Link>)}</nav><div className="navPowered"><span>Powered By</span><b>K12Matrix</b></div></aside></div>}
