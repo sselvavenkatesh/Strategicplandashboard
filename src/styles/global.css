@@ -231,3 +231,11 @@
  .app-shell:has(.goalPage) .yearBars i{position:relative;overflow:visible}
  .app-shell:has(.goalPage) .yearBars i b{position:absolute;left:0;right:0;top:2px;text-align:center;color:#dce8f2;font-size:7px;line-height:1;font-weight:700;white-space:nowrap}
 }
+
+/* Goal KPI variance stack + pointer affordance */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .varianceLine{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:29px;min-height:29px;margin:0!important;white-space:nowrap}
+ .app-shell:has(.goalPage) .varianceLabel{order:2;font-size:7px!important;line-height:1!important;color:#74879a!important}
+ .app-shell:has(.goalPage) .variance{order:1}
+}
+a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.kpi{cursor:pointer}
