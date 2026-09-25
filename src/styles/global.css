@@ -117,3 +117,38 @@
  .goalPage .stateAvg{display:flex;align-items:baseline;gap:8px;font-size:7px;white-space:nowrap}.goalPage .stateAvg b{display:inline;font-size:18px;line-height:1;color:#e4edf5}
  .goalPage .yearBars{height:36px}.goalPage .yearLabels{font-size:6.5px}
 }
+
+/* Goal page final desktop acceptance pass — match frozen compact UX and fit short laptop viewports */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage){padding-bottom:38px}
+ .goalPage{padding-left:4%;padding-right:4%;max-width:none}
+ .goalPage .initiativeIntro h4,.goalPage .indicatorIntro h4{font-weight:700;letter-spacing:0}
+ .goalPage .initiativeIntro p,.goalPage .indicatorIntro p{font-weight:400}
+ .goalPage .indicatorValueWrap{display:flex;align-items:center;gap:6px}
+ .goalPage .indicatorValueRow{align-items:center}
+ .goalPage .varianceLine{display:flex;align-items:center;gap:4px;margin:0;white-space:nowrap}
+ .goalPage .stateAvg{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+ .goalPage .stateAvg b{display:inline;margin:0}
+}
+@media (min-width:1101px) and (max-height:820px){
+ .goalPage{padding-top:10px;padding-bottom:12px;min-height:0}
+ .goalPage .goalTabs{padding-bottom:4px}
+ .goalPage .goalTab{padding:6px 15px;font-size:10px}
+ .goalPage .goalHero{padding:8px 4px 6px}
+ .goalPage .goalHero small{font-size:7.5px}.goalPage .goalHero h2{font-size:23px;line-height:1.05;margin:2px 0 3px}.goalPage .goalHero p{font-size:9px;line-height:1.25}
+ .goalPage .goalHeroIcon{width:38px;height:38px;font-size:17px}
+ .goalPage .goalSectionTitle{margin:4px 0 5px}.goalPage .goalSectionTitle small{font-size:7.5px}.goalPage .goalSectionTitle h3{font-size:16px;line-height:1.05;margin:1px 0}.goalPage .goalSectionTitle>span{font-size:7.5px}
+ .goalPage .initiativeGrid{gap:8px}
+ .goalPage .initiativeIntro{height:57px;padding:7px 10px}.goalPage .initiativeIntro h4{font-size:10px;line-height:1.12;margin:0 0 2px}.goalPage .initiativeIntro p{font-size:7.5px;line-height:1.18;-webkit-line-clamp:2}
+ .goalPage .initiativeSummary{margin:5px 7px 3px;padding:5px 7px;min-height:47px}.goalPage .initiativeSummary .duration{font-size:6.5px}.goalPage .donePct{margin-top:2px;font-size:7px}.goalPage .donePct b{font-size:15px}
+ .goalPage .gauge{width:34px;height:34px}.goalPage .gauge:after{width:25px;height:25px}.goalPage .gauge b{font-size:7px}
+ .goalPage .subChart{padding:1px 7px 5px}.goalPage .subRow{grid-template-columns:82px minmax(0,1fr);gap:4px;margin:2px 0}.goalPage .subRow>span{font-size:6.5px}.goalPage .subBar{height:11px}.goalPage .subBar i{font-size:6px}.goalPage .subLegend{margin:4px 0 0 86px;gap:5px;font-size:6px}.goalPage .subLegend i{width:5px;height:5px}
+ .goalPage .indicatorTitle{margin-top:7px}
+ .goalPage .indicatorGrid{gap:8px}.goalPage .indicatorCard{padding:7px 9px}
+ .goalPage .indicatorIntro h4{font-size:10px;line-height:1.1;margin:0 0 2px}.goalPage .indicatorIntro p{font-size:7px;line-height:1.15;height:18px;-webkit-line-clamp:2}
+ .goalPage .indicatorValueRow{margin:3px 0 2px}.goalPage .indicatorValueWrap{gap:5px}.goalPage .indicatorValue{font-size:20px;line-height:1}
+ .goalPage .varianceLine{height:13px;min-height:13px}.goalPage .varianceLabel{font-size:6.5px!important}.goalPage .variance{height:13px!important;min-height:13px!important;font-size:6.5px!important;padding:1px 3px!important}
+ .goalPage .stateAvg{font-size:6.5px;gap:5px}.goalPage .stateAvg b{font-size:16px;line-height:1}
+ .goalPage .yearBars{height:28px;gap:4px}.goalPage .yearLabels{font-size:6px!important;margin-top:2px!important}
+ #globalFooter{height:30px;min-height:30px;padding:3px 3%}
+}
