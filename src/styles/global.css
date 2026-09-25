@@ -92,3 +92,28 @@
  .goalPage .indicatorValueRow{margin:4px 0}.goalPage .indicatorValue{font-size:23px}.goalPage .stateAvg{font-size:7px}.goalPage .stateAvg b{font-size:9px}
  .goalPage .yearBars{height:38px;gap:4px}.goalPage .yearLabels{font-size:6.5px}.goalPage .varianceLine{margin-top:3px}
 }
+
+/* Goal screenshot acceptance baseline — compensate for React flow header and lock desktop density */
+@media (min-width:1101px) and (min-height:760px){
+ .goalPage{padding:24px 3.75% 42px;min-height:calc(100vh - 58px)}
+ .goalPage .goalTabs{padding-bottom:7px}
+ .goalPage .goalTab{padding:7px 15px}
+ .goalPage .goalHero{padding:13px 4px 10px}
+ .goalPage .goalHero small{font-size:8px}.goalPage .goalHero h2{font-size:26px;margin:3px 0}.goalPage .goalHero p{font-size:10px;line-height:1.35}
+ .goalPage .goalHeroIcon{width:42px;height:42px;font-size:19px}
+ .goalPage .goalSectionTitle{margin:7px 0 7px}.goalPage .goalSectionTitle small{font-size:8px}.goalPage .goalSectionTitle h3{font-size:17px;margin:2px 0}.goalPage .goalSectionTitle>span{font-size:8px}
+ .goalPage .initiativeIntro{height:70px;padding:9px 11px}.goalPage .initiativeIntro h4{font-size:11px}.goalPage .initiativeIntro p{font-size:8px}
+ .goalPage .initiativeSummary{margin:6px 8px 4px;padding:6px 8px;min-height:55px}.goalPage .donePct b{font-size:17px}
+ .goalPage .gauge{width:39px;height:39px}.goalPage .gauge:after{width:29px;height:29px}
+ .goalPage .subChart{padding:1px 8px 7px}.goalPage .subRow{grid-template-columns:96px minmax(0,1fr);margin:3px 0}.goalPage .subBar{height:13px}.goalPage .subLegend{margin-top:5px}
+ .goalPage .indicatorTitle{margin-top:12px}
+ .goalPage .indicatorCard{padding:8px 10px}.goalPage .indicatorIntro h4{font-size:11px}.goalPage .indicatorIntro p{font-size:7.5px;height:27px}
+ .goalPage .indicatorValueRow{align-items:center;margin:4px 0 3px}
+ .goalPage .indicatorValueWrap{display:flex;align-items:center;gap:7px;min-width:0}
+ .goalPage .indicatorValue{font-size:23px;line-height:1;font-weight:800}
+ .goalPage .varianceLine{display:flex;align-items:center;gap:4px;margin:0;height:15px;min-height:15px;white-space:nowrap}
+ .goalPage .varianceLabel{font-size:7px!important;line-height:1!important}
+ .goalPage .variance{height:14px!important;min-height:14px!important;padding:1px 4px!important;font-size:7px!important}
+ .goalPage .stateAvg{display:flex;align-items:baseline;gap:8px;font-size:7px;white-space:nowrap}.goalPage .stateAvg b{display:inline;font-size:18px;line-height:1;color:#e4edf5}
+ .goalPage .yearBars{height:36px}.goalPage .yearLabels{font-size:6.5px}
+}
