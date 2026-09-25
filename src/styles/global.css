@@ -248,3 +248,60 @@ a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.k
   line-height:1!important;
   color:#f0f4f8!important;
 }
+
+/* Initiative progress conditional color + detailed hover/focus tooltip */
+.goalPage .gauge{
+  background:conic-gradient(var(--progress-color,#58ad54) var(--pct),#203247 0)!important;
+  cursor:help;
+}
+.goalPage .initiativeProgressTooltip{
+  position:absolute;
+  z-index:80;
+  right:-8px;
+  bottom:calc(100% + 10px);
+  width:300px;
+  padding:10px 12px;
+  border:1px solid #35516a;
+  border-radius:7px;
+  background:#071523;
+  box-shadow:0 10px 26px rgba(0,0,0,.34);
+  color:#dbe7f1;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(4px);
+  transition:opacity .14s ease,transform .14s ease,visibility .14s;
+  pointer-events:none;
+  text-align:left;
+}
+.goalPage .initiativeProgressTooltip:after{
+  content:'';
+  position:absolute;
+  right:24px;
+  top:100%;
+  border:6px solid transparent;
+  border-top-color:#35516a;
+}
+.goalPage .initiativeProgressTooltip div{
+  display:grid;
+  grid-template-columns:112px 8px minmax(0,1fr);
+  gap:4px;
+  align-items:start;
+  margin:4px 0;
+  font-size:9px;
+  line-height:1.3;
+}
+.goalPage .initiativeProgressTooltip div:before{
+  content:'-';
+  grid-column:2;
+  grid-row:1;
+  color:#7890a5;
+}
+.goalPage .initiativeProgressTooltip span{grid-column:1;color:#91a5b7;white-space:nowrap}
+.goalPage .initiativeProgressTooltip b{grid-column:3;font-size:9px;font-weight:600;color:#eef5fb;overflow-wrap:anywhere}
+.goalPage .gauge:hover .initiativeProgressTooltip,
+.goalPage .gauge:focus-visible .initiativeProgressTooltip{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.goalPage .gauge:focus-visible{outline:2px solid #1597ff;outline-offset:2px}
