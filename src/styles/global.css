@@ -283,20 +283,15 @@ a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.k
 }
 .goalPage .initiativeProgressTooltip div{
   display:grid;
-  grid-template-columns:112px 8px minmax(0,1fr);
-  gap:4px;
+  grid-template-columns:116px 12px minmax(0,1fr);
+  column-gap:5px;
   align-items:start;
-  margin:4px 0;
+  margin:5px 0;
   font-size:9px;
-  line-height:1.3;
-}
-.goalPage .initiativeProgressTooltip div:before{
-  content:'-';
-  grid-column:2;
-  grid-row:1;
-  color:#7890a5;
+  line-height:1.35;
 }
 .goalPage .initiativeProgressTooltip span{grid-column:1;color:#91a5b7;white-space:nowrap}
+.goalPage .initiativeProgressTooltip em{grid-column:2;font-style:normal;color:#91a5b7;text-align:center}
 .goalPage .initiativeProgressTooltip b{grid-column:3;font-size:9px;font-weight:600;color:#eef5fb;overflow-wrap:anywhere}
 .goalPage .gauge:hover .initiativeProgressTooltip,
 .goalPage .gauge:focus-visible .initiativeProgressTooltip{
