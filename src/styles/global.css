@@ -311,3 +311,15 @@ a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.k
 @keyframes k12LogoPulse{0%,100%{opacity:.72;transform:scale(.98)}50%{opacity:1;transform:scale(1.02)}}
 @keyframes k12LoadSlide{0%{left:-40%}100%{left:102%}}
 @media(prefers-reduced-motion:reduce){.k12LoaderLogo,.k12LoaderPulse:after{animation:none}.k12LoaderPulse:after{left:31%}}
+
+/* V2 header branding refinement — preserves the existing 70px header height */
+.topbar .brand{gap:11px}
+.topbar .brand>b{font-size:16px;font-weight:750;line-height:1.1;letter-spacing:-.01em}
+.districtLogo{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center}
+.districtLogo svg{width:38px;height:38px;overflow:visible}
+.districtLogo svg path{fill:none;stroke:#68bdf2;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.headerPowered{display:flex;align-items:center;gap:5px;margin-left:7px;padding-left:12px;border-left:1px solid #31506a;color:#8298aa;font-size:8px;white-space:nowrap}
+.headerPowered strong{font-size:11px;color:#f3f7fb}
+.headerPowered strong span{color:#3ba8ef}
+.app-shell{padding-bottom:0}
+@media(max-width:650px){.topbar .brand>b{font-size:13px}.headerPowered{display:none}.districtLogo{width:32px;height:32px;flex-basis:32px}.districtLogo svg{width:32px;height:32px}}
