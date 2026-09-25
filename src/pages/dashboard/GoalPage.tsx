@@ -109,7 +109,7 @@ export function GoalPage(){
             <span className="duration">Duration: {i.start||'—'} — {i.end||'—'}</span>
             <div className="donePct"><b>{i.completion.toFixed(0)}%</b> Done</div>
           </div>
-          <div className="gauge" style={{'--pct':i.completion+'%','--progress-color':`hsl(${Math.round(i.completion*1.2)} 72% 48%)`} as React.CSSProperties} tabIndex={0} aria-label={`${i.shortName} progress: ${i.completion.toFixed(0)}% completed`}>
+          <div className="gauge" style={{'--pct':i.completion+'%','--progress-color':(i.completion>=100?'var(--green)':`hsl(${Math.round(i.completion*1.2)} 72% 48%)`)} as React.CSSProperties} tabIndex={0} aria-label={`${i.shortName} progress: ${i.completion.toFixed(0)}% completed`}>
             <b>{i.completion.toFixed(0)}%</b>
             <div className="initiativeProgressTooltip" role="tooltip">
               <div><span>Initiative Name</span><b>{i.shortName}</b></div>
