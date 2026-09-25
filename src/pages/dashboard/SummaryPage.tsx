@@ -1,6 +1,6 @@
 import {useEffect,useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {getGoals,getIndicators,getInitiatives,Goal,Indicator,Initiative} from '../../lib/dashboard';
+import {getGoals,getIndicators,getInitiatives,getProfile,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 
 type Bundle={goal:Goal;indicators:Indicator[];initiatives:Initiative[]};
@@ -12,12 +12,12 @@ const goalImages=[
 ];
 
 export function SummaryPage(){
- const nav=useNavigate(),goals=useDashboard(getGoals),[bundles,setBundles]=useState<Bundle[]>([]),[err,setErr]=useState('');
+ const nav=useNavigate(),goals=useDashboard(getGoals),profile=useDashboard(getProfile),[bundles,setBundles]=useState<Bundle[]>([]),[err,setErr]=useState('');
  useEffect(()=>{if(!goals.data)return;Promise.all(goals.data.map(async goal=>({goal,indicators:await getIndicators(goal.id),initiatives:await getInitiatives(goal.id)}))).then(setBundles).catch(e=>setErr(e.message))},[goals.data]);
- if(goals.loading||(!bundles.length&&!err))return <main className="page state">Loading strategic plan summary…</main>;
- if(goals.error||err)return <main className="page state error">{goals.error||err}</main>;
+ if(goals.loading||profile.loading||(!bundles.length&&!err))return <main className="page state">Loading strategic plan summary…</main>;
+ if(goals.error||profile.error||err)return <main className="page state error">{goals.error||profile.error||err}</main>;
  return <main className="page summaryPage">
-  <div className="summaryHeading"><div><small>STRATEGIC PLAN</small><h1>Goal Summary</h1></div><span>{bundles.length} Goals</span></div>
+  <div className="summaryHeading"><div><small>{profile.data?.planName||'Strategic Plan'}{profile.data?.duration?` · ${profile.data.duration}`:''}</small><h1>Goal Summary</h1></div><span>{bundles.length} Goals</span></div>
   <section className="summaryGrid">{bundles.map(({goal,indicators,initiatives},idx)=>{
    const all=initiatives.reduce((a,x)=>({d:a.d+x.done,p:a.p+x.inProgress,n:a.n+x.notStarted}),{d:0,p:0,n:0}),total=all.d+all.p+all.n;
    const pct=(n:number)=>total?Math.round(100*n/total):0;
