@@ -222,3 +222,12 @@
  .app-shell:has(.goalPage) .yearBars{height:34px;margin-top:1px!important;margin-bottom:1px}
  .app-shell:has(.goalPage) .yearLabels{font-size:8.5px!important;color:#9eb0c1!important;margin-top:5px!important;font-weight:600}
 }
+
+/* Goal indicator feedback */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorIntro{height:48px;min-height:48px;margin-bottom:1px;padding-bottom:4px}
+ .app-shell:has(.goalPage) .indicatorValueRow{min-height:29px;margin:0 0 7px!important;transform:translateY(-2px)}
+ .app-shell:has(.goalPage) .yearBars{height:34px;margin-top:0!important}
+ .app-shell:has(.goalPage) .yearBars i{position:relative;overflow:visible}
+ .app-shell:has(.goalPage) .yearBars i b{position:absolute;left:0;right:0;top:2px;text-align:center;color:#dce8f2;font-size:7px;line-height:1;font-weight:700;white-space:nowrap}
+}
