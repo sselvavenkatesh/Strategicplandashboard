@@ -300,3 +300,14 @@ a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.k
   transform:translateY(0);
 }
 .goalPage .gauge:focus-visible{outline:2px solid #1597ff;outline-offset:2px}
+
+/* V2 navigation loader — K12Matrix brand animation */
+.pageLoader{position:fixed;inset:0;z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#06111ef2;backdrop-filter:blur(3px)}
+.k12LoaderLogo{font-size:22px;font-weight:800;letter-spacing:-.4px;color:#fff;animation:k12LogoPulse 1s ease-in-out infinite}
+.k12LoaderLogo span{color:#3ba8ef}
+.k12LoaderPulse{width:96px;height:2px;border-radius:999px;background:#18334a;overflow:hidden;position:relative}
+.k12LoaderPulse:after{content:'';position:absolute;top:0;bottom:0;width:38%;border-radius:999px;background:#3ba8ef;animation:k12LoadSlide .85s ease-in-out infinite}
+.pageLoader small{font-size:8px;letter-spacing:1.1px;text-transform:uppercase;color:#7890a5}
+@keyframes k12LogoPulse{0%,100%{opacity:.72;transform:scale(.98)}50%{opacity:1;transform:scale(1.02)}}
+@keyframes k12LoadSlide{0%{left:-40%}100%{left:102%}}
+@media(prefers-reduced-motion:reduce){.k12LoaderLogo,.k12LoaderPulse:after{animation:none}.k12LoaderPulse:after{left:31%}}
