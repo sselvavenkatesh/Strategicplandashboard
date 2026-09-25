@@ -53,3 +53,250 @@
   .summaryPage .varianceLine{margin-top:2px;height:14px}
   .kpiYear{margin-top:2px}
 }
+
+/* Goal page preview — frozen UX parity */
+.goalPage{min-height:100vh;padding:84px 4% 42px;width:100%;max-width:none;background:radial-gradient(circle at 18% 0,#122a43,#07111e 52%)}
+.goalPage .goalTabs{display:flex;gap:7px;overflow-x:auto;padding:0 0 9px;border-bottom:1px solid #20374d}
+.goalPage .goalTab{flex:0 0 auto;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#8295a8;padding:8px 15px;font-size:11px;cursor:pointer}
+.goalPage .goalTab.active{color:#fff;border-color:transparent;border-bottom-color:#1597ff;background:transparent}
+.goalPage .goalHero{display:flex;justify-content:space-between;align-items:center;border:0;padding:18px 4px 14px}
+.goalPage .goalHero small,.goalPage .goalSectionTitle small{font-size:9px;letter-spacing:1.5px;color:#6f9ec3}.goalPage .goalHero h2{font-size:28px;margin:5px 0}.goalPage .goalHero p{max-width:850px;margin:0;color:#aebdcc;font-size:12px;line-height:1.45}
+.goalPage .goalHeroIcon{width:48px;height:48px;display:grid;place-items:center;border:1px solid #31526d;border-radius:12px;background:#10263a;color:#70bdf3;font-size:21px}
+.goalSectionTitle{display:flex;align-items:end;justify-content:space-between;margin:10px 0 9px}.goalSectionTitle h3{font-size:18px;margin:3px 0}.goalSectionTitle>span{font-size:9px;color:#708397}
+.goalPage .initiativeGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.goalPage .initiativeCard.detailed{background:#0b1a2a;border:1px solid #29425b;border-radius:8px;padding:0;overflow:hidden;cursor:pointer;text-align:left;color:var(--text);transition:.18s}
+.goalPage .initiativeCard:hover,.goalPage .initiativeCard:focus-visible,.goalPage .indicatorCard:hover,.goalPage .indicatorCard:focus-visible{border-color:#3b83b7;background:#0e2134;outline:none;box-shadow:0 5px 18px rgba(21,151,255,.10);transform:translateY(-1px)}
+.goalPage .initiativeIntro{height:86px;padding:12px 14px;background:linear-gradient(90deg,#17283a,#102131)}.goalPage .initiativeIntro h4{margin:0 0 6px;font-size:13px}.goalPage .initiativeIntro p{margin:0;color:#c2ccd6;font-size:11px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.goalPage .initiativeSummary{margin:10px 12px 7px;padding:10px 12px;min-height:72px;background:#101b28;border:1px solid #22384d;border-radius:6px;display:flex;align-items:center;justify-content:space-between}.goalPage .initiativeSummary .duration{display:block;margin:0;font-size:9px;font-weight:700;color:#9eacba}.goalPage .donePct{margin-top:8px;font-size:10px}.goalPage .donePct b{font-size:20px;margin-right:4px}
+.goalPage .gauge{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#58ad54 var(--pct),#203247 0);position:relative}.goalPage .gauge:after{content:'';position:absolute;width:37px;height:37px;background:#0b1a2a;border-radius:50%}.goalPage .gauge b{z-index:1;font-size:9px}
+.goalPage .subChart{padding:3px 13px 11px}.goalPage .subRow{display:grid;grid-template-columns:145px 1fr;align-items:center;gap:8px;margin:6px 0}.goalPage .subRow>span{font-size:9px;color:#c0ccd7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}.goalPage .subBar{height:18px;display:flex;overflow:hidden;border-radius:2px}.goalPage .subBar i{display:grid;place-items:center;font-style:normal;font-size:8px;color:#101820;font-weight:700;min-width:0}.goalPage .subLegend{display:flex;gap:12px;margin:10px 0 0 153px;font-size:8px;color:#9babb9}.goalPage .subLegend span{display:flex;align-items:center;gap:4px}.goalPage .subLegend i{width:7px;height:7px;border-radius:2px}
+.goalPage .indicatorTitle{margin-top:18px}.goalPage .indicatorGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.goalPage .indicatorCard{background:#0b1a2a;border:1px solid #29425b;border-radius:8px;padding:11px;cursor:pointer;text-align:left;color:var(--text);transition:.18s}
+.goalPage .indicatorIntro h4{font-size:13px;margin:0 0 5px}.goalPage .indicatorIntro p{font-size:9px;color:#90a3b5;line-height:1.35;height:38px;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.goalPage .indicatorValueRow{display:flex;align-items:end;justify-content:space-between;margin:5px 0}.goalPage .indicatorValue{font-size:24px;font-weight:800}.goalPage .stateAvg{font-size:8px;color:#71879a;text-align:right}.goalPage .stateAvg b{display:block;color:#b4c2cf;font-size:10px}.goalPage .yearBars{height:42px;display:flex;align-items:end;gap:5px;border-bottom:1px solid #294057;padding:0 2px}.goalPage .yearBars i{flex:1;background:#2389d7;border-radius:2px 2px 0 0;opacity:.7;min-width:7px}.goalPage .yearLabels{display:flex;justify-content:space-between;color:#60788e;font-size:7px;margin-top:3px}.goalPage .varianceLine{margin-top:6px}
+.goalPage .modalCard .subChart{padding-left:0;padding-right:0}.goalPage .modalCard .subLegend{margin-left:153px}
+@media(max-width:1000px){.goalPage .initiativeGrid,.goalPage .indicatorGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.goalPage{padding:74px 14px 30px}.goalPage .goalHero{align-items:flex-start}.goalPage .goalHero h2{font-size:23px}.goalPage .goalHeroIcon{width:38px;height:38px}.goalPage .initiativeGrid,.goalPage .indicatorGrid{grid-template-columns:1fr}.goalPage .goalSectionTitle>span{display:none}.goalPage .initiativeCard{padding:0}.goalPage .indicatorGrid{gap:7px}.goalPage .subRow{grid-template-columns:115px 1fr}.goalPage .subLegend{margin-left:123px}}
+
+/* Goal page desktop screenshot parity — 4-up compact cards */
+@media (min-width:1101px){
+ .goalPage{padding:82px 3.75% 44px}
+ .goalPage .goalHero{padding:15px 4px 12px}
+ .goalPage .goalHero h2{font-size:27px;margin:4px 0}.goalPage .goalHero p{font-size:11px}
+ .goalSectionTitle{margin:8px 0 8px}.goalSectionTitle h3{font-size:18px}
+ .goalPage .initiativeGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+ .goalPage .initiativeIntro{height:76px;padding:10px 12px}.goalPage .initiativeIntro h4{font-size:12px;margin-bottom:4px}.goalPage .initiativeIntro p{font-size:9px;line-height:1.35;-webkit-line-clamp:3}
+ .goalPage .initiativeSummary{margin:7px 9px 5px;padding:7px 9px;min-height:60px}.goalPage .initiativeSummary .duration{font-size:7px}.goalPage .donePct{margin-top:5px;font-size:8px}.goalPage .donePct b{font-size:18px}
+ .goalPage .gauge{width:42px;height:42px}.goalPage .gauge:after{width:31px;height:31px}.goalPage .gauge b{font-size:8px}
+ .goalPage .subChart{padding:2px 9px 8px}.goalPage .subRow{grid-template-columns:96px minmax(0,1fr);gap:6px;margin:4px 0}.goalPage .subRow>span{font-size:7px}.goalPage .subBar{height:14px}.goalPage .subBar i{font-size:6.5px}
+ .goalPage .subLegend{gap:7px;margin:7px 0 0 102px;font-size:6.5px}.goalPage .subLegend i{width:6px;height:6px}
+ .goalPage .indicatorTitle{margin-top:14px}.goalPage .indicatorGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+ .goalPage .indicatorCard{padding:9px 10px;min-height:0}.goalPage .indicatorIntro h4{font-size:12px;margin-bottom:4px}.goalPage .indicatorIntro p{font-size:8px;line-height:1.3;height:31px;-webkit-line-clamp:3}
+ .goalPage .indicatorValueRow{margin:4px 0}.goalPage .indicatorValue{font-size:23px}.goalPage .stateAvg{font-size:7px}.goalPage .stateAvg b{font-size:9px}
+ .goalPage .yearBars{height:38px;gap:4px}.goalPage .yearLabels{font-size:6.5px}.goalPage .varianceLine{margin-top:3px}
+}
+
+/* Goal screenshot acceptance baseline — compensate for React flow header and lock desktop density */
+@media (min-width:1101px) and (min-height:760px){
+ .goalPage{padding:24px 3.75% 42px;min-height:calc(100vh - 58px)}
+ .goalPage .goalTabs{padding-bottom:7px}
+ .goalPage .goalTab{padding:7px 15px}
+ .goalPage .goalHero{padding:13px 4px 10px}
+ .goalPage .goalHero small{font-size:8px}.goalPage .goalHero h2{font-size:26px;margin:3px 0}.goalPage .goalHero p{font-size:10px;line-height:1.35}
+ .goalPage .goalHeroIcon{width:42px;height:42px;font-size:19px}
+ .goalPage .goalSectionTitle{margin:7px 0 7px}.goalPage .goalSectionTitle small{font-size:8px}.goalPage .goalSectionTitle h3{font-size:17px;margin:2px 0}.goalPage .goalSectionTitle>span{font-size:8px}
+ .goalPage .initiativeIntro{height:70px;padding:9px 11px}.goalPage .initiativeIntro h4{font-size:11px}.goalPage .initiativeIntro p{font-size:8px}
+ .goalPage .initiativeSummary{margin:6px 8px 4px;padding:6px 8px;min-height:55px}.goalPage .donePct b{font-size:17px}
+ .goalPage .gauge{width:39px;height:39px}.goalPage .gauge:after{width:29px;height:29px}
+ .goalPage .subChart{padding:1px 8px 7px}.goalPage .subRow{grid-template-columns:96px minmax(0,1fr);margin:3px 0}.goalPage .subBar{height:13px}.goalPage .subLegend{margin-top:5px}
+ .goalPage .indicatorTitle{margin-top:12px}
+ .goalPage .indicatorCard{padding:8px 10px}.goalPage .indicatorIntro h4{font-size:11px}.goalPage .indicatorIntro p{font-size:7.5px;height:27px}
+ .goalPage .indicatorValueRow{align-items:center;margin:4px 0 3px}
+ .goalPage .indicatorValueWrap{display:flex;align-items:center;gap:7px;min-width:0}
+ .goalPage .indicatorValue{font-size:23px;line-height:1;font-weight:800}
+ .goalPage .varianceLine{display:flex;align-items:center;gap:4px;margin:0;height:15px;min-height:15px;white-space:nowrap}
+ .goalPage .varianceLabel{font-size:7px!important;line-height:1!important}
+ .goalPage .variance{height:14px!important;min-height:14px!important;padding:1px 4px!important;font-size:7px!important}
+ .goalPage .stateAvg{display:flex;align-items:baseline;gap:8px;font-size:7px;white-space:nowrap}.goalPage .stateAvg b{display:inline;font-size:18px;line-height:1;color:#e4edf5}
+ .goalPage .yearBars{height:36px}.goalPage .yearLabels{font-size:6.5px}
+}
+
+/* Goal page final desktop acceptance pass — match frozen compact UX and fit short laptop viewports */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage){padding-bottom:38px}
+ .goalPage{padding-left:4%;padding-right:4%;max-width:none}
+ .goalPage .initiativeIntro h4,.goalPage .indicatorIntro h4{font-weight:700;letter-spacing:0}
+ .goalPage .initiativeIntro p,.goalPage .indicatorIntro p{font-weight:400}
+ .goalPage .indicatorValueWrap{display:flex;align-items:center;gap:6px}
+ .goalPage .indicatorValueRow{align-items:center}
+ .goalPage .varianceLine{display:flex;align-items:center;gap:4px;margin:0;white-space:nowrap}
+ .goalPage .stateAvg{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+ .goalPage .stateAvg b{display:inline;margin:0}
+}
+@media (min-width:1101px) and (max-height:820px){
+ .goalPage{padding-top:10px;padding-bottom:12px;min-height:0}
+ .goalPage .goalTabs{padding-bottom:4px}
+ .goalPage .goalTab{padding:6px 15px;font-size:10px}
+ .goalPage .goalHero{padding:8px 4px 6px}
+ .goalPage .goalHero small{font-size:7.5px}.goalPage .goalHero h2{font-size:23px;line-height:1.05;margin:2px 0 3px}.goalPage .goalHero p{font-size:9px;line-height:1.25}
+ .goalPage .goalHeroIcon{width:38px;height:38px;font-size:17px}
+ .goalPage .goalSectionTitle{margin:4px 0 5px}.goalPage .goalSectionTitle small{font-size:7.5px}.goalPage .goalSectionTitle h3{font-size:16px;line-height:1.05;margin:1px 0}.goalPage .goalSectionTitle>span{font-size:7.5px}
+ .goalPage .initiativeGrid{gap:8px}
+ .goalPage .initiativeIntro{height:57px;padding:7px 10px}.goalPage .initiativeIntro h4{font-size:10px;line-height:1.12;margin:0 0 2px}.goalPage .initiativeIntro p{font-size:7.5px;line-height:1.18;-webkit-line-clamp:2}
+ .goalPage .initiativeSummary{margin:5px 7px 3px;padding:5px 7px;min-height:47px}.goalPage .initiativeSummary .duration{font-size:6.5px}.goalPage .donePct{margin-top:2px;font-size:7px}.goalPage .donePct b{font-size:15px}
+ .goalPage .gauge{width:34px;height:34px}.goalPage .gauge:after{width:25px;height:25px}.goalPage .gauge b{font-size:7px}
+ .goalPage .subChart{padding:1px 7px 5px}.goalPage .subRow{grid-template-columns:82px minmax(0,1fr);gap:4px;margin:2px 0}.goalPage .subRow>span{font-size:6.5px}.goalPage .subBar{height:11px}.goalPage .subBar i{font-size:6px}.goalPage .subLegend{margin:4px 0 0 86px;gap:5px;font-size:6px}.goalPage .subLegend i{width:5px;height:5px}
+ .goalPage .indicatorTitle{margin-top:7px}
+ .goalPage .indicatorGrid{gap:8px}.goalPage .indicatorCard{padding:7px 9px}
+ .goalPage .indicatorIntro h4{font-size:10px;line-height:1.1;margin:0 0 2px}.goalPage .indicatorIntro p{font-size:7px;line-height:1.15;height:18px;-webkit-line-clamp:2}
+ .goalPage .indicatorValueRow{margin:3px 0 2px}.goalPage .indicatorValueWrap{gap:5px}.goalPage .indicatorValue{font-size:20px;line-height:1}
+ .goalPage .varianceLine{height:13px;min-height:13px}.goalPage .varianceLabel{font-size:6.5px!important}.goalPage .variance{height:13px!important;min-height:13px!important;font-size:6.5px!important;padding:1px 3px!important}
+ .goalPage .stateAvg{font-size:6.5px;gap:5px}.goalPage .stateAvg b{font-size:16px;line-height:1}
+ .goalPage .yearBars{height:28px;gap:4px}.goalPage .yearLabels{font-size:6px!important;margin-top:2px!important}
+ #globalFooter{height:30px;min-height:30px;padding:3px 3%}
+}
+
+/* Goal page UX screenshot lock — reference: approved GitHub UX screenshot */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .topbar{height:58px}
+ .app-shell:has(.goalPage) .goalPage{padding:58px 4% 42px;min-height:calc(100vh - 58px);background:radial-gradient(circle at 18% 0,#122a43,#07111e 52%)}
+ .app-shell:has(.goalPage) .goalTabs{padding-bottom:9px;border-bottom:1px solid #20374d}
+ .app-shell:has(.goalPage) .goalTab{padding:8px 15px;font-size:11px}
+ .app-shell:has(.goalPage) .goalHero{padding:12px 4px 10px}
+ .app-shell:has(.goalPage) .goalHero small{font-size:9px}.app-shell:has(.goalPage) .goalHero h2{font-size:23px;line-height:1.1;margin:2px 0}.app-shell:has(.goalPage) .goalHero p{font-size:10px;line-height:1.3;max-width:850px}
+ .app-shell:has(.goalPage) .goalHeroIcon{width:38px;height:38px;font-size:17px}
+ .app-shell:has(.goalPage) .goalSectionTitle{margin:5px 0 6px}.app-shell:has(.goalPage) .goalSectionTitle small{font-size:9px}.app-shell:has(.goalPage) .goalSectionTitle h3{font-size:16px;line-height:1.1;margin:1px 0}.app-shell:has(.goalPage) .goalSectionTitle>span{font-size:9px}
+ .app-shell:has(.goalPage) .initiativeGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+ .app-shell:has(.goalPage) .initiativeCard.detailed{height:219px}
+ .app-shell:has(.goalPage) .initiativeIntro{height:66px;padding:9px 10px}.app-shell:has(.goalPage) .initiativeIntro h4{font-size:11px;line-height:1.15;margin:0 0 3px;font-weight:700}.app-shell:has(.goalPage) .initiativeIntro p{font-size:9px;line-height:1.25;-webkit-line-clamp:2}
+ .app-shell:has(.goalPage) .initiativeSummary{height:54px;min-height:54px;margin:6px 8px 4px;padding:6px 8px}.app-shell:has(.goalPage) .initiativeSummary .duration{font-size:7.5px}.app-shell:has(.goalPage) .donePct{margin-top:4px;font-size:8px}.app-shell:has(.goalPage) .donePct b{font-size:15px}
+ .app-shell:has(.goalPage) .gauge{width:38px;height:38px}.app-shell:has(.goalPage) .gauge:after{width:28px;height:28px}.app-shell:has(.goalPage) .gauge b{font-size:8px}
+ .app-shell:has(.goalPage) .subChart{height:87px;padding:1px 8px 7px;overflow:hidden}.app-shell:has(.goalPage) .subRow{grid-template-columns:78px minmax(0,1fr);gap:5px;margin:3px 0}.app-shell:has(.goalPage) .subRow>span{font-size:7.5px}.app-shell:has(.goalPage) .subBar{height:13px}.app-shell:has(.goalPage) .subBar i{font-size:6.5px}.app-shell:has(.goalPage) .subLegend{margin:6px 0 0 83px;gap:6px;font-size:6.5px}
+ .app-shell:has(.goalPage) .indicatorTitle{margin-top:10px}
+ .app-shell:has(.goalPage) .indicatorGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+ .app-shell:has(.goalPage) .indicatorCard{height:157px;padding:9px 10px}
+ .app-shell:has(.goalPage) .indicatorIntro h4{font-size:11px;line-height:1.15;margin:0 0 3px;font-weight:700}.app-shell:has(.goalPage) .indicatorIntro p{font-size:9px;line-height:1.25;height:31px;-webkit-line-clamp:2}
+ .app-shell:has(.goalPage) .indicatorValueRow{height:34px;align-items:center;margin:3px 0}
+ .app-shell:has(.goalPage) .indicatorValueWrap{display:flex;align-items:center;gap:6px}.app-shell:has(.goalPage) .indicatorValue{font-size:21px;line-height:1;font-weight:800}
+ .app-shell:has(.goalPage) .varianceLine{display:flex;align-items:center;gap:4px;margin:0;height:16px;min-height:16px}.app-shell:has(.goalPage) .varianceLabel{font-size:8px!important}.app-shell:has(.goalPage) .variance{height:15px!important;min-height:15px!important;font-size:7.5px!important;padding:1px 4px!important}
+ .app-shell:has(.goalPage) .stateAvg{display:flex;align-items:baseline;gap:5px;font-size:10px;color:#f0f4f8;text-align:left}.app-shell:has(.goalPage) .stateAvg b{display:inline;margin:0;font-size:20px;line-height:1;color:#f0f4f8}
+ .app-shell:has(.goalPage) .yearBars{height:34px;gap:5px}.app-shell:has(.goalPage) .yearLabels{font-size:8.5px!important;margin-top:5px!important}
+}
+@media (min-width:1101px) and (max-height:820px){
+ .app-shell:has(.goalPage) .goalPage{padding-top:58px}
+}
+
+/* Goal indicators — exact UX typography / vertical rhythm / LY variance treatment */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorCard{height:157px;padding:9px 10px}
+ .app-shell:has(.goalPage) .indicatorIntro{height:52px}
+ .app-shell:has(.goalPage) .indicatorIntro h4{font-size:11px;line-height:1.15;margin:0 0 5px;font-weight:700}
+ .app-shell:has(.goalPage) .indicatorIntro p{font-size:9px;line-height:1.3;height:auto;max-height:25px;margin:0;color:#b9c6d2;-webkit-line-clamp:2}
+ .app-shell:has(.goalPage) .indicatorValueRow{height:30px;display:flex;align-items:center;justify-content:space-between;margin:0 0 3px}
+ .app-shell:has(.goalPage) .indicatorValueWrap{display:flex;align-items:center;gap:7px;min-width:0}
+ .app-shell:has(.goalPage) .indicatorValue{font-size:21px;line-height:1;font-weight:800;letter-spacing:-.02em}
+ .app-shell:has(.goalPage) .varianceLine{display:flex;align-items:center;gap:4px;margin:0;height:16px;min-height:16px;white-space:nowrap}
+ .app-shell:has(.goalPage) .varianceLabel{font-size:8px!important;line-height:1!important;color:#8799ab!important;font-weight:500!important}
+ .app-shell:has(.goalPage) .variance{display:inline-flex!important;align-items:center;gap:2px;height:15px!important;min-height:15px!important;padding:1px 4px!important;border-radius:5px!important;font-size:7.5px!important;line-height:1!important;font-weight:600!important;opacity:.78}
+ .app-shell:has(.goalPage) .variance.positive{background:rgba(71,148,116,.22)!important;color:#87c7a8!important}
+ .app-shell:has(.goalPage) .variance.negative{background:rgba(205,92,84,.20)!important;color:#e59a94!important}
+ .app-shell:has(.goalPage) .variance .trend{font-size:8px!important;line-height:1!important}
+ .app-shell:has(.goalPage) .stateAvg{display:flex;align-items:baseline;gap:5px;font-size:10px;color:#f0f4f8;white-space:nowrap}
+ .app-shell:has(.goalPage) .stateAvg b{display:inline;margin:0;font-size:20px;line-height:1;font-weight:800;color:#f0f4f8}
+ .app-shell:has(.goalPage) .yearBars{height:34px;margin:0 0 1px}
+}
+
+/* Goal indicator component — frozen UX source-of-truth override */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorCard{height:auto;min-height:0;padding:9px 10px;overflow:hidden}
+ .app-shell:has(.goalPage) .indicatorIntro{box-sizing:border-box;min-height:52px;height:52px;margin:-9px -10px 4px;padding:9px 10px 6px;background:linear-gradient(90deg,#17283a,#102131)}
+ .app-shell:has(.goalPage) .indicatorIntro h4{margin:0 0 4px;font-size:11px;line-height:1.2;color:#f0f4f8;font-weight:700}
+ .app-shell:has(.goalPage) .indicatorIntro p{height:auto;max-height:22px;margin:0;color:#c2ccd6;font-size:8.5px;line-height:1.3;-webkit-line-clamp:2}
+ .app-shell:has(.goalPage) .indicatorValueRow{height:auto;min-height:31px;margin:1px 0 2px!important;display:flex;align-items:center;justify-content:space-between}
+ .app-shell:has(.goalPage) .indicatorValueWrap{display:flex;align-items:center;gap:6px}
+ .app-shell:has(.goalPage) .indicatorValue{font-size:21px;line-height:1;font-weight:800}
+ .app-shell:has(.goalPage) .varianceLine{display:flex;align-items:center;gap:4px;margin:0!important;height:16px;min-height:16px}
+ .app-shell:has(.goalPage) .varianceLabel{font-size:8px!important;color:#74879a!important;line-height:1!important;font-weight:500!important}
+ .app-shell:has(.goalPage) .variance{display:inline-flex!important;align-items:center;gap:2px;height:15px!important;min-height:15px!important;padding:1px 4px!important;border-radius:5px!important;font-size:7.5px!important;font-weight:600!important;line-height:1!important;margin:0!important;opacity:.78}
+ .app-shell:has(.goalPage) .variance.positive{background:rgba(71,148,116,.22)!important;color:#87c7a8!important}
+ .app-shell:has(.goalPage) .variance.negative{background:rgba(205,92,84,.20)!important;color:#e59a94!important}
+ .app-shell:has(.goalPage) .stateAvg{display:flex;align-items:baseline;gap:5px;font-size:10px;color:#f0f4f8;text-align:left}
+ .app-shell:has(.goalPage) .stateAvg b{display:inline;margin:0 0 0 5px;font-size:20px;line-height:1;color:#f0f4f8}
+ .app-shell:has(.goalPage) .yearBars{height:34px;margin-top:1px!important;margin-bottom:1px}
+ .app-shell:has(.goalPage) .yearLabels{font-size:8.5px!important;color:#9eb0c1!important;margin-top:5px!important;font-weight:600}
+}
+
+/* Goal indicator feedback */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorIntro{height:48px;min-height:48px;margin-bottom:1px;padding-bottom:4px}
+ .app-shell:has(.goalPage) .indicatorValueRow{min-height:29px;margin:0 0 7px!important;transform:translateY(-2px)}
+ .app-shell:has(.goalPage) .yearBars{height:34px;margin-top:0!important}
+ .app-shell:has(.goalPage) .yearBars i{position:relative;overflow:visible}
+ .app-shell:has(.goalPage) .yearBars i b{position:absolute;left:0;right:0;top:2px;text-align:center;color:#dce8f2;font-size:7px;line-height:1;font-weight:700;white-space:nowrap}
+}
+
+/* Goal KPI variance stack + pointer affordance */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .varianceLine{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:29px;min-height:29px;margin:0!important;white-space:nowrap}
+ .app-shell:has(.goalPage) .varianceLabel{order:2;font-size:7px!important;line-height:1!important;color:#74879a!important}
+ .app-shell:has(.goalPage) .variance{order:1}
+}
+a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.kpi{cursor:pointer}
+
+/* Goal KPI value typography aligned to Initiative progress percentage */
+.app-shell:has(.goalPage) .indicatorValue,
+.app-shell:has(.goalPage) .stateAvg b{
+  font-size:15px!important;
+  font-weight:700!important;
+  line-height:1!important;
+  color:#f0f4f8!important;
+}
+
+/* Initiative progress conditional color + detailed hover/focus tooltip */
+.goalPage .gauge{
+  background:conic-gradient(var(--progress-color,#58ad54) var(--pct),#203247 0)!important;
+  cursor:help;
+}
+.goalPage .initiativeProgressTooltip{
+  position:absolute;
+  z-index:80;
+  right:-8px;
+  bottom:calc(100% + 10px);
+  width:300px;
+  padding:10px 12px;
+  border:1px solid #35516a;
+  border-radius:7px;
+  background:#071523;
+  box-shadow:0 10px 26px rgba(0,0,0,.34);
+  color:#dbe7f1;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(4px);
+  transition:opacity .14s ease,transform .14s ease,visibility .14s;
+  pointer-events:none;
+  text-align:left;
+}
+.goalPage .initiativeProgressTooltip:after{
+  content:'';
+  position:absolute;
+  right:24px;
+  top:100%;
+  border:6px solid transparent;
+  border-top-color:#35516a;
+}
+.goalPage .initiativeProgressTooltip div{
+  display:grid;
+  grid-template-columns:116px 12px minmax(0,1fr);
+  column-gap:5px;
+  align-items:start;
+  margin:5px 0;
+  font-size:9px;
+  line-height:1.35;
+}
+.goalPage .initiativeProgressTooltip span{grid-column:1;color:#91a5b7;white-space:nowrap}
+.goalPage .initiativeProgressTooltip em{grid-column:2;font-style:normal;color:#91a5b7;text-align:center}
+.goalPage .initiativeProgressTooltip b{grid-column:3;font-size:9px;font-weight:600;color:#eef5fb;overflow-wrap:anywhere}
+.goalPage .gauge:hover .initiativeProgressTooltip,
+.goalPage .gauge:focus-visible .initiativeProgressTooltip{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.goalPage .gauge:focus-visible{outline:2px solid #1597ff;outline-offset:2px}
