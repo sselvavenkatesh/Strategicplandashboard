@@ -35,3 +35,21 @@
 .kpiYear{display:block;color:#60788e;font-size:7px;margin-top:3px}.summaryUnavailable{height:34px;border:1px dashed #30465a;border-radius:5px;display:grid;place-items:center;color:#75899c;font-size:9px;margin:8px 0 6px}
 .summaryGoal:focus-visible{outline:2px solid #1597ff;outline-offset:2px}
 @media(max-width:650px){.summaryPage{padding-top:75px}.summaryHeading h1{font-size:23px}}
+
+/* Goal Summary viewport fit — match frozen UX card geometry */
+@media (min-width:1101px) and (min-height:700px){
+  .summaryPage{padding-top:66px}
+  .summaryHeading{margin-bottom:10px}
+  .summaryHeading h1{font-size:28px;margin:3px 0}
+  .summaryPage .summaryGoal{padding:0;border-radius:9px;overflow:hidden}
+  .summaryPage .goalImage{height:88px;border-radius:0}
+  .summaryPage .summaryBody{padding:11px 13px 10px}
+  .summaryPage .summaryGoal h2{height:36px;margin:3px 0}
+  .summaryPage .summaryGoal .clamp3{height:44px;min-height:44px;margin:4px 0}
+  .summaryPage .sectionLabel{margin:8px 0 5px}
+  .summaryPage .stack{height:18px;margin:6px 0 4px}
+  .summaryPage .kpis{margin-top:6px}
+  .summaryPage .kpi{min-height:64px;padding:6px 8px}
+  .summaryPage .varianceLine{margin-top:2px;height:14px}
+  .kpiYear{margin-top:2px}
+}
