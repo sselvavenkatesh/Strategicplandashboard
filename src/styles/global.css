@@ -239,3 +239,12 @@
  .app-shell:has(.goalPage) .variance{order:1}
 }
 a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.kpi{cursor:pointer}
+
+/* Goal KPI value typography aligned to Initiative progress percentage */
+.app-shell:has(.goalPage) .indicatorValue,
+.app-shell:has(.goalPage) .stateAvg b{
+  font-size:15px!important;
+  font-weight:700!important;
+  line-height:1!important;
+  color:#f0f4f8!important;
+}
