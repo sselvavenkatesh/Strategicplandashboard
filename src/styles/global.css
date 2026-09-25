@@ -231,39 +231,3 @@
  .app-shell:has(.goalPage) .yearBars i{position:relative;overflow:visible}
  .app-shell:has(.goalPage) .yearBars i b{position:absolute;left:0;right:0;top:2px;text-align:center;color:#dce8f2;font-size:7px;line-height:1;font-weight:700;white-space:nowrap}
 }
-
-/* Goal KPI row overlap correction — reserve independent metric and statewide columns */
-@media (min-width:1101px){
- .app-shell:has(.goalPage) .indicatorValueRow{
-   display:grid!important;
-   grid-template-columns:minmax(0,1fr) auto;
-   column-gap:14px;
-   align-items:center;
-   min-height:31px;
-   transform:translateY(-2px);
- }
- .app-shell:has(.goalPage) .indicatorValueWrap{
-   display:flex;
-   align-items:center;
-   gap:7px;
-   min-width:0;
-   white-space:nowrap;
- }
- .app-shell:has(.goalPage) .varianceLine{
-   flex:0 0 auto;
-   white-space:nowrap;
- }
- .app-shell:has(.goalPage) .stateAvg{
-   display:flex;
-   align-items:baseline;
-   justify-self:end;
-   gap:8px;
-   min-width:max-content;
-   white-space:nowrap;
-   margin-left:0!important;
- }
- .app-shell:has(.goalPage) .stateAvg b{
-   margin:0!important;
-   flex:0 0 auto;
- }
-}
