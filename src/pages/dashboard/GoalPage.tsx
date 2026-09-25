@@ -33,13 +33,13 @@ export function GoalPage(){
  return <main className="page goalPage">
   <nav className="goalTabs" aria-label="Strategic goals">{goals.data?.map((g,idx)=><button className={'goalTab '+(g.id===id?'active':'')} onClick={()=>nav('/goals/'+g.id)} key={g.id}>Goal {idx+1} · {g.name}</button>)}</nav>
   <header className="goalHero"><div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div><span className="goalHeroIcon" aria-hidden="true">✦</span></header>
-  <div className="goalSectionTitle"><div><small>PLAN OF ACTION</small><h3>Key Initiatives</h3></div><span>{initiatives.length} Initiatives</span></div>
+  <div className="goalSectionTitle"><div><small>PROGRESS TOWARD THE GOAL</small><h3>Key Initiatives</h3></div><span>Click an initiative to view details</span></div>
   <section className="initiativeGrid">{initiatives.map(i=><article className="initiativeCard detailed" key={i.id} onClick={()=>setInitiative(i)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')setInitiative(i)}}>
    <div className="initiativeIntro"><h4>{i.name}</h4><p title={i.description||i.name}>{i.description||'Strategic initiative aligned with this goal.'}</p></div>
    <div className="initiativeSummary"><div><span className="duration">Duration: {i.start||'—'} — {i.end||'—'}</span><div className="donePct"><b>{i.completion.toFixed(0)}%</b> Done</div></div><div className="gauge" style={{'--pct':i.completion+'%'} as React.CSSProperties} title={`${i.completion.toFixed(0)}% Done`}><b>{i.completion.toFixed(0)}%</b></div></div>
    <InitiativeBars i={i}/>
   </article>)}</section>
-  <div className="goalSectionTitle indicatorTitle"><div><small>MEASURES OF SUCCESS</small><h3>Key Indicators</h3></div><span>{indicators.length} Indicators</span></div>
+  <div className="goalSectionTitle indicatorTitle"><div><small>MEASURING OUTCOMES</small><h3>Key Indicators</h3></div><span>Latest year performance &amp; trend</span></div>
   <section className="indicatorGrid">{indicators.map(k=>{const rows=(histories[k.id]||[]).filter((r:any)=>r.value_3_numeric!=null).slice(-4),mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0));const favorable=k.variance==null?null:(k.nature==='Negative'?k.variance<=0:k.variance>=0);return <article className="indicatorCard goalIndicatorCard" key={k.id} onClick={()=>setIndicator(k)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')setIndicator(k)}}>
    <div className="indicatorIntro"><h4>{k.name}</h4><p title={k.description||k.name}>{k.description||'Strategic performance indicator.'}</p></div>
    <div className="indicatorValueRow"><div className="indicatorValueWrap"><span className="indicatorValue">{k.value}</span>{k.variance!=null&&<span className="varianceLine"><span className="varianceLabel">LY Var</span><span className={'variance '+(favorable?'positive':'negative')} title={`Current year minus last year: ${k.variance.toFixed(1)}${k.isPercent?'%':''}`}><span className="trend">{k.variance>=0?'↗':'↘'}</span>{k.variance.toFixed(1)}{k.isPercent?'%':''}</span></span>}</div><span className="stateAvg">Statewide Average <b>{stateAvgs[k.id]||'—'}</b></span></div>
