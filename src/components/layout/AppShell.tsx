@@ -52,14 +52,13 @@ export function AppShell(){
   return <div className="app-shell">
     {pageLoading&&<div className="pageLoader" role="status" aria-live="polite" aria-label="Loading page"><div className="k12LoaderLogo">K12<span>Matrix</span></div><div className="k12LoaderPulse"/><small>Loading strategic plan…</small></div>}
     <header className="topbar">
-      <Link to="/" className="brand">{p.data?.logo?<img src={p.data.logo} alt="District logo"/>:<span className="brandMark">D360</span>}<b>{p.data?.districtName||'District 360'}</b></Link>
+      <Link to="/" className="brand"><span className="districtLogo" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 17c6 0 11 2 16 6 5-4 10-6 16-6v20c-6 0-11 2-16 5-5-3-10-5-16-5V17Z"/><path d="M24 23v19M13 13l3 3M35 13l-3 3M24 7v5M17 9l2 4M31 9l-2 4"/><path d="M17 17a8 8 0 0 1 14 0"/></svg></span><b>{p.data?.districtName||'District 360'}</b><span className="headerPowered">Powered by <strong>K12<span>Matrix</span></strong></span></Link>
       <div className="tools">
         {admin?<button className="signInBtn welcomeUserBtn" onClick={signOut} title="Sign out">Welcome {admin.name}</button>:<button className="signInBtn" onClick={()=>{setAuthMessage('');setSignInOpen(true)}}>Sign In</button>}
         <button className="menuBtn" onClick={()=>setOpen(true)} aria-label="Open navigation"><Menu size={20}/></button>
       </div>
     </header>
     <Outlet/>
-    <footer id="globalFooter"><span>Powered By</span><b>K12<span>Matrix</span></b></footer>
     <div className={'scrim '+(open?'on':'')} onClick={()=>setOpen(false)}/>
     <aside className={'navPanel '+(open?'open':'')}>
       <div className="navTitle"><b>Explore the Dashboard</b><button onClick={()=>setOpen(false)}><X size={18}/></button></div>
