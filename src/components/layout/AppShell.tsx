@@ -69,7 +69,7 @@ export function AppShell(){
     {signInOpen&&<div className="signInModal open" role="dialog" aria-modal="true" aria-labelledby="signInTitle" onMouseDown={e=>{if(e.target===e.currentTarget)setSignInOpen(false)}}>
       <form className="signInCard" onSubmit={submitSignIn}>
         <button type="button" className="signInClose" aria-label="Close sign in" onClick={()=>setSignInOpen(false)}>×</button>
-        <small>ADMIN ACCESS</small><h2 id="signInTitle">Sign In</h2><p>Sign in with your District 360 administrator account.</p>
+        <img className="signInK12Logo" src="/k12matrix-logo.svg" alt="K12Matrix"/><small>ADMIN ACCESS</small><h2 id="signInTitle">Sign In</h2><p>Sign in with your administrator account.</p>
         <label htmlFor="adminEmail">Email</label><input id="adminEmail" type="email" autoComplete="username" required value={email} onChange={e=>setEmail(e.target.value)}/>
         <label htmlFor="adminPassword">Password</label><input id="adminPassword" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)}/>
         {authMessage&&<div className="signInError" role="alert">{authMessage}</div>}
