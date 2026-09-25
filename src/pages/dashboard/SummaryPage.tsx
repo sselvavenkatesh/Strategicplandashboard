@@ -11,6 +11,12 @@ const goalImages=[
   'https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=900&q=80'
 ];
 
+function summaryIndicatorValue(k:Indicator){
+  const isFundBalance=k.shortName.toLowerCase().includes('fund balance')||k.name.toLowerCase().includes('fund balance');
+  if(isFundBalance&&k.numeric!=null)return '$'+(k.numeric/1000000).toFixed(2)+'M';
+  return k.value;
+}
+
 export function SummaryPage(){
  const nav=useNavigate(),goals=useDashboard(getGoals),profile=useDashboard(getProfile),[bundles,setBundles]=useState<Bundle[]>([]),[err,setErr]=useState('');
  useEffect(()=>{if(!goals.data)return;Promise.all(goals.data.map(async goal=>({goal,indicators:await getIndicators(goal.id),initiatives:await getInitiatives(goal.id)}))).then(setBundles).catch(e=>setErr(e.message))},[goals.data]);
@@ -32,12 +38,7 @@ export function SummaryPage(){
       </div><div className="legend"><span>■ Done</span><span>■ In Progress</span><span>■ Not Yet Started</span></div></>:<div className="summaryUnavailable" title="No initiative action-item data is currently available for this goal.">Initiative data unavailable</div>}
      <div className="sectionLabel"><b>Key Indicators</b><span>View All →</span></div>
      <div className="kpis">{indicators.map(k=><div className="kpi" key={k.id} title={k.description||`${k.name}: latest available value ${k.value}`} onClick={e=>e.stopPropagation()}>
-       <span>{k.shortName}</span><div className="kpiValue"><b>{(k.shortName.toLowerCase().includes('fund balance')||k.name.toLowerCase().includes('fund balance'))&&k.numeric!=null?'{k.variance!=null&&<span className="varianceLine"><small>LY Var</small><em className={(k.nature==='Negative'?k.variance<=0:k.variance>=0)?'up':'down'}>{k.variance>=0?'↗':'↘'} {k.variance.toFixed(1)}{k.isPercent?'%':''}</em></span>}</div>{k.year!=='—'&&<small className="kpiYear">{k.year}</small>}
-      </div>)}</div>
-    </div>
-   </article>})}</section>
- </main>
-}+(k.numeric/1000000).toFixed(2)+'M':k.value}</b>{k.variance!=null&&<span className="varianceLine"><small>LY Var</small><em className={(k.nature==='Negative'?k.variance<=0:k.variance>=0)?'up':'down'}>{k.variance>=0?'↗':'↘'} {k.variance.toFixed(1)}{k.isPercent?'%':''}</em></span>}</div>{k.year!=='—'&&<small className="kpiYear">{k.year}</small>}
+       <span>{k.shortName}</span><div className="kpiValue"><b>{summaryIndicatorValue(k)}</b>{k.variance!=null&&<span className="varianceLine"><small>LY Var</small><em className={(k.nature==='Negative'?k.variance<=0:k.variance>=0)?'up':'down'}>{k.variance>=0?'↗':'↘'} {k.variance.toFixed(1)}{k.isPercent?'%':''}</em></span>}</div>{k.year!=='—'&&<small className="kpiYear">{k.year}</small>}
       </div>)}</div>
     </div>
    </article>})}</section>
