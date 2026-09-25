@@ -135,7 +135,7 @@ export function GoalPage(){
         const rows=(histories[k.id]||[]).filter((r:any)=>r.value_3_numeric!=null).slice(-4);
         const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0));
         const favorable=k.variance==null?null:(k.nature==='Negative'?k.variance<=0:k.variance>=0);
-        return <article className="indicatorCard goalIndicatorCard" key={k.id} onClick={()=>setIndicator(k)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')setIndicator(k)}}>
+        return <article className="indicatorCard goalIndicatorCard" key={k.id}>
           <div className="indicatorIntro"><h4>{k.shortName}</h4><p title={k.name}>{k.name}</p></div>
           <div className="indicatorValueRow">
             <div className="indicatorValueWrap">
