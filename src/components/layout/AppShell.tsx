@@ -18,46 +18,28 @@ export function AppShell(){
   const p=useDashboard(getProfile),g=useDashboard(getGoals);
   const nav=useNavigate();
 
-  async function loadAdmin(userId:string){
-    const {data,error}=await supabase.from('admin_users').select('Name,Email,Role,"Is Active"').eq('Auth User ID',userId).eq('Role','Admin').eq('Is Active',true).maybeSingle();
-    if(error||!data){setAdmin(null);return false}
-    setAdmin({name:data.Name||data.Email,email:data.Email});
-    return true;
-  }
-
   useEffect(()=>{
-    let active=true;
-    supabase.auth.getSession().then(async({data})=>{
-      if(active&&data.session) await loadAdmin(data.session.user.id);
-    });
-    const {data:listener}=supabase.auth.onAuthStateChange((_event,session)=>{
-      if(!active)return;
-      if(session) void loadAdmin(session.user.id); else setAdmin(null);
-    });
-    return()=>{active=false;listener.subscription.unsubscribe()}
+    const saved=sessionStorage.getItem('district360_admin');
+    if(saved){try{setAdmin(JSON.parse(saved))}catch{sessionStorage.removeItem('district360_admin')}}
   },[]);
 
   async function submitSignIn(e:FormEvent){
     e.preventDefault();setAuthBusy(true);setAuthMessage('');
-    const {data,error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
-    if(error||!data.user){
+    const {data,error}=await supabase.rpc('validate_admin_login',{p_email:email.trim(),p_password:password});
+    const row=Array.isArray(data)?data[0]:null;
+    if(error||!row){
+      sessionStorage.removeItem('district360_admin');setAdmin(null);
       setAuthMessage('Sign in failed. Please check your email and password.');
       setAuthBusy(false);
       setTimeout(()=>{setSignInOpen(false);setAuthMessage('');nav('/')},1400);
       return;
     }
-    const ok=await loadAdmin(data.user.id);
-    if(!ok){
-      await supabase.auth.signOut();
-      setAuthMessage('Sign in failed. This account is not an active administrator.');
-      setAuthBusy(false);
-      setTimeout(()=>{setSignInOpen(false);setAuthMessage('');nav('/')},1400);
-      return;
-    }
-    setPassword('');setSignInOpen(false);setAuthBusy(false);nav('/');
+    const profile={name:row.user_name||row.user_email,email:row.user_email};
+    sessionStorage.setItem('district360_admin',JSON.stringify(profile));
+    setAdmin(profile);setPassword('');setSignInOpen(false);setAuthBusy(false);nav('/');
   }
 
-  async function signOut(){await supabase.auth.signOut();setAdmin(null);nav('/')}
+  function signOut(){sessionStorage.removeItem('district360_admin');setAdmin(null);nav('/')}
 
   return <div className="app-shell">
     <header className="topbar">
