@@ -112,12 +112,12 @@ export function GoalPage(){
           <div className="gauge" style={{'--pct':i.completion+'%','--progress-color':(i.completion>=100?'var(--green)':`hsl(${Math.round(i.completion*1.2)} 72% 48%)`)} as React.CSSProperties} tabIndex={0} aria-label={`${i.shortName} progress: ${i.completion.toFixed(0)}% completed`}>
             <b>{i.completion.toFixed(0)}%</b>
             <div className="initiativeProgressTooltip" role="tooltip">
-              <div><span>Initiative Name</span><b>{i.shortName}</b></div>
-              <div><span>Sub Initiative Name</span><b>{i.subInitiatives.map(s=>s.name).join(', ')||'—'}</b></div>
-              <div><span>Start Date</span><b>{i.start||'—'}</b></div>
-              <div><span>End Date</span><b>{i.end||'—'}</b></div>
-              <div><span>Total Action Items</span><b>{i.totalActionItems}</b></div>
-              <div><span>Completed %</span><b>{i.completion.toFixed(0)}%</b></div>
+              <div><span>Initiative Name</span><em>—</em><b>{i.shortName}</b></div>
+              <div><span>Sub Initiative Name</span><em>—</em><b>{i.subInitiatives.map(s=>s.name).join(', ')||'—'}</b></div>
+              <div><span>Start Date</span><em>—</em><b>{i.start||'—'}</b></div>
+              <div><span>End Date</span><em>—</em><b>{i.end||'—'}</b></div>
+              <div><span>Total Action Items</span><em>—</em><b>{i.totalActionItems}</b></div>
+              <div><span>Completed %</span><em>—</em><b>{i.completion.toFixed(0)}%</b></div>
             </div>
           </div>
         </div>
