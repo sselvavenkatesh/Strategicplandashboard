@@ -328,3 +328,5 @@ a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.k
 .headerPowered img{display:block;width:95px;height:24px;object-fit:contain}
 .k12LoaderLogo{display:block;width:190px;height:48px;object-fit:contain}
 .navPowered img{display:inline-block;width:95px;height:24px;object-fit:contain}
+
+.signInK12Logo{display:block;width:120px;height:auto;max-height:34px;object-fit:contain;margin:0 0 14px}
