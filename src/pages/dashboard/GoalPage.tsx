@@ -6,14 +6,26 @@ import {useDashboard} from '../../hooks/useDashboard';
 type HistoryMap=Record<string,any[]>;
 type AvgMap=Record<string,string>;
 
+function InitiativeTooltip({i,s}:{i:Initiative;s:Initiative['subInitiatives'][number]}){
+  return <div className="initiativeBarTooltip" role="tooltip">
+    <div><span>Initiative Name</span><em>—</em><b>{i.shortName}</b></div>
+    <div><span>Sub Initiative Name</span><em>—</em><b>{s.name}</b></div>
+    <div><span>Start Date</span><em>—</em><b>{s.start||i.start||'—'}</b></div>
+    <div><span>End Date</span><em>—</em><b>{s.end||i.end||'—'}</b></div>
+    <div><span>Total Action Items</span><em>—</em><b>{s.totalActionItems}</b></div>
+    <div><span>Completed %</span><em>—</em><b>{s.completion.toFixed(0)}%</b></div>
+  </div>;
+}
+
 function InitiativeBars({i}:{i:Initiative}){
   return <div className="subChart">
     {i.subInitiatives.map(s=><div className="subRow" key={s.name}>
-      <span title={s.name+(i.start?' — Start Date: '+i.start:'')+(i.end?' | End Date: '+i.end:'')}>{s.name}</span>
-      <div className="subBar" aria-label={`${s.name}: ${s.done.toFixed(0)}% Done, ${s.inProgress.toFixed(0)}% In Progress, ${s.notStarted.toFixed(0)}% Not Yet Started`}>
-        <i className="done" title={`Done: ${s.done.toFixed(0)}%`} style={{width:s.done+'%'}}>{s.done>=14?Math.round(s.done)+'%':''}</i>
-        <i className="progress" title={`In Progress: ${s.inProgress.toFixed(0)}%`} style={{width:s.inProgress+'%'}}>{s.inProgress>=14?Math.round(s.inProgress)+'%':''}</i>
-        <i className="not" title={`Not Yet Started: ${s.notStarted.toFixed(0)}%`} style={{width:s.notStarted+'%'}}>{s.notStarted>=14?Math.round(s.notStarted)+'%':''}</i>
+      <span>{s.name}</span>
+      <div className="subBar" tabIndex={0} aria-label={`${s.name}: ${s.done.toFixed(0)}% Done, ${s.inProgress.toFixed(0)}% In Progress, ${s.notStarted.toFixed(0)}% Not Yet Started`}>
+        <i className="done" style={{width:s.done+'%'}}>{s.done>=14?Math.round(s.done)+'%':''}</i>
+        <i className="progress" style={{width:s.inProgress+'%'}}>{s.inProgress>=14?Math.round(s.inProgress)+'%':''}</i>
+        <i className="not" style={{width:s.notStarted+'%'}}>{s.notStarted>=14?Math.round(s.notStarted)+'%':''}</i>
+        <InitiativeTooltip i={i} s={s}/>
       </div>
     </div>)}
     <div className="subLegend">
