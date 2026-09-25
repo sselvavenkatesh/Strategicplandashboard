@@ -300,3 +300,22 @@ a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.k
   transform:translateY(0);
 }
 .goalPage .gauge:focus-visible{outline:2px solid #1597ff;outline-offset:2px}
+
+/* Custom tooltip for each Initiative stacked bar; replaces browser-native title tooltip */
+.goalPage .subBar{position:relative;overflow:visible!important}
+.goalPage .subBar>i:first-child{border-radius:2px 0 0 2px}
+.goalPage .subBar>i:nth-last-of-type(1){border-radius:0 2px 2px 0}
+.goalPage .initiativeBarTooltip{
+  position:absolute;z-index:120;left:50%;bottom:calc(100% + 9px);width:330px;
+  transform:translate(-50%,4px);padding:10px 12px;border:1px solid #35516a;border-radius:7px;
+  background:#071523;box-shadow:0 10px 26px rgba(0,0,0,.38);color:#dbe7f1;
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s ease,transform .12s ease,visibility .12s;
+  text-align:left;
+}
+.goalPage .initiativeBarTooltip:after{content:'';position:absolute;left:50%;top:100%;margin-left:-6px;border:6px solid transparent;border-top-color:#35516a}
+.goalPage .initiativeBarTooltip div{display:grid;grid-template-columns:116px 12px minmax(0,1fr);column-gap:5px;align-items:start;margin:5px 0;font-size:9px;line-height:1.35}
+.goalPage .initiativeBarTooltip span{grid-column:1;color:#91a5b7;white-space:nowrap}
+.goalPage .initiativeBarTooltip em{grid-column:2;font-style:normal;color:#91a5b7;text-align:center}
+.goalPage .initiativeBarTooltip b{grid-column:3;font-size:9px;font-weight:600;color:#eef5fb;overflow-wrap:anywhere}
+.goalPage .subBar:hover .initiativeBarTooltip,.goalPage .subBar:focus-visible .initiativeBarTooltip{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.goalPage .subBar:focus-visible{outline:2px solid #1597ff;outline-offset:2px}
