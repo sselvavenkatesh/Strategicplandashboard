@@ -1,6 +1,6 @@
 import {Menu,X} from 'lucide-react';
 import {FormEvent,useEffect,useState} from 'react';
-import {Link,Outlet,useNavigate} from 'react-router-dom';
+import {Link,Outlet,useLocation,useNavigate} from 'react-router-dom';
 import {getGoals,getProfile} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 import {supabase} from '../../lib/supabase';
@@ -17,6 +17,14 @@ export function AppShell(){
   const[admin,setAdmin]=useState<AdminProfile|null>(null);
   const p=useDashboard(getProfile),g=useDashboard(getGoals);
   const nav=useNavigate();
+  const location=useLocation();
+  const[pageLoading,setPageLoading]=useState(false);
+
+  useEffect(()=>{
+    setPageLoading(true);
+    const timer=window.setTimeout(()=>setPageLoading(false),450);
+    return()=>window.clearTimeout(timer);
+  },[location.pathname]);
 
   useEffect(()=>{
     const saved=sessionStorage.getItem('district360_admin');
@@ -42,6 +50,7 @@ export function AppShell(){
   function signOut(){sessionStorage.removeItem('district360_admin');setAdmin(null);nav('/')}
 
   return <div className="app-shell">
+    {pageLoading&&<div className="pageLoader" role="status" aria-live="polite" aria-label="Loading page"><div className="k12LoaderLogo">K12<span>Matrix</span></div><div className="k12LoaderPulse"/><small>Loading strategic plan…</small></div>}
     <header className="topbar">
       <Link to="/" className="brand">{p.data?.logo?<img src={p.data.logo} alt="District logo"/>:<span className="brandMark">D360</span>}<b>{p.data?.districtName||'District 360'}</b></Link>
       <div className="tools">
