@@ -72,7 +72,7 @@ export function GoalPage(){
   const{goalId:id}=useParams(),nav=useNavigate(),goals=useDashboard(getGoals);
   const[goal,setGoal]=useState<Goal|null>(null),[initiatives,setInitiatives]=useState<Initiative[]>([]),[indicators,setIndicators]=useState<Indicator[]>([]);
   const[histories,setHistories]=useState<HistoryMap>({}),[stateAvgs,setStateAvgs]=useState<AvgMap>({});
-  const[initiative,setInitiative]=useState<Initiative|null>(null),[indicator,setIndicator]=useState<Indicator|null>(null),[history,setHistory]=useState<any[]>([]),[groups,setGroups]=useState<any[]>([]),[selectedYear,setSelectedYear]=useState(''),[error,setError]=useState('');
+  const[initiative,setInitiative]=useState<Initiative|null>(null),[indicator,setIndicator]=useState<Indicator|null>(null),[history,setHistory]=useState<any[]>([]),[groups,setGroups]=useState<any[]>([]),[selectedYear,setSelectedYear]=useState(''),[indicatorLoading,setIndicatorLoading]=useState(false),[error,setError]=useState('');
 
   useEffect(()=>{
     if(!id||!goals.data)return;
@@ -95,11 +95,11 @@ export function GoalPage(){
   useEffect(()=>{
     if(!indicator)return;
     getIndicatorHistory(indicator.id).then(rows=>{setHistory(rows);setSelectedYear(indicator.year)});
-    getStudentGroups(indicator.id,indicator.year).then(setGroups);
+    setIndicatorLoading(true);getStudentGroups(indicator.id,indicator.year).then(setGroups).finally(()=>setIndicatorLoading(false));
   },[indicator]);
 
   useEffect(()=>{
-    if(indicator&&selectedYear&&selectedYear!==indicator.year)getStudentGroups(indicator.id,selectedYear).then(setGroups);
+    if(indicator&&selectedYear&&selectedYear!==indicator.year){setIndicatorLoading(true);getStudentGroups(indicator.id,selectedYear).then(setGroups).finally(()=>setIndicatorLoading(false))}
   },[selectedYear]);
 
   useEffect(()=>{
@@ -234,7 +234,7 @@ export function GoalPage(){
         <section className="indicatorChartPanel">
           <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>
           <div className="yearChooser"><label htmlFor="indicatorYear">Choose Year:</label><select id="indicatorYear" value={selectedYear} onChange={e=>setSelectedYear(e.target.value)}>{[...new Set(history.map((r:any)=>r.school_year))].map((y:any)=><option key={y}>{y}</option>)}</select></div>
-          <div className="studentChart">
+          <div className={'studentChart '+(indicatorLoading?'isLoading':'')}>{indicatorLoading&&<div className="indicatorLoader" role="status" aria-live="polite"><i/><span>Loading data…</span></div>}
             <div className="yAxisLabel">{indicator.isPercent?'Percent of students proficient':'Indicator value'}</div>
             <div className="studentBars">
               {(()=>{const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0));return rows.map((r:any)=><div className="studentBarCol" key={r.student_group}><div className="studentBar" style={{height:Math.max(4,(Number(r.value_3_numeric)||0)/mx*100)+'%'}}><b>{r.value_3_display??r.value_3_numeric}</b></div><span>{r.student_group}</span></div>)})()}
