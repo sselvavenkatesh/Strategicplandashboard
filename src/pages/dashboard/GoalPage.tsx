@@ -40,15 +40,14 @@ function InitiativeTimeline({initiative}:{initiative:Initiative}){
   const groups=new Map<string,typeof initiative.subInitiatives>();
   initiative.subInitiatives.forEach(s=>{const key=s.end||max||'';groups.set(key,[...(groups.get(key)||[]),s])});
   return <section className="timelinePanel">
-    <div className="timelineTitle"><b>Plan of Action</b><span className="timelineEndDate"><small>END DATE</small><strong>{max||'End'}</strong></span></div>
+    <div className="timelineTitle"><b>Plan of Action</b></div>
     <div className="timelineScale">
       <div className="timelineLine"/>
       <div className="timelineEndpoint timelineStart"><i className="greenFlag">⚑</i><b>{min||'Start'}</b><span>Initiative Start</span></div>
       {[...groups.entries()].map(([date,items])=><div className="timelineMilestoneGroup" key={date} style={{left:timelinePct(date,min,max)+'%'}}>
         <i className={items.every(s=>s.completion>=99.999)?'greenFlag':'redFlag'}>⚑</i>
-        <div className="timelineMilestoneLabels">{items.map(s=><div key={s.name}><strong>{s.name}</strong><span>{s.end||date}</span></div>)}</div>
+        <div className="timelineMilestoneLabels">{items.map(s=><div key={s.name}>{date===max&&<em className="initiativeEndLabel">Initiative End</em>}<strong>{s.name}</strong><span>{s.end||date}</span></div>)}</div>
       </div>)}
-      <div className="timelineEndpoint timelineEnd"><i className={initiative.completion>=99.999?'greenFlag':'redFlag'}>⚑</i></div>
     </div>
     <div className="timelineLegend"><span><i className="greenFlag">⚑</i> Completed</span><span><i className="redFlag">⚑</i> Not Completed</span></div>
   </section>
@@ -112,6 +111,7 @@ export function GoalPage(){
   if(error)return <main className="page state error">{error}</main>;
 
   const goalIndex=Math.max(0,goals.data?.findIndex(g=>g.id===id)??0);
+  const goalIcon=['★','◆','♥','✦'][goalIndex%4];
 
   return <main className="page goalPage">
     <nav className="goalTabs" aria-label="Strategic goals">
@@ -120,7 +120,7 @@ export function GoalPage(){
 
     <header className="goalHero">
       <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
-      <span className="goalHeroIcon" aria-hidden="true">✦</span>
+      <span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span>
     </header>
 
     <div className="goalSectionTitle">
@@ -193,7 +193,7 @@ export function GoalPage(){
       <div className="modalShell" onClick={e=>e.stopPropagation()}>
         <button className="modalClose" onClick={()=>setInitiative(null)} aria-label="Close">×</button>
         <div className="modalGoal">
-          <span className="popupGoalIcon" aria-hidden="true">✦</span>
+          <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
         <div className="modalInitiativeHead"><span className="statusDot"/><div><small>INITIATIVE</small><h3>{initiative.shortName}</h3></div></div>
@@ -223,7 +223,7 @@ export function GoalPage(){
       <div className="indicatorModalShell" onClick={e=>e.stopPropagation()}>
         <button className="modalClose" onClick={()=>setIndicator(null)} aria-label="Close">×</button>
         <div className="indicatorModalGoal">
-          <span className="popupGoalIcon" aria-hidden="true">✦</span>
+          <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
         <div className="indicatorModalHead"><span className="statusDot"/><h3>{indicator.shortName}</h3></div>
