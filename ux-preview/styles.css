@@ -350,3 +350,52 @@ html[data-theme="light"] .k12MatrixLogo,
 html[data-theme="light"] .navPowered img{
   content:url('./assets/k12matrix-logo-light.svg');
 }
+
+
+/* Light-theme navigation completion — overrides late dark nav rules. */
+html[data-theme="light"] .navPanel{
+  background:#ffffff!important;
+  border-left-color:#ccd8e3!important;
+  color:#17283a!important;
+  box-shadow:-10px 0 30px rgba(38,62,84,.12)!important;
+}
+html[data-theme="light"] .navPanel .panelTitle{
+  border-bottom-color:#dbe5ed!important;
+}
+html[data-theme="light"] .navPanel .panelTitle b{color:#17283a!important}
+html[data-theme="light"] .navPanel .panelTitle button{
+  background:#f5f8fb!important;
+  border-color:#cbd8e3!important;
+  color:#334b62!important;
+}
+html[data-theme="light"] .navUtilities button{
+  background:#f5f9fc!important;
+  border-color:#d1dde7!important;
+  color:#334b62!important;
+}
+html[data-theme="light"] .navUtilities button:hover{
+  background:#eaf4fb!important;
+  border-color:#bdd5e6!important;
+  color:#173a55!important;
+}
+html[data-theme="light"] .navLinks>a,
+html[data-theme="light"] .navLinks #goalNavLinks>a{
+  color:#435b70!important;
+  background:transparent!important;
+}
+html[data-theme="light"] .navLinks>a:hover,
+html[data-theme="light"] .navLinks #goalNavLinks>a:hover{
+  background:#edf5fb!important;
+  color:#173a55!important;
+  border-color:#d4e2ee!important;
+}
+html[data-theme="light"] .navMainIcon,
+html[data-theme="light"] .navGoalIcon{
+  background:#e6f2fa!important;
+  color:#167dbd!important;
+}
+html[data-theme="light"] .navGroupLabel{color:#70869a!important}
+html[data-theme="light"] .navPowered{
+  border-top-color:#dbe5ed!important;
+}
+html[data-theme="light"] .navPowered span{color:#687f93!important}
