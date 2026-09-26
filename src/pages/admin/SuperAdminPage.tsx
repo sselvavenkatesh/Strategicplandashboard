@@ -17,16 +17,17 @@ export function SuperAdminPage(){
  const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[error,setError]=useState('');const[busy,setBusy]=useState(false);
  const[section,setSection]=useState<Section>('home');
  const[profile,setProfile]=useState<Profile>({districtName:'',planName:'',duration:'',mission:'',vision:'',goals:0});
- const[indicators,setIndicators]=useState<any[]>([]);const[initiatives,setInitiatives]=useState<any[]>([]);
+ const[goals,setGoals]=useState<any[]>([]);const[indicators,setIndicators]=useState<any[]>([]);const[initiatives,setInitiatives]=useState<any[]>([]);
 
  useEffect(()=>{if(!authenticated)return;(async()=>{
-  const[{data:p},{data:i},{data:n}]=await Promise.all([
+  const[{data:p},{data:g},{data:i},{data:n}]=await Promise.all([
    supabase.from('District_Profile').select('*').limit(1).maybeSingle(),
-   supabase.from('Indicator_Data').select('*').limit(100),
-   supabase.from('Initiative_Data').select('*').limit(100)
+   supabase.from('Goal_master').select('*').order('Goal ID'),
+   supabase.from('Indicator_Data').select('*'),
+   supabase.from('Initiative_Data').select('*')
   ]);
   if(p)setProfile({districtName:p['School District Name']||'',planName:p['Strategic Plan Name']||'',duration:p['Strategic Plan Duration']||'',mission:p['Mission Statement']||'',vision:p['Vision Statement']||'',goals:Number(p['Total Goals']||0)});
-  setIndicators(i||[]);setInitiatives(n||[]);
+  setGoals(g||[]);setIndicators(i||[]);setInitiatives(n||[]);
  })()},[authenticated]);
 
  async function login(e:FormEvent){e.preventDefault();setError('');
@@ -61,10 +62,10 @@ export function SuperAdminPage(){
     <label>Number of Goals<input type="number" min="1" max="20" value={profile.goals} onChange={e=>setProfile({...profile,goals:Number(e.target.value)})}/></label>
     <label className="wide">Mission Statement<textarea value={profile.mission} onChange={e=>setProfile({...profile,mission:e.target.value})}/></label>
     <label className="wide">Vision Statement<textarea value={profile.vision} onChange={e=>setProfile({...profile,vision:e.target.value})}/></label>
-   </div><div className="adminNotice">Goal Name and Goal Description configuration will be connected to Goal_master in the data-write phase.</div><button className="adminPrimary" disabled>Save Configuration</button></section>}
+   </div><h3>Goal Master</h3><div className="adminTableWrap"><table><thead><tr>{goals[0]&&Object.keys(goals[0]).map(k=><th key={k}>{k}</th>)}</tr></thead><tbody>{goals.map((r,i)=><tr key={i}>{Object.keys(r).map(k=><td key={k}>{String(r[k]??'')}</td>)}</tr>)}</tbody></table></div><div className="adminNotice">Goal editing and database-write controls will be enabled in the write phase.</div><button className="adminPrimary" disabled>Save Configuration</button></section>}
    {(section==='indicators'||section==='initiatives')&&<section className="adminPanel"><div className="adminPanelHead"><div><h2>{section==='indicators'?'Indicator':'Initiative'} Data</h2><p>Review Supabase data and manage bulk updates using the approved CSV template.</p></div><div className="adminActions"><button><Download size={15}/> Download Template</button><label className="adminUpload"><Upload size={15}/> Upload CSV<input type="file" accept=".csv" disabled/></label></div></div>
     <div className="adminNotice">Upload is intentionally disabled in this first UI build. Validation and database-write controls will be added before uploads are enabled.</div>
-    <div className="adminTableWrap"><table><thead><tr>{data[0]&&Object.keys(data[0]).slice(0,8).map(k=><th key={k}>{k}</th>)}</tr></thead><tbody>{data.slice(0,20).map((r,i)=><tr key={i}>{Object.keys(r).slice(0,8).map(k=><td key={k}>{String(r[k]??'')}</td>)}</tr>)}</tbody></table></div>
+    <div className="adminTableWrap"><table><thead><tr>{data[0]&&Object.keys(data[0]).map(k=><th key={k}>{k}</th>)}</tr></thead><tbody>{data.map((r,i)=><tr key={i}>{Object.keys(r).map(k=><td key={k}>{String(r[k]??'')}</td>)}</tr>)}</tbody></table></div>
    </section>}
   </main>
  </div>
