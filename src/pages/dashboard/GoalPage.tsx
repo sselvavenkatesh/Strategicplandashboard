@@ -229,7 +229,17 @@ export function GoalPage(){
         <div className="indicatorModalHead"><span className="statusDot"/><h3>{indicator.shortName}</h3></div>
         <section className="currentKpi">
           <div><small>CY: {selectedYear||indicator.year}</small><span>{indicator.shortName}{indicator.isPercent?' Proficient %':''}</span></div>
-          <b>{(()=>{const r=history.find((x:any)=>x.school_year===selectedYear);if(!r)return formatIndicatorValue(indicator);const raw=r.value_3_display;const n=r.value_3_numeric==null?null:Number(r.value_3_numeric);if(raw!=null)return String(raw);if(n==null)return '—';if(indicator.isPercent)return n.toFixed(1)+'%';if(indicator.shortName.toLowerCase().includes('fund balance')||indicator.name.toLowerCase().includes('fund balance'))return '
+          <b>{(()=>{
+            const r=history.find((x:any)=>x.school_year===selectedYear);
+            if(!r)return formatIndicatorValue(indicator);
+            if(r.value_3_display!=null)return String(r.value_3_display);
+            const n=r.value_3_numeric==null?null:Number(r.value_3_numeric);
+            if(n==null)return '—';
+            if(indicator.isPercent)return n.toFixed(1)+'%';
+            if(indicator.shortName.toLowerCase().includes('fund balance')||indicator.name.toLowerCase().includes('fund balance'))return '$'+(n/1000000).toFixed(2)+'M';
+            return n.toFixed(1);
+          })()}</b>
+        </section>
         <section className="indicatorChartPanel">
           <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>
           <div className="yearChooser"><label htmlFor="indicatorYear">Choose Year:</label><select id="indicatorYear" value={selectedYear} onChange={e=>setSelectedYear(e.target.value)}>{[...new Set(history.map((r:any)=>r.school_year))].map((y:any)=><option key={y}>{y}</option>)}</select></div>
