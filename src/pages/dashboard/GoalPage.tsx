@@ -112,6 +112,7 @@ export function GoalPage(){
 
   const goalIndex=Math.max(0,goals.data?.findIndex(g=>g.id===id)??0);
   const goalIcon=['★','◆','♥','✦'][goalIndex%4];
+  const keyResourcesUrl=(import.meta.env.VITE_KEY_RESOURCES_URL||'').trim();
 
   return <main className="page goalPage">
     <nav className="goalTabs" aria-label="Strategic goals">
@@ -120,7 +121,7 @@ export function GoalPage(){
 
     <header className="goalHero">
       <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
-      <span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span>
+      <div className="goalHeroActions"><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}>Key Resources</button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
     </header>
 
     <div className="goalSectionTitle">
