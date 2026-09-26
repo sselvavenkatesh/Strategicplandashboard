@@ -65,7 +65,6 @@ export function AppShell(){
     <div className={'scrim '+(open?'on':'')} onClick={()=>setOpen(false)}/>
     <aside className={'navPanel '+(open?'open':'')}>
       <div className="navTitle"><b>Explore the Dashboard</b><button onClick={()=>setOpen(false)}><X size={18}/></button></div>
-      <div className="navUtilities"><button>?</button><span>Help</span><button>⚙</button><span>Filters</span></div>
       <nav><Link to="/" onClick={()=>setOpen(false)}>⌂ <span>Home</span></Link><Link to="/summary" onClick={()=>setOpen(false)}>▦ <span>Summary</span></Link><small>GOALS</small>{g.data?.map((x,i)=><Link to={'/goals/'+x.id} onClick={()=>setOpen(false)} key={x.id}><i>{['✦','◆','●','▲'][i%4]}</i><span>{x.name}</span></Link>)}</nav>
       <div className="navPowered"><span>Powered By</span><img src="/k12matrix-logo.svg" alt="K12Matrix"/></div>
     </aside>
