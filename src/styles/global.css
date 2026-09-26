@@ -330,3 +330,118 @@ a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.k
 .navPowered img{display:inline-block;width:95px;height:24px;object-fit:contain}
 
 .signInK12Logo{display:block;width:120px;height:auto;max-height:34px;object-fit:contain;margin:0 0 14px}
+
+
+/* V2.1 approved light theme — color-only React parity with the frozen UX.
+   Dark remains the default. Layout, typography, dimensions, positioning and interactions are unchanged. */
+.themeBtn{border:1px solid var(--line);background:#0d2132;color:#fff;border-radius:9px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
+
+html[data-theme="light"]{color-scheme:light;--bg:#f4f7fb;--panel:#fff;--panel2:#f4f8fc;--text:#17283a;--muted:#64798d;--line:rgba(72,103,128,.18);--gray:#aebdca}
+html[data-theme="light"] body{background:radial-gradient(circle at 18% 0,#e6f0f9 0,transparent 28%),var(--bg);color:var(--text)}
+html[data-theme="light"] .topbar{background:linear-gradient(180deg,rgba(248,251,255,.98),rgba(248,251,255,.90),transparent)}
+html[data-theme="light"] .brand{color:#17283a}
+html[data-theme="light"] .districtLogo svg path{stroke:#1684c8}
+html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
+html[data-theme="light"] .headerPowered img,
+html[data-theme="light"] .navPowered img,
+html[data-theme="light"] .signInK12Logo,
+html[data-theme="light"] .k12LoaderLogo{content:url('/k12matrix-logo-light.svg')}
+html[data-theme="light"] .menuBtn,
+html[data-theme="light"] .themeBtn,
+html[data-theme="light"] .navTitle button{background:#fff;color:#203449;border-color:#c4d2df}
+html[data-theme="light"] .pageLoader{background:rgba(248,251,255,.97);color:#526a80}
+html[data-theme="light"] .pageLoader small{color:#64798d}
+
+html[data-theme="light"] .uxWelcome{background:linear-gradient(90deg,rgba(248,251,255,.98) 0%,rgba(248,251,255,.91) 55%,rgba(248,251,255,.72)),url('https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=2000&q=80') center/cover}
+html[data-theme="light"] .uxWelcome .welcomeCopy small{color:#59738b}
+html[data-theme="light"] .uxWelcome .welcomeCopy h1{color:#15283a}
+html[data-theme="light"] .uxWelcome .welcomeCopy>p,
+html[data-theme="light"] .uxWelcome .welcomeGoal p,
+html[data-theme="light"] .principles article p{color:#536a80}
+html[data-theme="light"] .uxWelcome .welcomeGoal,
+html[data-theme="light"] .principles article{background:rgba(255,255,255,.92);border-color:#c9d7e3;color:#17283a;box-shadow:0 5px 18px rgba(42,66,89,.07)}
+html[data-theme="light"] .uxWelcome .welcomeGoal .goalIcon{background:#e8f4fc;border-color:#b9d8ee;color:#147ebf}
+html[data-theme="light"] .uxWelcome .welcomeGoal:hover,
+html[data-theme="light"] .principles article:hover{background:#fff;border-color:#1597ff;box-shadow:0 8px 24px rgba(21,151,255,.12)}
+
+html[data-theme="light"] .summaryPage{background:radial-gradient(circle at 50% 0,#e6f0f9,#f6f8fb 58%);color:#17283a}
+html[data-theme="light"] .summaryGoal{background:#fff;border-color:#cbd8e4;box-shadow:0 5px 16px rgba(35,60,84,.07)}
+html[data-theme="light"] .summaryPage .goalImage:after{background:linear-gradient(transparent,#fff)}
+html[data-theme="light"] .summaryGoal>p,
+html[data-theme="light"] .summaryBody>small,
+html[data-theme="light"] .sectionLabel span,
+html[data-theme="light"] .legend{color:#61768a}
+html[data-theme="light"] .kpi{background:#f4f8fc;border-color:#d2dee8;color:#17283a}
+html[data-theme="light"] .kpi>span,
+html[data-theme="light"] .kpiYear{color:#5c7186}
+html[data-theme="light"] .up{background:#e1f3e8;color:#2f7650}
+html[data-theme="light"] .down{background:#fae5e3;color:#a74943}
+html[data-theme="light"] .summaryUnavailable{color:#64798d}
+
+html[data-theme="light"] .goalPage{background:radial-gradient(circle at 18% 0,#e6f0f9,#f7f9fc 52%);color:#17283a}
+html[data-theme="light"] .goalTabs{border-color:#d0dce6}
+html[data-theme="light"] .goalTabs button{background:#fff;color:#667d91;border-color:#d0dce6}
+html[data-theme="light"] .goalTabs .active{background:#e9f4fb;color:#17283a;border-color:#68a8d4}
+html[data-theme="light"] .goalHero{border-color:#d0dce6}
+html[data-theme="light"] .goalHero p:last-child{color:#526a80}
+html[data-theme="light"] .goalHeroIcon{color:#1684c8}
+html[data-theme="light"] .initiativeCard,
+html[data-theme="light"] .indicatorCard{background:#fff;border-color:#cbd8e4;color:#17283a;box-shadow:0 4px 14px rgba(35,60,84,.06)}
+html[data-theme="light"] .initiativeCard:hover,
+html[data-theme="light"] .indicatorCard:hover{background:#fbfdff;border-color:#68a8d4}
+html[data-theme="light"] .initiativeIntro,
+html[data-theme="light"] .indicatorIntro{background:linear-gradient(90deg,#edf4fa,#f7fafc)!important;color:#17283a}
+html[data-theme="light"] .initiativeIntro h4,
+html[data-theme="light"] .indicatorIntro h4,
+html[data-theme="light"] .indicatorValue{color:#20384e}
+html[data-theme="light"] .initiativeIntro p,
+html[data-theme="light"] .indicatorIntro p,
+html[data-theme="light"] .duration,
+html[data-theme="light"] .completion span,
+html[data-theme="light"] .subRow>span,
+html[data-theme="light"] .subLegend,
+html[data-theme="light"] .stateAvg{color:#64798d}
+html[data-theme="light"] .initiativeSummary{background:#f5f9fc!important;border-color:#d8e3ec!important}
+html[data-theme="light"] .gauge:after{background:#fff}
+html[data-theme="light"] .stateAvg b{color:#344c62}
+html[data-theme="light"] .yearBars{border-color:#ccd9e4}
+html[data-theme="light"] .yearBars i{background:#4d9ed5!important}
+html[data-theme="light"] .yearLabels{color:#71869a!important}
+
+html[data-theme="light"] .modal{background:rgba(31,50,68,.35)}
+html[data-theme="light"] .modalCard{background:#fff;border-color:#c9d7e3;color:#17283a;box-shadow:0 22px 60px rgba(31,53,73,.20)}
+html[data-theme="light"] .modalCard>p{color:#60758a}
+html[data-theme="light"] .close{background:#f4f7fa;color:#344b61;border-color:#ccd8e3}
+html[data-theme="light"] .timeline,
+html[data-theme="light"] .indicatorTop>div{background:#f7f9fc;color:#17283a}
+html[data-theme="light"] .timeline span,
+html[data-theme="light"] .bigCompletion span,
+html[data-theme="light"] .indicatorTop span{color:#657b8f}
+html[data-theme="light"] .historyBars,
+html[data-theme="light"] .groupBars{border-color:#d2dee8}
+html[data-theme="light"] .historyBars span,
+html[data-theme="light"] .groupBars span{color:#526a80}
+html[data-theme="light"] .historyBars i,
+html[data-theme="light"] .groupBars i{background:#5ba5d7}
+html[data-theme="light"] .chartChooser select{background:#f7f9fc;color:#17283a;border-color:#c8d5e0}
+html[data-theme="light"] .stateReference{color:#526a80}
+
+html[data-theme="light"] .scrim{background:rgba(20,39,58,.30)}
+html[data-theme="light"] .navPanel{background:#fff;border-left-color:#ccd8e3;color:#17283a;box-shadow:-10px 0 30px rgba(38,62,84,.12)}
+html[data-theme="light"] .navTitle{color:#17283a}
+html[data-theme="light"] .navUtilities{border-color:#dbe5ed;color:#687f93}
+html[data-theme="light"] .navUtilities button{background:#f5f9fc;border-color:#d1dde7;color:#334b62}
+html[data-theme="light"] .navPanel nav a{color:#435b70}
+html[data-theme="light"] .navPanel nav a:hover{background:#edf5fb;color:#173a55}
+html[data-theme="light"] .navPanel nav i{background:#e6f2fa;color:#167dbd}
+html[data-theme="light"] .navPanel nav small{color:#70869a}
+html[data-theme="light"] .navPowered{border-color:#dbe5ed;color:#687f93}
+
+html[data-theme="light"] .signInModal{background:rgba(31,50,68,.35)}
+html[data-theme="light"] .signInCard{background:#fff;border-color:#c9d7e3;color:#17283a;box-shadow:0 22px 60px rgba(31,53,73,.20)}
+html[data-theme="light"] .signInCard p,
+html[data-theme="light"] .signInHint{color:#60758a}
+html[data-theme="light"] .signInCard label{color:#536a80}
+html[data-theme="light"] .signInCard input{background:#f7f9fc;color:#17283a;border-color:#c8d5e0}
+html[data-theme="light"] .signInClose{background:#f4f7fa;color:#344b61;border-color:#ccd8e3}
+html[data-theme="light"] #globalFooter{background:rgba(248,251,255,.96)!important;border-top:1px solid #dce5ed!important;color:#667b8e!important}
