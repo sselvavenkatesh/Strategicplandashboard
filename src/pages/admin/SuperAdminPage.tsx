@@ -15,7 +15,7 @@ const menu=[
 
 export function SuperAdminPage(){
  const[authenticated,setAuthenticated]=useState(()=>sessionStorage.getItem('strategic_superadmin')==='true');
- const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[error,setError]=useState('');const[busy,setBusy]=useState(false);
+ const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[error,setError]=useState('');const[busy,setBusy]=useState(false);const[saveMessage,setSaveMessage]=useState('');
  const[section,setSection]=useState<Section>('home');
  const[profile,setProfile]=useState<Profile>({districtName:'',planName:'',duration:'',mission:'',vision:'',goals:0,signinMethod:'Userbased',googleClientId:'',googleAuthId:'',microsoftClientId:'',microsoftTenantId:'',microsoftAuthId:''});
  const[initiativePage,setInitiativePage]=useState(1);const initiativePageSize=20;
@@ -35,13 +35,13 @@ export function SuperAdminPage(){
  async function login(e:FormEvent){e.preventDefault();setError('');
   if(email.trim().toLowerCase()!=='selva@k12matrix.com'){setError('This account is not authorized for Super Admin access.');return}
   setBusy(true);
-  const{data,error:authError}=await supabase.rpc('validate_admin_login',{p_email:email.trim(),p_password:password});
+  const{data,error:authError}=await supabase.rpc('validate_superadmin_login',{p_email:email.trim(),p_password:password});
   const row=Array.isArray(data)?data[0]:null;
   setBusy(false);
   if(authError||!row){setError('Sign in failed. Please check your email and password.');return}
-  sessionStorage.setItem('strategic_superadmin','true');setAuthenticated(true);setPassword('');
+  sessionStorage.setItem('strategic_superadmin','true');sessionStorage.setItem('strategic_superadmin_token',row.session_token);setAuthenticated(true);setPassword('');
  }
- function logout(){sessionStorage.removeItem('strategic_superadmin');setAuthenticated(false)}
+ function logout(){sessionStorage.removeItem('strategic_superadmin');sessionStorage.removeItem('strategic_superadmin_token');setAuthenticated(false)}
  if(!authenticated)return <main className="superAdminLogin"><form className="superAdminLoginCard" onSubmit={login}>
   <img src="/k12matrix-logo.svg" alt="K12Matrix"/><small>SUPER ADMIN ACCESS</small><h1>Sign In</h1><p>Manage district strategic plan configuration and reporting data.</p>
   <label>Email</label><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter SuperAdmin email"/>
@@ -49,6 +49,10 @@ export function SuperAdminPage(){
   {error&&<div className="superAdminError">{error}</div>}<button disabled={busy}>{busy?'Signing in…':'Sign In'}</button>
  </form></main>;
 
+ function changeGoalCount(value:number){const count=Math.max(1,Math.min(20,value||1));setProfile({...profile,goals:count});setGoals(prev=>{const next=[...prev];while(next.length<count)next.push({'Goal ID':'','Goal Name':'','Goal Description':'','Role':'All'});return next.slice(0,count)})}
+ function updateGoal(index:number,key:'Goal Name'|'Goal Description',value:string){setGoals(prev=>prev.map((g,i)=>i===index?{...g,[key]:value}:g))}
+ async function saveConfiguration(){const token=sessionStorage.getItem('strategic_superadmin_token');if(!token){setSaveMessage('Your Super Admin session has expired. Please sign in again.');return}setBusy(true);setSaveMessage('');const payloadGoals=goals.slice(0,profile.goals).map(g=>({'Goal ID':g['Goal ID']||'', 'Goal Name':g['Goal Name']||'', 'Goal Description':g['Goal Description']||''}));const{error}=await supabase.rpc('save_superadmin_configuration',{p_token:token,p_profile:profile,p_goals:payloadGoals});setBusy(false);setSaveMessage(error?'Save failed: '+error.message:'Configuration saved successfully. Public dashboard data will use the updated values.')}
+ 
  const initiativePages=Math.max(1,Math.ceil(initiatives.length/initiativePageSize));
  const pagedInitiatives=initiatives.slice((initiativePage-1)*initiativePageSize,initiativePage*initiativePageSize);
  const data=section==='indicators'?indicators:pagedInitiatives;
@@ -63,14 +67,14 @@ export function SuperAdminPage(){
     <label>District Name<input value={profile.districtName} onChange={e=>setProfile({...profile,districtName:e.target.value})}/></label>
     <label>Strategic Plan Name<input value={profile.planName} onChange={e=>setProfile({...profile,planName:e.target.value})}/></label>
     <label>Strategic Plan Duration<input value={profile.duration} onChange={e=>setProfile({...profile,duration:e.target.value})}/></label>
-    <label>Number of Goals<input type="number" min="1" max="20" value={profile.goals} onChange={e=>setProfile({...profile,goals:Number(e.target.value)})}/></label>
+    <label>Number of Goals<input type="number" min="1" max="20" value={profile.goals} onChange={e=>changeGoalCount(Number(e.target.value))}/></label>
     <label className="wide">Mission Statement<textarea value={profile.mission} onChange={e=>setProfile({...profile,mission:e.target.value})}/></label>
     <label className="wide">Vision Statement<textarea value={profile.vision} onChange={e=>setProfile({...profile,vision:e.target.value})}/></label>
     <label>Admin Signin<select value={profile.signinMethod} onChange={e=>setProfile({...profile,signinMethod:e.target.value as SigninMethod})}><option value="Userbased">Userbased</option><option value="Google">Google</option><option value="Microsoft">Microsoft</option></select></label>
     {profile.signinMethod==='Google'&&<><label>Google Client ID<input value={profile.googleClientId} onChange={e=>setProfile({...profile,googleClientId:e.target.value})}/></label><label>Google Auth ID<input value={profile.googleAuthId} onChange={e=>setProfile({...profile,googleAuthId:e.target.value})}/></label></>}
     {profile.signinMethod==='Microsoft'&&<><label>Microsoft Client ID<input value={profile.microsoftClientId} onChange={e=>setProfile({...profile,microsoftClientId:e.target.value})}/></label><label>Microsoft Tenant ID<input value={profile.microsoftTenantId} onChange={e=>setProfile({...profile,microsoftTenantId:e.target.value})}/></label><label>Microsoft Auth ID<input value={profile.microsoftAuthId} onChange={e=>setProfile({...profile,microsoftAuthId:e.target.value})}/></label></>}
     <div className="adminNotice wide">OAuth client secrets are intentionally not stored in browser code or District_Profile. Configure provider secrets securely in Supabase Auth. These fields hold non-secret provider identifiers used by the Admin configuration.</div>
-   </div><h3>Goal Master</h3><div className="adminTableWrap"><table><thead><tr>{goals[0]&&Object.keys(goals[0]).map(k=><th key={k}>{k}</th>)}</tr></thead><tbody>{goals.map((r,i)=><tr key={i}>{Object.keys(r).map(k=><td key={k}>{String(r[k]??'')}</td>)}</tr>)}</tbody></table></div><div className="adminNotice">Goal editing and database-write controls will be enabled in the write phase.</div><button className="adminPrimary" disabled>Save Configuration</button></section>}
+   </div><h3>Goal Master</h3><div className="goalEditor">{goals.slice(0,profile.goals).map((g,i)=><article key={g['Goal ID']||i}><b>Goal {i+1}</b><label>Goal Name<input value={g['Goal Name']||''} onChange={e=>updateGoal(i,'Goal Name',e.target.value)}/></label><label>Goal Description<textarea value={g['Goal Description']||''} onChange={e=>updateGoal(i,'Goal Description',e.target.value)}/></label></article>)}</div><div className="adminNotice">Goal IDs are managed automatically and are not shown here. Increasing the goal count adds another editable Goal section.</div>{saveMessage&&<div className={saveMessage.startsWith('Save failed')?'superAdminError':'adminSaveSuccess'}>{saveMessage}</div>}<button className="adminPrimary" disabled={busy} onClick={saveConfiguration}>{busy?'Saving…':'Save Configuration'}</button></section>}
    {(section==='indicators'||section==='initiatives')&&<section className="adminPanel"><div className="adminPanelHead"><div><h2>{section==='indicators'?'Indicator':'Initiative'} Data</h2><p>Review Supabase data and manage bulk updates using the approved CSV template.</p></div><div className="adminActions"><button><Download size={15}/> Download Template</button><label className="adminUpload"><Upload size={15}/> Upload CSV<input type="file" accept=".csv" disabled/></label></div></div>
     <div className="adminNotice">Upload is intentionally disabled in this first UI build. Validation and database-write controls will be added before uploads are enabled.</div>
     <div className="adminTableWrap"><table><thead><tr>{data[0]&&Object.keys(data[0]).map(k=><th key={k}>{k}</th>)}</tr></thead><tbody>{data.map((r,i)=><tr key={i}>{Object.keys(r).map(k=><td key={k}>{String(r[k]??'')}</td>)}</tr>)}</tbody></table></div>
