@@ -468,3 +468,39 @@ Important V2.1 behavior:
 - Theme preference is persisted; dark remains default.
 
 The frozen V2.1 branch/checkpoint must remain unchanged after freeze. V2.2 is reserved for Admin-page development and should start from the frozen V2.1 code/documentation state.
+
+
+---
+
+## 14. V2.2 frozen release scope — 27 Sep 2026
+
+**Document status update:** V2.2 frozen product baseline. This section supersedes the earlier document header/status that described V2.2 only as Admin planning input.
+
+### Business release definition
+
+V2.2 preserves all approved V2.1 public-dashboard behavior and adds the Super Admin management experience completed during V2.2. The release therefore has three user-facing access contexts: public stakeholder viewing, existing district Admin sign-in behavior, and the dedicated Super Admin configuration route.
+
+### Super Admin business capabilities included
+
+- Access through `/superadmin` with dedicated Super Admin authentication.
+- Home overview showing total configured Goals, Indicators and Initiatives (master counts, not reporting-row counts).
+- District/Strategic Plan configuration: District Name, Strategic Plan Name, duration, Mission, Vision and Number of Goals.
+- District logo selection/update, with the configured logo reflected in the public dashboard header.
+- Goal Master maintenance: edit Goal Name/Description, add Goals by increasing Goal count, distinct Goal-name validation, and explicit confirmed deletion.
+- Goal deletion must not silently cascade. If Indicator/Initiative dependencies exist, deletion is rejected until those records are reassigned or removed through an approved workflow.
+- Goal IDs remain internal and existing IDs are preserved to protect relationships.
+- Admin Signin configuration supports Userbased / Google / Microsoft selection and provider-specific non-secret identifiers.
+- Indicator and Initiative data can be reviewed in Super Admin; Initiative rows are paginated.
+- Implemented CRUD actions provide transient push/toast success, warning or failure feedback; destructive Goal deletion uses a confirmation dialog.
+
+### SSO business rule
+
+The intended end state is interface-managed SSO configuration with secure backend application to Supabase Auth. V2.2 contains the sign-in-method/provider-identifier foundation and Admin OAuth login/authorization logic. OAuth secrets must never be stored in frontend code or District_Profile. The secure provider-configuration backend needed to apply provider secrets/settings to Supabase Auth remains outstanding; therefore SSO configuration must not be represented as fully self-configuring in this frozen release.
+
+### Protected/incomplete Admin data-write scope
+
+Indicator/Initiative CSV upload is not released for database writes in V2.2. Before enabling it, the product requires approved templates, required-field validation, hidden/backend-generated IDs for new records, FK checks, duplicate checks, all-or-nothing database writes, and clear success/failure feedback.
+
+### Release governance
+
+V2.2 is frozen after documentation is committed to the V2.2 release branch. New product development must use a later version branch. The freeze is a source/version checkpoint and does not itself mean that production deployment has been approved or completed.
