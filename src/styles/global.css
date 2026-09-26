@@ -672,3 +672,15 @@ html[data-theme="light"] .timelineMilestoneLabels div{background:#eaf1f7}.timeli
 @keyframes indicatorSpin{to{transform:rotate(360deg)}}
 html[data-theme="light"] .indicatorLoader{background:rgba(247,250,252,.82);color:#334d63}
 html[data-theme="light"] .indicatorLoader i{border-color:#c3d1dc;border-top-color:#1597ff}
+
+
+/* V2.1 timeline end-label separation — reserve bottom of timeline for sub-initiatives only. */
+.timelineTitle .timelineEndDate{display:flex;align-items:baseline;gap:7px;color:#b9c6d1}
+.timelineTitle .timelineEndDate small{font-size:7px;letter-spacing:.8px;color:#7f94a7}
+.timelineTitle .timelineEndDate strong{font-size:10px;color:inherit}
+.timelineEnd{align-items:center}
+.timelineEnd b,.timelineEnd>span{display:none!important}
+.initiativeModal .timelineMilestoneGroup[style*="100%"]{transform:translateX(-100%);align-items:flex-end}
+.initiativeModal .timelineMilestoneGroup[style*="100%"] .timelineMilestoneLabels{text-align:right;align-items:flex-end}
+html[data-theme="light"] .timelineTitle .timelineEndDate{color:#40596f}
+html[data-theme="light"] .timelineTitle .timelineEndDate small{color:#71869a}
