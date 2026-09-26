@@ -1,6 +1,6 @@
 # Strategic Plan Dashboard — Business Requirements Document (BRD)
 
-**Document status:** V2.1 frozen public-dashboard baseline / V2.2 Admin planning input  
+**Document status:** V2.2 frozen product baseline — 27 Sep 2026  
 **Product:** Strategic Plan Dashboard  
 **Audience:** Product owner, school-district stakeholders, UX/design, engineering, QA, AI development agents
 
