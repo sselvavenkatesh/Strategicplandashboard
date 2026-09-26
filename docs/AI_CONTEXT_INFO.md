@@ -1,5 +1,8 @@
 # Strategic Plan Dashboard — AI Context Info
 
+**Document status:** V2.2 frozen release baseline — 27 Sep 2026
+
+
 > **Purpose:** canonical AI/agent handoff document. Read this file before making enhancements, bug fixes, schema changes, UX changes, releases, or deployment recommendations. It is designed to let a new AI tool understand the product without relying on prior chat history.
 
 ## 1. Product identity
