@@ -561,3 +561,61 @@ When requirements conflict, use this order:
 4. earlier exploratory requirements.
 
 Do not silently revive superseded behavior. In particular, the current product name is **Strategic Plan Dashboard**, Goal Indicator click-to-detail is disabled, K12Matrix branding is in the header/current shell rather than a fixed footer, and the Sign In copy is the revised administrator-account wording.
+
+
+---
+
+## V2.1 final prompt history and frozen requirements — 26 Sep 2026
+
+The product owner completed the V2.1 public-dashboard review and explicitly requested that **V2.1 be frozen**. The following requirements supersede conflicting V2.0/frozen-UX notes above where applicable.
+
+### Theme and visual parity
+- Light Theme is approved across Welcome, Summary, Goal, Initiative Detail, Indicator Detail, K12Matrix branding, and right-side navigation.
+- Dark remains the default theme; theme preference is persisted.
+- Theme changes affect surfaces, typography, borders and colors without changing business behavior.
+
+### Goal page and scalable goal navigation
+- Goal icons on Goal pages and popups must match the Goal identity used on the Welcome page.
+- Support districts with up to at least eight Goals without changing the approved four-goal desktop presentation:
+  - Welcome retains four Goal tiles per desktop row; additional Goals flow to subsequent rows.
+  - Goal tabs remain single-line and horizontally scroll when required.
+  - Navigation pane scrolls when its Goal list exceeds viewport height.
+  - Eight distinct Goal icons are available and used consistently.
+- Add **Key Resources** beside the Goal icon. It opens the district strategic-plan resource location in a new tab.
+- Current Key Resources destination is the approved district Zoho WorkDrive strategic-plan folder.
+- Hide Help and Filter controls from the navigation pane.
+
+### Initiative tile and Initiative Detail
+- Initiative tiles retain hover/focus interaction.
+- Initiative Detail popup is compact enough for normal desktop use without unnecessary scrolling.
+- Popup title displays **Initiative short name - Initiative long name**.
+- Plan of Action timeline:
+  - initiative minimum Start Date is the left boundary;
+  - initiative maximum End Date is the right boundary;
+  - Sub-Initiative flags are positioned from Sub-Initiative End Date;
+  - flag is green only when every Action Item in that Sub-Initiative is Done, otherwise red;
+  - same-date Sub-Initiatives stack rather than overlap;
+  - the final Sub-Initiative flag doubles as the Initiative End milestone, with **Initiative End** shown above it rather than a duplicate end flag.
+- Initiative gauge uses the same dynamic progress-color logic as Goal-level progress.
+- Approved data-readability adjustment: public Sub-Initiative End Dates were distributed across Jun-2025 / Jun-2026 / Jun-2027 by Initiative where needed to avoid excessive timeline overlap.
+
+### Indicator tile and Indicator Detail
+- Indicator Detail popup is enabled from Indicator tiles.
+- Popup title displays **Indicator short name - Indicator long name**.
+- Popup is compact and includes a loading treatment while selected-year data loads.
+- Changing School Year updates both the Student Group chart and the displayed KPI value.
+- Indicator tile LY variance remains beside the KPI area, positioned slightly lower than the KPI value.
+- **LY Var** text is immediately beside the variance pill/value.
+- Statewide Average has reserved independent space and must not overlap the KPI/variance area.
+
+### Branding/navigation
+- K12Matrix logo treatment is approved in both themes.
+- Right-side navigation contains Home, Summary and dynamic Goal entries.
+- Help and Filter utilities are hidden.
+- Do not use the legacy product name in user-facing product copy; use **Strategic Plan Dashboard**.
+
+### Release decision
+- Product owner instruction: **“i want to freeze v2.1.”**
+- V2.1 is the approved public-dashboard feature baseline.
+- After documentation and freeze checkpoint creation, subsequent Admin-page development begins on **v2.2**.
+- Do not modify the frozen V2.1 checkpoint for V2.2 work.
