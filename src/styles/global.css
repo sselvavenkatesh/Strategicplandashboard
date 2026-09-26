@@ -700,3 +700,12 @@ html[data-theme="light"] .initiativeEndLabel{color:#687d91}
 html[data-theme="light"] .keyResourcesBtn{background:#fff;color:#245a7e;border-color:#8ebbd7}
 html[data-theme="light"] .keyResourcesBtn:hover:not(:disabled),html[data-theme="light"] .keyResourcesBtn:focus-visible:not(:disabled){background:#edf7fd;border-color:#4d9fd1}
 @media(max-width:700px){.goalHeroActions{gap:6px}.keyResourcesBtn{height:34px;padding:0 10px;font-size:9px}}
+
+
+/* V2.1 goal-count scalability. Existing 1-4 goal desktop layout remains unchanged. */
+.uxWelcome .welcomeGoals{grid-template-columns:repeat(4,minmax(0,1fr))}
+.goalPage .goalTabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.goalPage .goalTab{flex:0 0 auto}
+.navPanel nav{min-height:0;max-height:calc(100vh - 120px);overflow-y:auto;padding-bottom:72px}
+@media(max-width:1000px){.uxWelcome .welcomeGoals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.uxWelcome .welcomeGoals{grid-template-columns:repeat(2,minmax(0,1fr))}}
