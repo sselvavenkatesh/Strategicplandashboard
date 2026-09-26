@@ -619,3 +619,50 @@ The product owner completed the V2.1 public-dashboard review and explicitly requ
 - V2.1 is the approved public-dashboard feature baseline.
 - After documentation and freeze checkpoint creation, subsequent Admin-page development begins on **v2.2**.
 - Do not modify the frozen V2.1 checkpoint for V2.2 work.
+
+
+---
+
+## V2.2 final requirements and freeze decision — 27 Sep 2026
+
+The product owner explicitly decided to stop the proposed V2.4/V2.5 split and instead **freeze all functionality completed to this point as Version 2.2**. GitHub documentation and release branching must reflect V2.2 as the current frozen product baseline.
+
+### Super Admin requirements captured in V2.2
+
+- Super Admin is reached by adding `/superadmin` to the product URL.
+- Dedicated Super Admin login is separate from the existing public-dashboard Admin login.
+- Super Admin Home shows counts of configured Goals, Indicators and Initiatives. Do not show Indicator_Data/Initiative_Data row counts as the Home KPIs.
+- Strategic Plan Configuration manages District Name, Strategic Plan Name, Strategic Plan Duration, Mission, Vision, Number of Goals, district logo and Admin Signin method.
+- Admin Signin choices: Userbased, Google, Microsoft. Provider-specific identifiers are shown conditionally. Sensitive OAuth secrets must not be exposed in browser code or persisted in District_Profile.
+- Intended SSO operating model: configuration is entered through the Super Admin interface and a secure backend applies provider configuration to Supabase Auth. The backend provider-configuration layer is not yet complete at this V2.2 freeze; do not claim otherwise.
+- Public Admin login switches between Userbased, Google and Microsoft based on District_Profile configuration. SSO-authenticated emails must still map to an active authorized Admin record.
+- District Logo uses a compact upload/change action; after update, the configured image is used in the public dashboard header.
+- Goal Master is editable from Super Admin. Goal ID is not displayed to the user and new IDs are intended to be backend-managed while existing IDs remain unchanged.
+- Goal Names must be distinct after trimming/case normalization. Duplicate names block save in both UI and backend validation.
+- Number of Goals cannot be reduced below the count of saved Goals through the count field. The user must explicitly delete the unwanted Goal.
+- Every saved Goal exposes a Delete action. Deletion requires a confirmation dialog. Cancel leaves the Goal unchanged. Successful deletion produces a push/toast notification.
+- Goal deletion is blocked when dependent Indicator/Initiative master or data records exist; no automatic cascading deletion of reporting data is allowed.
+- Implemented Super Admin CRUD operations must use professional transient push/toast notifications for success, warning and failure instead of persistent bottom-of-form messages.
+- Strategic Plan/Goal configuration Save is enabled and protected by server-validated Super Admin authorization.
+- Indicator/Initiative screens display Supabase data; Initiative data has pagination.
+- CSV templates/uploads are intended to omit user-managed Goal/Indicator/Initiative IDs and use backend-generated IDs for new records, but the Indicator/Initiative write/upload flow remains disabled at this freeze until full validation/atomic-write safeguards are implemented.
+- Goal-context sample image generation was requested as a future enhancement but was not completed as part of this V2.2 freeze.
+
+### Final V2.2 UX corrections
+
+- Super Admin configuration should remain compact.
+- Number of Goals is a narrow control.
+- Admin Signin is aligned beneath the Strategic Plan Duration column rather than consuming unnecessary width.
+- District Logo uses an Upload Logo / Change Logo button with a compact preview rather than a large upload box.
+- Delete Goal uses a centered confirmation modal with clear Cancel and Delete Goal actions; unnecessary/extraneous warning icon treatment was removed in the final source correction.
+
+### Freeze instruction
+
+Product-owner instruction: **“We can freeze till now and make the product release as V2.2.”**
+
+Release handling:
+1. Update README, AI context, BRD and this requirements log to V2.2 frozen status.
+2. Treat the resulting `v2.2` head as the release checkpoint.
+3. Do not add subsequent features to frozen V2.2; start a new version branch from it.
+4. Preserve `v2.1-frozen` as the previous public-dashboard checkpoint.
+5. Do not infer production deployment/merge approval from the freeze instruction alone.
