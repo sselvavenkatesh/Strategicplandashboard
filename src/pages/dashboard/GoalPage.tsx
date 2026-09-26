@@ -53,6 +53,15 @@ function InitiativeTimeline({initiative}:{initiative:Initiative}){
   </section>
 }
 
+function indicatorYAxisLabel(k:Indicator){
+  const type=(k.type||'').trim().toLowerCase();
+  if(type==='percent'||k.isPercent)return 'Percent of students proficient';
+  if(type==='number'&&k.shortName.toLowerCase().includes('sat'))return 'SAT score';
+  if(type==='currency'||k.shortName.toLowerCase().includes('fund balance'))return 'Fund balance';
+  if(type==='number')return 'Indicator value';
+  return k.type?String(k.type):'Indicator value';
+}
+
 function formatIndicatorValue(k:Indicator){
   if(k.numeric==null)return k.value;
   if(k.isPercent)return k.numeric.toFixed(1)+'%';
@@ -245,7 +254,7 @@ export function GoalPage(){
           <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>
           <div className="yearChooser"><label htmlFor="indicatorYear">Choose Year:</label><select id="indicatorYear" value={selectedYear} onChange={e=>setSelectedYear(e.target.value)}>{[...new Set(history.map((r:any)=>r.school_year))].map((y:any)=><option key={y}>{y}</option>)}</select></div>
           <div className={'studentChart '+(indicatorLoading?'isLoading':'')}>{indicatorLoading&&<div className="indicatorLoader" role="status" aria-live="polite"><i/><span>Loading data…</span></div>}
-            <div className="yAxisLabel">{indicator.isPercent?'Percent of students proficient':'Indicator value'}</div>
+            <div className="yAxisLabel">{indicatorYAxisLabel(indicator)}</div>
             <div className="studentBars">
               {(()=>{const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0));return rows.map((r:any)=><div className="studentBarCol" key={r.student_group}><div className="studentBar" style={{height:Math.max(4,(Number(r.value_3_numeric)||0)/mx*100)+'%'}}><b>{r.value_3_display??r.value_3_numeric}</b></div><span>{r.student_group}</span></div>)})()}
             </div>
