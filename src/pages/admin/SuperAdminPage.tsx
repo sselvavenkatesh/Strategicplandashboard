@@ -19,17 +19,19 @@ export function SuperAdminPage(){
  const[section,setSection]=useState<Section>('home');
  const[profile,setProfile]=useState<Profile>({districtName:'',planName:'',duration:'',mission:'',vision:'',goals:0,signinMethod:'Userbased',googleClientId:'',googleAuthId:'',microsoftClientId:'',microsoftTenantId:'',microsoftAuthId:''});
  const[initiativePage,setInitiativePage]=useState(1);const initiativePageSize=20;const[pendingDeleteGoals,setPendingDeleteGoals]=useState<any[]>([]);
- const[goals,setGoals]=useState<any[]>([]);const[indicators,setIndicators]=useState<any[]>([]);const[initiatives,setInitiatives]=useState<any[]>([]);
+ const[goals,setGoals]=useState<any[]>([]);const[indicators,setIndicators]=useState<any[]>([]);const[initiatives,setInitiatives]=useState<any[]>([]);const[indicatorCount,setIndicatorCount]=useState(0);const[initiativeCount,setInitiativeCount]=useState(0);
 
  useEffect(()=>{if(!authenticated)return;(async()=>{
-  const[{data:p},{data:g},{data:i},{data:n}]=await Promise.all([
+  const[{data:p},{data:g},{data:i},{data:n},{count:ic},{count:nc}]=await Promise.all([
    supabase.from('District_Profile').select('*').limit(1).maybeSingle(),
    supabase.from('Goal_master').select('*').order('Goal ID'),
    supabase.from('Indicator_Data').select('*'),
-   supabase.from('Initiative_Data').select('*')
+   supabase.from('Initiative_Data').select('*'),
+   supabase.from('Indicator_master').select('*',{count:'exact',head:true}).eq('Role','All'),
+   supabase.from('Initiative_master').select('*',{count:'exact',head:true}).eq('Role','All')
   ]);
   if(p)setProfile({districtName:p['School District Name']||'',planName:p['Strategic Plan Name']||'',duration:p['Strategic Plan Duration']||'',mission:p['Mission Statement']||'',vision:p['Vision Statement']||'',goals:Number(p['Total Goals']||0),signinMethod:(p['Admin Signin Method']||'Userbased') as SigninMethod,googleClientId:p['Google Client ID']||'',googleAuthId:p['Google Auth ID']||'',microsoftClientId:p['Microsoft Client ID']||'',microsoftTenantId:p['Microsoft Tenant ID']||'',microsoftAuthId:p['Microsoft Auth ID']||''});
-  setGoals(g||[]);setIndicators(i||[]);setInitiatives(n||[]);
+  setGoals(g||[]);setIndicators(i||[]);setInitiatives(n||[]);setIndicatorCount(ic||0);setInitiativeCount(nc||0);
  })()},[authenticated]);
 
  async function login(e:FormEvent){e.preventDefault();setError('');
@@ -65,7 +67,7 @@ export function SuperAdminPage(){
    <button className="superAdminLogout" onClick={logout}><LogOut size={16}/> Sign Out</button>
   </aside>
   <main className="superAdminMain"><header><div><small>SUPER ADMIN</small><h1>{menu.find(x=>x.id===section)?.label}</h1></div><span className="superAdminUser">selva@k12matrix.com</span></header>
-   {section==='home'&&<section><div className="adminWelcome"><Building2 size={26}/><div><h2>{profile.districtName||'District'}</h2><p>{profile.planName||'Strategic Plan'} · {profile.duration||'Duration not configured'}</p></div></div><div className="adminStats"><article><span>Goals</span><b>{profile.goals}</b></article><article><span>Indicator rows</span><b>{indicators.length}</b></article><article><span>Initiative rows</span><b>{initiatives.length}</b></article></div></section>}
+   {section==='home'&&<section><div className="adminWelcome"><Building2 size={26}/><div><h2>{profile.districtName||'District'}</h2><p>{profile.planName||'Strategic Plan'} · {profile.duration||'Duration not configured'}</p></div></div><div className="adminStats"><article><span>Goals</span><b>{profile.goals}</b></article><article><span>Indicators</span><b>{indicatorCount}</b></article><article><span>Initiatives</span><b>{initiativeCount}</b></article></div></section>}
    {section==='plan'&&<section className="adminPanel"><h2>District & Strategic Plan</h2><p>Configure the information displayed in the public Strategic Plan Dashboard.</p><div className="adminForm">
     <label>District Name<input value={profile.districtName} onChange={e=>setProfile({...profile,districtName:e.target.value})}/></label>
     <label>Strategic Plan Name<input value={profile.planName} onChange={e=>setProfile({...profile,planName:e.target.value})}/></label>
