@@ -690,3 +690,13 @@ html[data-theme="light"] .timelineTitle .timelineEndDate small{color:#71869a}
 .initiativeEndLabel{display:block;font-style:normal;font-weight:600;font-size:6px;line-height:1.05;color:#9fb0bf;margin-bottom:2px}
 @media (min-width:901px){.initiativeModal .initiativeEndLabel{font-size:6px}}
 html[data-theme="light"] .initiativeEndLabel{color:#687d91}
+
+
+/* V2.1 Goal Key Resources action. */
+.goalHeroActions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.keyResourcesBtn{height:38px;padding:0 16px;border:1px solid #39749e;border-radius:6px;background:#12334a;color:#eaf4fb;font:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease}
+.keyResourcesBtn:hover:not(:disabled),.keyResourcesBtn:focus-visible:not(:disabled){background:#174560;border-color:#55a7dc;transform:translateY(-1px);outline:none}
+.keyResourcesBtn:disabled{opacity:.55;cursor:not-allowed}
+html[data-theme="light"] .keyResourcesBtn{background:#fff;color:#245a7e;border-color:#8ebbd7}
+html[data-theme="light"] .keyResourcesBtn:hover:not(:disabled),html[data-theme="light"] .keyResourcesBtn:focus-visible:not(:disabled){background:#edf7fd;border-color:#4d9fd1}
+@media(max-width:700px){.goalHeroActions{gap:6px}.keyResourcesBtn{height:34px;padding:0 10px;font-size:9px}}
