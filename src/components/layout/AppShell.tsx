@@ -34,6 +34,7 @@ export function AppShell(){
   useEffect(()=>{
     const saved=sessionStorage.getItem('district360_admin');
     if(saved){try{setAdmin(JSON.parse(saved))}catch{sessionStorage.removeItem('district360_admin')}}
+    (async()=>{const{data:{session}}=await supabase.auth.getSession();const ssoEmail=session?.user?.email;if(!saved&&ssoEmail){const{data}=await supabase.rpc('validate_sso_admin',{p_email:ssoEmail});const row=Array.isArray(data)?data[0]:null;if(row){const profile={name:row.user_name||row.user_email,email:row.user_email};sessionStorage.setItem('district360_admin',JSON.stringify(profile));setAdmin(profile)}else{await supabase.auth.signOut();setAuthMessage('This SSO account is not authorized for Admin access.')}}})();
   },[]);
 
   async function submitSignIn(e:FormEvent){
