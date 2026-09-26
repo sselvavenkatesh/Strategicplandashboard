@@ -1,4 +1,4 @@
-# District 360 Strategic Plan Dashboard — User Requirements & Prompt Log
+# Strategic Plan Dashboard — User Requirements & Prompt Log
 
 > Living document capturing the product requirements, decisions, and implementation instructions provided by the product owner. Update this document as new requirements are supplied. It complements `MASTER_PRODUCT_SPEC.md`; it does not replace the approved specification or live schema inspection.
 
@@ -414,3 +414,150 @@ Release discipline:
 5. Perform desktop visual parity review page-by-page against frozen UX before requesting stakeholder review.
 6. Do not call a deployment review-ready merely because it builds or deploys.
 7. A release candidate must pass code/build checks, data checks, interaction checks, and visual-parity checks.
+
+
+---
+
+## Product naming clarification — 26 Sep 2026
+
+The product owner explicitly instructed: **Do not call the product “District 360.” The product name is “Strategic Plan Dashboard.”**
+
+Use **Strategic Plan Dashboard** in product documentation and future product discussions. Existing historical code identifiers, database values, storage/session keys, commit messages, or old screenshots may still contain “District 360”; do not rename technical identifiers without a separate migration requirement.
+
+## React implementation and release history — 24–26 Sep 2026
+
+The following prompt/decision history supplements the earlier UX and reporting requirements and records the product-owner instructions that drove the production React implementation.
+
+### React parity and QA discipline
+
+- The frozen UX is a strict visual specification, not general inspiration.
+- React must reproduce each approved UX component and use Supabase data rather than screenshot/sample KPI values.
+- The product owner explicitly required component-by-component comparison against the frozen UX before pushing a React candidate.
+- When QA finds a failure, do not stop at reporting it: investigate the cause, correct it, retest, and make the candidate stable.
+- A successful build alone is not sufficient to call a version review-ready.
+- Preview deployments are preferred during iteration. Production deployment happens only after explicit approval.
+- The product owner asked for basic automated/unit testing as part of the quality process.
+- Responsive behavior is required for web/desktop, laptop, tablet and mobile. Final release QA should explicitly cover representative viewport sizes rather than assuming media queries are sufficient.
+
+### Welcome page
+
+- Welcome React implementation was brought into parity with the frozen UX.
+- The primary CTA text was changed from **“Explore Full Dashboard →”** to **“Explore Strategic Plan →”** for V2.0.
+- Goal tiles on Welcome navigate to Summary.
+- Current page navigation uses a route-change loader carrying K12Matrix branding.
+
+### Summary / Goal Summary page
+
+- The generic **STRATEGIC PLAN** label above Goal Summary was replaced with the actual Strategic Plan Name and Strategic Plan Duration from District Profile.
+- Summary Goal cards use real Supabase Goal, Initiative and Indicator data.
+- Summary Key Indicator cards use **Indicator short names**.
+- Fund Balance is displayed in millions using the format **$x.xxM**.
+- LY variance respects KPI Nature: for Negative-nature indicators, a decrease is favorable; for Positive-nature indicators, an increase is favorable.
+- Percent indicators retain the percent suffix in LY variance.
+- Missing Indicator/Initiative data must use the approved unavailable state rather than fabricated data.
+
+### Goal page — Initiative requirements implemented
+
+- Initiative cards use Initiative short names and descriptions.
+- Four Initiative cards per row remain the desktop UX target.
+- Initiative progress is calculated from Action Item status rows.
+- Overall completion gauge and Done percentage use the same calculated completion.
+- Gauge color varies with progress; exactly 100% uses the same green as the Done status bar.
+- Gauge hover/focus detail includes Initiative name, Sub-Initiative names, Start Date, End Date, Total Action Items and Completed %.
+- Sub-Initiative stacked bars retain the compact/native tooltip behavior after the custom large stacked-bar tooltip experiment was explicitly rejected and reverted.
+- Initiative charts were explicitly approved/frozen for V1.0.
+
+### Goal page — Indicator requirements implemented / current behavior
+
+- Indicator cards use Indicator short names and descriptions.
+- Latest value, LY variance, Statewide Average and historical School Year bars are displayed.
+- Fund Balance uses **$x.xxM**.
+- Indicator and Statewide Average typography was aligned with the Initiative progress percentage treatment.
+- **Current V2.0 behavior supersedes the earlier frozen UX interaction:** the product owner explicitly requested that clicking a Goal Page Indicator card **must not open the Indicator detail popup**. The click and keyboard activation trigger was disabled in React. The underlying Indicator data/card remains visible.
+- The old Indicator detail implementation may remain in code temporarily, but it is not reachable from Goal Indicator cards unless the product owner explicitly re-enables that interaction.
+
+### Header, branding and loader
+
+- Riverside School District name in the header was enlarged while preserving the existing header height.
+- A professional district-style inline mark was added for the Riverside School District prototype.
+- **Powered By K12Matrix** branding was moved from the fixed global footer into the header.
+- The footer was removed from the current V2 React shell.
+- The canonical K12Matrix asset is the existing repository SVG: `ux-preview/assets/k12matrix-logo.svg`.
+- The frozen UX asset itself must not be edited.
+- A React-served copy is published at `public/k12matrix-logo.svg`; React references `/k12matrix-logo.svg` so Netlify/Vite can serve it reliably.
+- The same canonical K12Matrix SVG is used in the header, navigation panel and route-change loader.
+- On narrow mobile widths, header K12Matrix branding may be hidden to prevent collision/overflow while preserving the district identity and navigation controls.
+
+### Sign In
+
+- Sign In remains a compact pill action in the header.
+- Sign In opens a modal/popup.
+- The Sign In popup now includes the canonical **K12Matrix logo**.
+- Product-owner copy change: **“Sign in with your administrator account.”**
+- The previous copy “Sign in with your District 360 administrator account.” is obsolete.
+- Current Admin Sign In is a custom database-backed login using the `validate_admin_login(p_email,p_password)` RPC and pgcrypto password verification; it is not Supabase Auth.
+- Current browser session key is `district360_admin` (historical technical identifier; do not rename solely because the product display name changed).
+- Google/Microsoft SSO remains a future capability.
+
+### K12Matrix asset deployment correction
+
+A V2 preview initially showed broken K12Matrix images because React referenced `/ux-preview/assets/k12matrix-logo.svg`, which was not guaranteed to be copied into the Vite production bundle. The correction was:
+1. preserve the frozen source SVG;
+2. copy it to `public/k12matrix-logo.svg`;
+3. reference `/k12matrix-logo.svg` from React.
+
+This is the required deployment-safe pattern unless the asset pipeline is deliberately redesigned.
+
+### Responsive requirement and QA status
+
+Responsive CSS currently contains desktop/laptop/tablet/mobile adaptations. A separate experimental QA branch (`qa/v2.0-responsive`) was created to investigate additional responsive hardening, but the product owner later instructed **not to continue work on that branch**. Do not treat that branch as the active product branch.
+
+Active V2 development continued on `release/v2.0-dev`. Any V2.1 responsive work should start from the approved production baseline and be validated through a new preview branch.
+
+Representative release-QA viewport targets previously agreed:
+- 1920×1080 desktop
+- 1366×768 laptop
+- 768×1024 tablet
+- 390×844 mobile
+- 360×800 small mobile
+
+### Release/version control history
+
+- Frozen UX commit: `c75815e76e79b8fa97599d924265d7bd8015d0f7`.
+- V1.0 immutable release baseline branch: `release/v1.0`.
+- Goal Summary V1.0 merge into `react-dashboard`: `69791ec6c5558f9458c563bad3084d2f4c5aad28`.
+- V2.0 development branch: `release/v2.0-dev`.
+- V2.0 frozen checkpoint: `release/v2.0-frozen-checkpoint-1`.
+- Responsive experiment branch: `qa/v2.0-responsive` — no longer the active branch by explicit product-owner instruction.
+- Production hosting: Netlify.
+- Production site: `https://vocal-twilight-54ee43.netlify.app/#/`.
+- V2.0 was manually promoted/published in Netlify after successful preview deployment.
+- Current production candidate lineage includes disabling the Goal Indicator popup and adding the K12Matrix logo/revised copy to Sign In.
+
+### Netlify release discipline
+
+- Avoid unnecessary production publishes because production deploys consume Netlify credits.
+- Use Deploy Previews/branch previews for iteration where possible.
+- Do not claim Netlify built/passed a commit without checking deployment/status evidence.
+- The product owner may manually use Netlify **Publish deploy** to promote a successful Deploy Preview to production.
+- Public visibility is acceptable for stakeholder/product evaluation provided public users remain read-only and Admin capabilities/data remain protected.
+
+## V2.1 planning instruction
+
+V2.0 is the current production milestone. Before V2.1 feature development:
+1. preserve the production baseline;
+2. maintain this prompt/requirements log;
+3. maintain an AI handoff/context document in `docs`;
+4. maintain a functional BRD in `docs`;
+5. define V2.1 scope before implementation;
+6. use preview → QA → owner approval → freeze → production release discipline.
+
+## Documentation precedence
+
+When requirements conflict, use this order:
+1. the latest explicit product-owner instruction;
+2. the current production behavior when explicitly approved;
+3. the frozen UX baseline for areas not superseded;
+4. earlier exploratory requirements.
+
+Do not silently revive superseded behavior. In particular, the current product name is **Strategic Plan Dashboard**, Goal Indicator click-to-detail is disabled, K12Matrix branding is in the header/current shell rather than a fixed footer, and the Sign In copy is the revised administrator-account wording.
