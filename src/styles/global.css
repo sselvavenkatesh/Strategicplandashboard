@@ -709,3 +709,20 @@ html[data-theme="light"] .keyResourcesBtn:hover:not(:disabled),html[data-theme="
 .navPanel nav{min-height:0;max-height:calc(100vh - 120px);overflow-y:auto;padding-bottom:72px}
 @media(max-width:1000px){.uxWelcome .welcomeGoals{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.uxWelcome .welcomeGoals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* V2.1 indicator KPI row final alignment: variance sits slightly below KPI; LY Var stays beside it. */
+.goalPage .indicatorValueRow{align-items:flex-end}
+.goalPage .indicatorValueWrap{display:flex;align-items:flex-end;gap:7px;min-width:0;flex:1}
+.goalPage .varianceLine{display:flex!important;flex-direction:row!important;align-items:center!important;gap:4px!important;height:16px!important;min-height:16px!important;margin:0 0 1px!important;white-space:nowrap}
+.goalPage .varianceLabel{order:2!important;white-space:nowrap}
+.goalPage .variance{order:1!important}
+.goalPage .stateAvg{flex:0 0 auto;margin-left:12px;white-space:nowrap}
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorValueRow{align-items:flex-end!important}
+ .app-shell:has(.goalPage) .indicatorValueWrap{align-items:flex-end!important;gap:7px!important;min-width:0;flex:1}
+ .app-shell:has(.goalPage) .varianceLine{display:flex!important;flex-direction:row!important;align-items:center!important;gap:4px!important;height:16px!important;min-height:16px!important;margin:0 0 1px!important;white-space:nowrap}
+ .app-shell:has(.goalPage) .varianceLabel{order:2!important}
+ .app-shell:has(.goalPage) .variance{order:1!important}
+ .app-shell:has(.goalPage) .stateAvg{flex:0 0 auto;margin-left:12px!important;white-space:nowrap}
+}
