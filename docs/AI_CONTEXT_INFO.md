@@ -495,3 +495,19 @@ Before coding:
 8. For UX changes, compare the actual rendered candidate at desktop and mobile sizes before calling it complete.
 
 If code and documentation disagree, do not guess. Prefer the latest explicit product-owner requirement and ask for clarification when the conflict materially changes behavior.
+
+
+---
+
+## V2.1 freeze checkpoint — 26 Sep 2026
+
+V2.1 public dashboard is product-owner approved and frozen.
+
+Treat the V2.1 branch/checkpoint as immutable after the freeze. It contains the final approved public dashboard, including dark/light themes, scalable Goal handling, Key Resources, Initiative/Indicator popup refinements, Indicator selected-year behavior, navigation refinements, and final KPI/LY variance alignment.
+
+For subsequent work:
+- create/use **v2.2** from the frozen V2.1 head;
+- V2.2 scope begins with the **Admin page**;
+- do not alter the V2.1 frozen checkpoint to implement Admin functionality;
+- preserve existing public-dashboard behavior while Admin work proceeds;
+- follow build/test → Deploy Preview → QA → product-owner approval before any production promotion.
