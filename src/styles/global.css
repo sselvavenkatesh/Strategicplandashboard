@@ -684,3 +684,9 @@ html[data-theme="light"] .indicatorLoader i{border-color:#c3d1dc;border-top-colo
 .initiativeModal .timelineMilestoneGroup[style*="100%"] .timelineMilestoneLabels{text-align:right;align-items:flex-end}
 html[data-theme="light"] .timelineTitle .timelineEndDate{color:#40596f}
 html[data-theme="light"] .timelineTitle .timelineEndDate small{color:#71869a}
+
+
+/* V2.1 final timeline milestone: one flag, Initiative End above last sub-initiative. */
+.initiativeEndLabel{display:block;font-style:normal;font-weight:600;font-size:6px;line-height:1.05;color:#9fb0bf;margin-bottom:2px}
+@media (min-width:901px){.initiativeModal .initiativeEndLabel{font-size:6px}}
+html[data-theme="light"] .initiativeEndLabel{color:#687d91}
