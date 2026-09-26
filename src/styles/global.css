@@ -770,3 +770,7 @@ html[data-theme="light"] .keyResourcesBtn:hover:not(:disabled),html[data-theme="
 /* V2.2 verified configuration alignment */
 .adminForm .goalCountField{grid-column:1;align-self:start}.adminForm .signinField{grid-column:2;align-self:start}.adminForm .goalCountField .goalCountInput{width:72px!important;max-width:72px!important}.adminForm .signinField select{width:150px!important;min-width:150px!important;max-width:150px!important}.adminConfirmModal{padding:22px!important;overflow:visible!important}.adminConfirmModal h3{margin:0 0 9px!important}.adminConfirmModal .modalActions{display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:10px!important;margin-top:20px!important}.adminConfirmModal .modalCancel,.adminConfirmModal .modalDelete{position:static!important;display:inline-flex!important;visibility:visible!important;opacity:1!important;transform:none!important;min-width:100px!important;height:36px!important;margin:0!important}
 @media(max-width:800px){.adminForm .goalCountField,.adminForm .signinField{grid-column:1/-1}}
+
+/* V2.2 final indicator-popup refinement: separate year control from plot area. */
+.indicatorModal .yearChooser{margin-bottom:30px}
+@media (min-width:901px){.indicatorModal .yearChooser{margin-bottom:20px}}
