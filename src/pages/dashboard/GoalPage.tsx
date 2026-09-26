@@ -84,7 +84,7 @@ function chartScale(indicator:Indicator,groups:any[]){
   const fund=indicator.shortName.toLowerCase().includes('fund balance')||indicator.name.toLowerCase().includes('fund balance');
   const format=(n:number)=>{
     if(!fund)return n.toLocaleString(undefined,{maximumFractionDigits:1});
-    if(Math.abs(n)>=1000000)return 'function formatIndicatorValue(k:Indicator){
+    if(Math.abs(n)>=1000000)return '
   if(k.numeric==null)return k.value;
   if(k.isPercent)return k.numeric.toFixed(1)+'%';
   if(k.shortName.toLowerCase().includes('fund balance')||k.name.toLowerCase().includes('fund balance'))return '$'+(k.numeric/1000000).toFixed(2)+'M';
@@ -291,7 +291,7 @@ export function GoalPage(){
   </main>;
 }
 +(n/1000000).toFixed(n%1000000===0?0:1)+'M';
-    if(Math.abs(n)>=1000)return 'function formatIndicatorValue(k:Indicator){
+    if(Math.abs(n)>=1000)return '
   if(k.numeric==null)return k.value;
   if(k.isPercent)return k.numeric.toFixed(1)+'%';
   if(k.shortName.toLowerCase().includes('fund balance')||k.name.toLowerCase().includes('fund balance'))return '$'+(k.numeric/1000000).toFixed(2)+'M';
@@ -497,7 +497,7 @@ export function GoalPage(){
   </main>;
 }
 +(n/1000).toFixed(0)+'K';
-    return 'function formatIndicatorValue(k:Indicator){
+    return '
   if(k.numeric==null)return k.value;
   if(k.isPercent)return k.numeric.toFixed(1)+'%';
   if(k.shortName.toLowerCase().includes('fund balance')||k.name.toLowerCase().includes('fund balance'))return '$'+(k.numeric/1000000).toFixed(2)+'M';
