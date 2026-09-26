@@ -16,6 +16,7 @@ export function AppShell(){
   const[password,setPassword]=useState('');
   const[authMessage,setAuthMessage]=useState('');
   const[authBusy,setAuthBusy]=useState(false);
+  const[signinMethod,setSigninMethod]=useState<'Userbased'|'Google'|'Microsoft'>('Userbased');
   const[admin,setAdmin]=useState<AdminProfile|null>(null);
   const p=useDashboard(getProfile),g=useDashboard(getGoals);
   const nav=useNavigate();
@@ -27,6 +28,8 @@ export function AppShell(){
     const timer=window.setTimeout(()=>setPageLoading(false),450);
     return()=>window.clearTimeout(timer);
   },[location.pathname]);
+
+  useEffect(()=>{(async()=>{const{data}=await supabase.from('District_Profile').select('"Admin Signin Method"').limit(1).maybeSingle();if(data?.['Admin Signin Method'])setSigninMethod(data['Admin Signin Method'])})()},[]);
 
   useEffect(()=>{
     const saved=sessionStorage.getItem('district360_admin');
@@ -49,7 +52,14 @@ export function AppShell(){
     setAdmin(profile);setPassword('');setSignInOpen(false);setAuthBusy(false);nav('/');
   }
 
-  function signOut(){sessionStorage.removeItem('district360_admin');setAdmin(null);nav('/')}
+  async function submitSso(provider:'google'|'azure'){
+    setAuthBusy(true);setAuthMessage('');
+    const options=provider==='azure'?{redirectTo:window.location.origin,scopes:'email openid profile',queryParams:{prompt:'select_account'}}:{redirectTo:window.location.origin,queryParams:{prompt:'select_account'}};
+    const{error}=await supabase.auth.signInWithOAuth({provider,options});
+    if(error){setAuthMessage('SSO sign in could not be started. Please contact your administrator.');setAuthBusy(false)}
+  }
+
+  function signOut(){sessionStorage.removeItem('district360_admin');setAdmin(null);supabase.auth.signOut();nav('/')}
 
   return <div className="app-shell">
     {pageLoading&&<div className="pageLoader" role="status" aria-live="polite" aria-label="Loading page"><img className="k12LoaderLogo" src="/k12matrix-logo.svg" alt="K12Matrix"/><div className="k12LoaderPulse"/><small>Loading strategic plan…</small></div>}
@@ -72,10 +82,15 @@ export function AppShell(){
       <form className="signInCard" onSubmit={submitSignIn}>
         <button type="button" className="signInClose" aria-label="Close sign in" onClick={()=>setSignInOpen(false)}>×</button>
         <img className="signInK12Logo" src="/k12matrix-logo.svg" alt="K12Matrix"/><small>ADMIN ACCESS</small><h2 id="signInTitle">Sign In</h2><p>Sign in with your administrator account.</p>
-        <label htmlFor="adminEmail">Email</label><input id="adminEmail" type="email" autoComplete="username" required value={email} onChange={e=>setEmail(e.target.value)}/>
-        <label htmlFor="adminPassword">Password</label><input id="adminPassword" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)}/>
-        {authMessage&&<div className="signInError" role="alert">{authMessage}</div>}
-        <button className="signInSubmit" type="submit" disabled={authBusy}>{authBusy?'Signing in…':'Sign In'}</button>
+        {signinMethod==='Userbased'?<>
+          <label htmlFor="adminEmail">Email</label><input id="adminEmail" type="email" autoComplete="username" required value={email} onChange={e=>setEmail(e.target.value)}/>
+          <label htmlFor="adminPassword">Password</label><input id="adminPassword" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)}/>
+          {authMessage&&<div className="signInError" role="alert">{authMessage}</div>}
+          <button className="signInSubmit" type="submit" disabled={authBusy}>{authBusy?'Signing in…':'Sign In'}</button>
+        </>:<>
+          {authMessage&&<div className="signInError" role="alert">{authMessage}</div>}
+          <button className="signInSubmit ssoSignIn" type="button" disabled={authBusy} onClick={()=>submitSso(signinMethod==='Google'?'google':'azure')}>Sign in with {signinMethod}</button>
+        </>}
       </form>
     </div>}
   </div>
