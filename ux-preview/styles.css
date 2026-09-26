@@ -343,3 +343,10 @@ html[data-theme="light"] .indicatorChartTitle>span:hover:after{
   color:#334c62!important;
   box-shadow:0 5px 16px rgba(35,60,84,.12)!important;
 }
+
+
+/* Light-theme K12Matrix branding: use dark K12 wordmark for contrast on light surfaces. */
+html[data-theme="light"] .k12MatrixLogo,
+html[data-theme="light"] .navPowered img{
+  content:url('./assets/k12matrix-logo-light.svg');
+}
