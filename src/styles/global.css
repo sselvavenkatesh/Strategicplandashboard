@@ -637,3 +637,38 @@ html[data-theme="light"] .timelineMilestoneLabels div{background:#eaf1f7}.timeli
  .initiativeModal .modalProgressBar{height:18px}
  .initiativeModal .modalLegend{margin-top:6px}
 }
+
+
+/* V2.1 popup refinement — readable timeline labels + matching compact indicator popup. */
+@media (min-width:901px){
+ .initiativeModal .timelineScale{margin-left:34px;margin-right:34px}
+ .initiativeModal .timelineMilestoneGroup{max-width:170px}
+ .initiativeModal .timelineMilestoneLabels{min-width:125px;max-width:170px}
+ .initiativeModal .timelineMilestoneLabels strong{font-size:7.5px;line-height:1.12}
+ .initiativeModal .timelineMilestoneLabels span{font-size:7px;line-height:1.05}
+ .initiativeModal .timelineStart{transform:translateX(-10px)}
+ .initiativeModal .timelineEnd{transform:translateX(10px)}
+
+ .indicatorModal{padding:8px 12px 16px}
+ .indicatorModal .indicatorModalShell{max-width:1420px;max-height:calc(100vh - 24px);overflow:hidden}
+ .indicatorModal .indicatorModalGoal{padding:10px 22px 8px}
+ .indicatorModal .indicatorModalGoal .popupGoalIcon{width:34px;height:34px}
+ .indicatorModal .indicatorModalGoal h2{font-size:17px;margin:1px 0}
+ .indicatorModal .indicatorModalGoal p{font-size:9px}
+ .indicatorModal .indicatorModalHead{padding:7px 22px}
+ .indicatorModal .indicatorModalHead h3{font-size:12px}
+ .indicatorModal .currentKpi{margin:8px 14px 7px;padding:8px 13px;width:410px}
+ .indicatorModal .currentKpi b{font-size:19px}
+ .indicatorModal .indicatorChartPanel{margin:0 14px 10px;padding:10px 12px}
+ .indicatorModal .indicatorChartTitle h3{font-size:13px}
+ .indicatorModal .yearChooser{margin:8px 0 12px;padding:5px 8px}
+ .indicatorModal .yearChooser select{padding:5px 8px}
+ .indicatorModal .studentChart{height:245px;margin-left:40px}
+ .indicatorModal .xAxisLabel{margin-top:28px}
+ .indicatorModal .chartNote{margin-top:15px}
+}
+.indicatorLoader{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(8,20,33,.78);backdrop-filter:blur(2px);font-size:9px;color:#dbe7f0}
+.indicatorLoader i{width:26px;height:26px;border:3px solid #52697d;border-top-color:#1597ff;border-radius:50%;animation:indicatorSpin .75s linear infinite}
+@keyframes indicatorSpin{to{transform:rotate(360deg)}}
+html[data-theme="light"] .indicatorLoader{background:rgba(247,250,252,.82);color:#334d63}
+html[data-theme="light"] .indicatorLoader i{border-color:#c3d1dc;border-top-color:#1597ff}
