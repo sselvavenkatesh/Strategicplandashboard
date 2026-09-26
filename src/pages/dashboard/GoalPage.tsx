@@ -78,10 +78,20 @@ function chartScale(indicator:Indicator,groups:any[]){
   const power=Math.pow(10,Math.floor(Math.log10(rough)));
   const normalized=rough/power;
   const nice=normalized<=1?1:normalized<=2?2:normalized<=5?5:10;
-  const step=nice*power,max=Math.max(step,Math.ceil(dataMax/step)*step);
+  const step=nice*power;
+  const max=Math.max(step,Math.ceil(dataMax/step)*step);
   const ticks=Array.from({length:Math.round(max/step)+1},(_,i)=>i*step);
   const fund=indicator.shortName.toLowerCase().includes('fund balance')||indicator.name.toLowerCase().includes('fund balance');
-  return{max,ticks,format:(n:number)=>fund?(Math.abs(n)>=1000000?'
+  const format=(n:number)=>{
+    if(!fund)return n.toLocaleString(undefined,{maximumFractionDigits:1});
+    if(Math.abs(n)>=1000000)return '$'+(n/1000000).toFixed(n%1000000===0?0:1)+'M';
+    if(Math.abs(n)>=1000)return '$'+(n/1000).toFixed(0)+'K';
+    return '$'+n.toFixed(0);
+  };
+  return{max,ticks,format};
+}
+
+function formatIndicatorValue(k:Indicator){
   if(k.numeric==null)return k.value;
   if(k.isPercent)return k.numeric.toFixed(1)+'%';
   if(k.shortName.toLowerCase().includes('fund balance')||k.name.toLowerCase().includes('fund balance'))return '$'+(k.numeric/1000000).toFixed(2)+'M';
