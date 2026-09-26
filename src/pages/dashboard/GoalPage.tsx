@@ -112,7 +112,7 @@ export function GoalPage(){
 
   const goalIndex=Math.max(0,goals.data?.findIndex(g=>g.id===id)??0);
   const goalIcon=['★','◆','♥','✦'][goalIndex%4];
-  const keyResourcesUrl=(import.meta.env.VITE_KEY_RESOURCES_URL||'').trim();
+  const keyResourcesUrl='https://workdrive.zoho.com/folder/jmdh6c3b96a0af6d340ee91a0363cde9f8dbf';
 
   return <main className="page goalPage">
     <nav className="goalTabs" aria-label="Strategic goals">
