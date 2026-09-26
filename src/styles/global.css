@@ -445,3 +445,56 @@ html[data-theme="light"] .signInCard label{color:#536a80}
 html[data-theme="light"] .signInCard input{background:#f7f9fc;color:#17283a;border-color:#c8d5e0}
 html[data-theme="light"] .signInClose{background:#f4f7fa;color:#344b61;border-color:#ccd8e3}
 html[data-theme="light"] #globalFooter{background:rgba(248,251,255,.96)!important;border-top:1px solid #dce5ed!important;color:#667b8e!important}
+
+
+/* V2.1 light-theme parity correction — exact frozen UX color selectors.
+   Color-only: no layout, sizing, typography, positioning, data or interaction changes. */
+html[data-theme="light"] .summaryPage .summaryGoal .clamp3{color:#61768a!important}
+html[data-theme="light"] .summaryHeading>span{color:#61768a}
+html[data-theme="light"] .summaryPage .legend{color:#61768a}
+html[data-theme="light"] .summaryPage .varianceLine small{color:#71869a!important}
+
+html[data-theme="light"] .goalPage .goalTabs{border-color:#d0dce6}
+html[data-theme="light"] .goalPage .goalTab{background:transparent;color:#667d91;border-color:transparent}
+html[data-theme="light"] .goalPage .goalTab.active{background:transparent;color:#17283a;border-color:transparent;border-bottom-color:#1597ff}
+html[data-theme="light"] .goalPage .goalHero h2,
+html[data-theme="light"] .goalPage .goalSectionTitle h3{color:#17283a}
+html[data-theme="light"] .goalPage .goalHero p{color:#526a80}
+html[data-theme="light"] .goalPage .goalHero small,
+html[data-theme="light"] .goalPage .goalSectionTitle small{color:#3779a8}
+html[data-theme="light"] .goalPage .goalHeroIcon{border-color:#b9d4e7;background:#e9f4fb;color:#1684c8}
+html[data-theme="light"] .goalPage .goalSectionTitle>span{color:#708397}
+
+html[data-theme="light"] .goalPage .initiativeCard.detailed,
+html[data-theme="light"] .goalPage .indicatorCard{background:#fff;border-color:#cbd8e4;color:#17283a;box-shadow:0 4px 14px rgba(35,60,84,.06)}
+html[data-theme="light"] .goalPage .initiativeCard:hover,
+html[data-theme="light"] .goalPage .initiativeCard:focus-visible,
+html[data-theme="light"] .goalPage .indicatorCard:hover,
+html[data-theme="light"] .goalPage .indicatorCard:focus-visible{background:#fbfdff;border-color:#68a8d4}
+html[data-theme="light"] .goalPage .initiativeIntro,
+html[data-theme="light"] .goalPage .indicatorIntro{background:linear-gradient(90deg,#edf4fa,#f7fafc)!important;color:#17283a!important}
+html[data-theme="light"] .goalPage .initiativeIntro h4,
+html[data-theme="light"] .goalPage .indicatorIntro h4,
+html[data-theme="light"] .goalPage .donePct,
+html[data-theme="light"] .goalPage .indicatorValue{color:#20384e!important}
+html[data-theme="light"] .goalPage .initiativeIntro p,
+html[data-theme="light"] .goalPage .indicatorIntro p,
+html[data-theme="light"] .goalPage .subLegend{color:#657b8f!important}
+html[data-theme="light"] .goalPage .initiativeSummary{background:#f5f9fc!important;border-color:#d8e3ec!important;color:#20384e!important}
+html[data-theme="light"] .goalPage .initiativeSummary .duration{color:#61778b!important}
+html[data-theme="light"] .goalPage .gauge:after{background:#f5f9fc!important}
+html[data-theme="light"] .goalPage .gauge b{color:#20384e}
+html[data-theme="light"] .goalPage .subRow>span{color:#20384e!important}
+html[data-theme="light"] .goalPage .subBar i{color:#101820}
+html[data-theme="light"] .goalPage .stateAvg{color:#64798d!important}
+html[data-theme="light"] .goalPage .stateAvg b{color:#344c62!important}
+html[data-theme="light"] .goalPage .yearBars{border-color:#ccd9e4}
+html[data-theme="light"] .goalPage .yearBars i{background:#4d9ed5!important}
+html[data-theme="light"] .goalPage .yearLabels{color:#71869a!important}
+html[data-theme="light"] .goalPage .barValue{color:#fff}
+html[data-theme="light"] .goalPage .varianceLabel{color:#71869a!important}
+html[data-theme="light"] .goalPage .variance.positive{background:#e1f3e8!important;color:#2f7650!important;opacity:1}
+html[data-theme="light"] .goalPage .variance.negative{background:#fae5e3!important;color:#a74943!important;opacity:1}
+
+html[data-theme="light"] .goalPage .initiativeProgressTooltip{background:#fff!important;border-color:#c9d7e3!important;color:#17283a!important;box-shadow:0 12px 32px rgba(31,53,73,.18)!important}
+html[data-theme="light"] .goalPage .initiativeProgressTooltip span{color:#64798d!important}
