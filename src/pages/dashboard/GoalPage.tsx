@@ -40,7 +40,7 @@ function InitiativeTimeline({initiative}:{initiative:Initiative}){
   const groups=new Map<string,typeof initiative.subInitiatives>();
   initiative.subInitiatives.forEach(s=>{const key=s.end||max||'';groups.set(key,[...(groups.get(key)||[]),s])});
   return <section className="timelinePanel">
-    <div className="timelineTitle"><b>Plan of Action</b><span>{min||'Start'} — {max||'End'}</span></div>
+    <div className="timelineTitle"><b>Plan of Action</b><span className="timelineEndDate"><small>END DATE</small><strong>{max||'End'}</strong></span></div>
     <div className="timelineScale">
       <div className="timelineLine"/>
       <div className="timelineEndpoint timelineStart"><i className="greenFlag">⚑</i><b>{min||'Start'}</b><span>Initiative Start</span></div>
@@ -48,7 +48,7 @@ function InitiativeTimeline({initiative}:{initiative:Initiative}){
         <i className={items.every(s=>s.completion>=99.999)?'greenFlag':'redFlag'}>⚑</i>
         <div className="timelineMilestoneLabels">{items.map(s=><div key={s.name}><strong>{s.name}</strong><span>{s.end||date}</span></div>)}</div>
       </div>)}
-      <div className="timelineEndpoint timelineEnd"><i className={initiative.completion>=99.999?'greenFlag':'redFlag'}>⚑</i><b>{max||'End'}</b><span>Initiative End</span></div>
+      <div className="timelineEndpoint timelineEnd"><i className={initiative.completion>=99.999?'greenFlag':'redFlag'}>⚑</i></div>
     </div>
     <div className="timelineLegend"><span><i className="greenFlag">⚑</i> Completed</span><span><i className="redFlag">⚑</i> Not Completed</span></div>
   </section>
@@ -229,7 +229,26 @@ export function GoalPage(){
         <div className="indicatorModalHead"><span className="statusDot"/><h3>{indicator.shortName}</h3></div>
         <section className="currentKpi">
           <div><small>CY: {selectedYear||indicator.year}</small><span>{indicator.shortName}{indicator.isPercent?' Proficient %':''}</span></div>
-          <b>{formatIndicatorValue(indicator)}</b>
+          <b>{(()=>{const r=history.find((x:any)=>x.school_year===selectedYear);if(!r)return formatIndicatorValue(indicator);const raw=r.value_3_display;const n=r.value_3_numeric==null?null:Number(r.value_3_numeric);if(raw!=null)return String(raw);if(n==null)return '—';if(indicator.isPercent)return n.toFixed(1)+'%';if(indicator.shortName.toLowerCase().includes('fund balance')||indicator.name.toLowerCase().includes('fund balance'))return '
+        </section>
+        <section className="indicatorChartPanel">
+          <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>
+          <div className="yearChooser"><label htmlFor="indicatorYear">Choose Year:</label><select id="indicatorYear" value={selectedYear} onChange={e=>setSelectedYear(e.target.value)}>{[...new Set(history.map((r:any)=>r.school_year))].map((y:any)=><option key={y}>{y}</option>)}</select></div>
+          <div className={'studentChart '+(indicatorLoading?'isLoading':'')}>{indicatorLoading&&<div className="indicatorLoader" role="status" aria-live="polite"><i/><span>Loading data…</span></div>}
+            <div className="yAxisLabel">{indicator.isPercent?'Percent of students proficient':'Indicator value'}</div>
+            <div className="studentBars">
+              {(()=>{const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0));return rows.map((r:any)=><div className="studentBarCol" key={r.student_group}><div className="studentBar" style={{height:Math.max(4,(Number(r.value_3_numeric)||0)/mx*100)+'%'}}><b>{r.value_3_display??r.value_3_numeric}</b></div><span>{r.student_group}</span></div>)})()}
+            </div>
+            {(()=>{const avg=groups.find((r:any)=>r.statewide_value_3_numeric!=null);const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0),Number(avg?.statewide_value_3_numeric)||0);return avg?<div className="stateAvgLine" style={{bottom:Math.min(100,Math.max(0,(Number(avg.statewide_value_3_numeric)||0)/mx*100))+'%'}}><span>Statewide Average: {avg.statewide_value_3_display??avg.statewide_value_3_numeric}</span></div>:null})()}
+          </div>
+          <div className="xAxisLabel">Student Group</div>
+          <p className="chartNote">ⓘ Student-group performance for the selected school year. Statewide Average is shown as a reference line.</p>
+        </section>
+      </div>
+    </div>}
+  </main>;
+}
++(n/1000000).toFixed(2)+'M';return n.toFixed(1)})()}</b>
         </section>
         <section className="indicatorChartPanel">
           <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>
