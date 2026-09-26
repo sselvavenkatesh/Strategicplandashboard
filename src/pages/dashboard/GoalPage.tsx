@@ -24,6 +24,36 @@ function InitiativeBars({i}:{i:Initiative}){
   </div>;
 }
 
+function parseMonthDate(v?:string){
+  if(!v)return null;
+  const s=String(v).trim(),m=s.match(/^([A-Za-z]{3})-(\d{4})$/);
+  const d=m?new Date(`1 ${m[1]} ${m[2]}`):new Date(s);
+  return Number.isNaN(d.getTime())?null:d;
+}
+function timelinePct(v:string|undefined,min:string|undefined,max:string|undefined){
+  const d=parseMonthDate(v),a=parseMonthDate(min),b=parseMonthDate(max);
+  if(!d||!a||!b||b.getTime()===a.getTime())return 50;
+  return Math.max(0,Math.min(100,(d.getTime()-a.getTime())/(b.getTime()-a.getTime())*100));
+}
+function InitiativeTimeline({initiative}:{initiative:Initiative}){
+  const min=initiative.start,max=initiative.end;
+  const groups=new Map<string,typeof initiative.subInitiatives>();
+  initiative.subInitiatives.forEach(s=>{const key=s.end||max||'';groups.set(key,[...(groups.get(key)||[]),s])});
+  return <section className="timelinePanel">
+    <div className="timelineTitle"><b>Plan of Action</b><span>{min||'Start'} — {max||'End'}</span></div>
+    <div className="timelineScale">
+      <div className="timelineLine"/>
+      <div className="timelineEndpoint timelineStart"><i className="greenFlag">⚑</i><b>{min||'Start'}</b><span>Initiative Start</span></div>
+      {[...groups.entries()].map(([date,items])=><div className="timelineMilestoneGroup" key={date} style={{left:timelinePct(date,min,max)+'%'}}>
+        <i className={items.every(s=>s.completion>=99.999)?'greenFlag':'redFlag'}>⚑</i>
+        <div className="timelineMilestoneLabels">{items.map(s=><div key={s.name}><strong>{s.name}</strong><span>{s.end||date}</span></div>)}</div>
+      </div>)}
+      <div className="timelineEndpoint timelineEnd"><i className={initiative.completion>=99.999?'greenFlag':'redFlag'}>⚑</i><b>{max||'End'}</b><span>Initiative End</span></div>
+    </div>
+    <div className="timelineLegend"><span><i className="greenFlag">⚑</i> Completed</span><span><i className="redFlag">⚑</i> Not Completed</span></div>
+  </section>
+}
+
 function formatIndicatorValue(k:Indicator){
   if(k.numeric==null)return k.value;
   if(k.isPercent)return k.numeric.toFixed(1)+'%';
@@ -135,7 +165,7 @@ export function GoalPage(){
         const rows=(histories[k.id]||[]).filter((r:any)=>r.value_3_numeric!=null).slice(-4);
         const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0));
         const favorable=k.variance==null?null:(k.nature==='Negative'?k.variance<=0:k.variance>=0);
-        return <article className="indicatorCard goalIndicatorCard" key={k.id}>
+        return <article className="indicatorCard goalIndicatorCard" key={k.id} onClick={()=>setIndicator(k)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')setIndicator(k)}}>
           <div className="indicatorIntro"><h4>{k.shortName}</h4><p title={k.name}>{k.name}</p></div>
           <div className="indicatorValueRow">
             <div className="indicatorValueWrap">
@@ -167,19 +197,10 @@ export function GoalPage(){
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
         <div className="modalInitiativeHead"><span className="statusDot"/><div><small>INITIATIVE</small><h3>{initiative.shortName}</h3></div></div>
-        <section className="timelinePanel">
-          <div className="timelineTitle"><b>Plan of Action</b><span>{initiative.start||'Start'} — {initiative.end||'End'}</span></div>
-          <div className="timelineTrack">
-            <div className="timelineLine"/>
-            <div className="milestone start"><i>⚑</i><b>{initiative.start||'Start'}</b><span>Initiative Start</span></div>
-            {initiative.subInitiatives.slice(0,5).map((s,idx)=><div className="milestone" key={s.name}><i>•</i><b>{idx+1}</b><span title={s.name}>{s.name}</span></div>)}
-            <div className="milestone end"><i>⚑</i><b>{initiative.end||'End'}</b><span>Initiative End</span></div>
-          </div>
-          <div className="timelineLegend"><span>● Initiative Start</span><span>○ In Progress</span><span>● Initiative End</span></div>
-        </section>
+        <InitiativeTimeline initiative={initiative}/>
         <section className="overallPanel">
           <div><small>INITIATIVE OVERALL PROGRESS</small><div className="overallDone"><b>{initiative.completion.toFixed(0)}%</b><span>Done</span></div></div>
-          <div className="modalGauge" style={{'--pct':initiative.completion+'%'} as React.CSSProperties}><b>{initiative.completion.toFixed(0)}%</b></div>
+          <div className="modalGauge" style={{'--pct':initiative.completion+'%','--progress-color':(initiative.completion>=100?'var(--green)':`hsl(${Math.round(initiative.completion*1.2)} 72% 48%)`)} as React.CSSProperties}><b>{initiative.completion.toFixed(0)}%</b></div>
         </section>
         <section className="progressPanel">
           <div className="progressTitle"><div><small>SUB-INITIATIVE STATUS</small><h3>Initiative Progress</h3></div><span>Done · In Progress · Not Started</span></div>
