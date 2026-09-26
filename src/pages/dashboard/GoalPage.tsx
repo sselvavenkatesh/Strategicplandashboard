@@ -111,7 +111,7 @@ export function GoalPage(){
   if(error)return <main className="page state error">{error}</main>;
 
   const goalIndex=Math.max(0,goals.data?.findIndex(g=>g.id===id)??0);
-  const goalIcon=['★','◆','♥','✦'][goalIndex%4];
+  const goalIcon=['★','◆','♥','✦','●','▲','⬟','✚'][goalIndex%8];
   const keyResourcesUrl='https://workdrive.zoho.com/folder/jmdh6c3b96a0af6d340ee91a0363cde9f8dbf';
 
   return <main className="page goalPage">
