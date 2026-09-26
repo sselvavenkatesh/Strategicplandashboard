@@ -159,38 +159,71 @@ export function GoalPage(){
       })}
     </section>
 
-    {initiative&&<div className="modal" onClick={()=>setInitiative(null)}>
-      <article className="modalCard" onClick={e=>e.stopPropagation()}>
-        <button className="close" onClick={()=>setInitiative(null)} aria-label="Close">×</button>
-        <p className="eyebrow">{goal.name}</p>
-        <h2>{initiative.shortName}</h2>
-        <p>{initiative.name}</p>
-        <div className="timeline"><b>Plan of Action</b><span>{initiative.start||'Start'} ━━━━━━━━━━━ {initiative.end||'End'}</span></div>
-        <div className="bigCompletion"><strong>{initiative.completion.toFixed(0)}%</strong><span>Overall Done</span></div>
-        <h3>Initiative Progress</h3>
-        <InitiativeBars i={initiative}/>
-      </article>
+    {initiative&&<div className="initiativeModal open" role="dialog" aria-modal="true" aria-label={initiative.shortName} onClick={()=>setInitiative(null)}>
+      <div className="modalShell" onClick={e=>e.stopPropagation()}>
+        <button className="modalClose" onClick={()=>setInitiative(null)} aria-label="Close">×</button>
+        <div className="modalGoal">
+          <span className="popupGoalIcon" aria-hidden="true">✦</span>
+          <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
+        </div>
+        <div className="modalInitiativeHead"><span className="statusDot"/><div><small>INITIATIVE</small><h3>{initiative.shortName}</h3></div></div>
+        <section className="timelinePanel">
+          <div className="timelineTitle"><b>Plan of Action</b><span>{initiative.start||'Start'} — {initiative.end||'End'}</span></div>
+          <div className="timelineTrack">
+            <div className="timelineLine"/>
+            <div className="milestone start"><i>⚑</i><b>{initiative.start||'Start'}</b><span>Initiative Start</span></div>
+            {initiative.subInitiatives.slice(0,5).map((s,idx)=><div className="milestone" key={s.name}><i>•</i><b>{idx+1}</b><span title={s.name}>{s.name}</span></div>)}
+            <div className="milestone end"><i>⚑</i><b>{initiative.end||'End'}</b><span>Initiative End</span></div>
+          </div>
+          <div className="timelineLegend"><span>● Initiative Start</span><span>○ In Progress</span><span>● Initiative End</span></div>
+        </section>
+        <section className="overallPanel">
+          <div><small>INITIATIVE OVERALL PROGRESS</small><div className="overallDone"><b>{initiative.completion.toFixed(0)}%</b><span>Done</span></div></div>
+          <div className="modalGauge" style={{'--pct':initiative.completion+'%'} as React.CSSProperties}><b>{initiative.completion.toFixed(0)}%</b></div>
+        </section>
+        <section className="progressPanel">
+          <div className="progressTitle"><div><small>SUB-INITIATIVE STATUS</small><h3>Initiative Progress</h3></div><span>Done · In Progress · Not Started</span></div>
+          <div>
+            {initiative.subInitiatives.map(s=><div className="modalProgressRow" key={s.name}>
+              <span title={s.name}>{s.name}</span>
+              <div className="modalProgressBar" aria-label={`${s.name}: ${s.done.toFixed(0)}% Done, ${s.inProgress.toFixed(0)}% In Progress, ${s.notStarted.toFixed(0)}% Not Started`}>
+                <i className="done" style={{width:s.done+'%'}}>{s.done>=10?Math.round(s.done)+'%':''}</i>
+                <i className="progress" style={{width:s.inProgress+'%'}}>{s.inProgress>=10?Math.round(s.inProgress)+'%':''}</i>
+                <i className="not" style={{width:s.notStarted+'%'}}>{s.notStarted>=10?Math.round(s.notStarted)+'%':''}</i>
+              </div>
+            </div>)}
+          </div>
+          <div className="modalLegend"><span><i className="done"/>Done</span><span><i className="progress"/>In Progress</span><span><i className="not"/>Not Started</span></div>
+        </section>
+      </div>
     </div>}
 
-    {indicator&&<div className="modal" onClick={()=>setIndicator(null)}>
-      <article className="modalCard indicatorModalCard" onClick={e=>e.stopPropagation()}>
-        <button className="close" onClick={()=>setIndicator(null)} aria-label="Close">×</button>
-        <p className="eyebrow">{goal.name}</p>
-        <h2>{indicator.shortName}</h2>
-        <p>{indicator.name}</p>
-        <div className="indicatorTop">
-          <div><span>Latest value · {indicator.year}</span><strong>{formatIndicatorValue(indicator)}</strong></div>
-          {indicator.variance!=null&&<em className={(indicator.nature==='Negative'?indicator.variance<=0:indicator.variance>=0)?'up':'down'}>LY Var {indicator.variance>=0?'↗':'↘'} {indicator.variance.toFixed(1)}{indicator.isPercent?'%':''}</em>}
+    {indicator&&<div className="indicatorModal open" role="dialog" aria-modal="true" aria-label={indicator.shortName} onClick={()=>setIndicator(null)}>
+      <div className="indicatorModalShell" onClick={e=>e.stopPropagation()}>
+        <button className="modalClose" onClick={()=>setIndicator(null)} aria-label="Close">×</button>
+        <div className="indicatorModalGoal">
+          <span className="popupGoalIcon" aria-hidden="true">✦</span>
+          <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
-        <h3>Performance by School Year</h3>
-        <div className="historyBars">{history.map((r:any)=><div key={r.school_year}><i style={{height:Math.max(8,Number(r.value_3_numeric||0))+'%'}} title={String(r.value_3_display||r.value_3_numeric)}/><span>{r.school_year}</span></div>)}</div>
-        <div className="chartChooser">
-          <h3>Student Group Performance</h3>
-          <label>Choose Year: <select value={selectedYear} onChange={e=>setSelectedYear(e.target.value)}>{[...new Set(history.map((r:any)=>r.school_year))].map((y:any)=><option key={y}>{y}</option>)}</select></label>
-        </div>
-        <div className="groupBars">{groups.filter((r:any)=>r.category!=='Statewide Average').map((r:any)=><div key={r.student_group}><b>{r.value_3_display||r.value_3_numeric}</b><i style={{height:Math.max(8,Number(r.value_3_numeric||0))+'%'}} title={`${r.student_group}: ${r.value_3_display||r.value_3_numeric}`}/><span>{r.student_group}</span></div>)}</div>
-        {(()=>{const avg=groups.find((r:any)=>r.statewide_value_3_display!=null||r.statewide_value_3_numeric!=null);return avg?<p className="stateReference">Statewide Average: <b>{avg.statewide_value_3_display||avg.statewide_value_3_numeric}</b></p>:null})()}
-      </article>
+        <div className="indicatorModalHead"><span className="statusDot"/><h3>{indicator.shortName}</h3></div>
+        <section className="currentKpi">
+          <div><small>CY: {selectedYear||indicator.year}</small><span>{indicator.shortName}{indicator.isPercent?' Proficient %':''}</span></div>
+          <b>{formatIndicatorValue(indicator)}</b>
+        </section>
+        <section className="indicatorChartPanel">
+          <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>
+          <div className="yearChooser"><label htmlFor="indicatorYear">Choose Year:</label><select id="indicatorYear" value={selectedYear} onChange={e=>setSelectedYear(e.target.value)}>{[...new Set(history.map((r:any)=>r.school_year))].map((y:any)=><option key={y}>{y}</option>)}</select></div>
+          <div className="studentChart">
+            <div className="yAxisLabel">{indicator.isPercent?'Percent of students proficient':'Indicator value'}</div>
+            <div className="studentBars">
+              {(()=>{const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0));return rows.map((r:any)=><div className="studentBarCol" key={r.student_group}><div className="studentBar" style={{height:Math.max(4,(Number(r.value_3_numeric)||0)/mx*100)+'%'}}><b>{r.value_3_display??r.value_3_numeric}</b></div><span>{r.student_group}</span></div>)})()}
+            </div>
+            {(()=>{const avg=groups.find((r:any)=>r.statewide_value_3_numeric!=null);const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0),Number(avg?.statewide_value_3_numeric)||0);return avg?<div className="stateAvgLine" style={{bottom:Math.min(100,Math.max(0,(Number(avg.statewide_value_3_numeric)||0)/mx*100))+'%'}}><span>Statewide Average: {avg.statewide_value_3_display??avg.statewide_value_3_numeric}</span></div>:null})()}
+          </div>
+          <div className="xAxisLabel">Student Group</div>
+          <p className="chartNote">ⓘ Student-group performance for the selected school year. Statewide Average is shown as a reference line.</p>
+        </section>
+      </div>
     </div>}
   </main>;
 }
