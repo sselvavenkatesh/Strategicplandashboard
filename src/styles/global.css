@@ -498,3 +498,27 @@ html[data-theme="light"] .goalPage .variance.negative{background:#fae5e3!importa
 
 html[data-theme="light"] .goalPage .initiativeProgressTooltip{background:#fff!important;border-color:#c9d7e3!important;color:#17283a!important;box-shadow:0 12px 32px rgba(31,53,73,.18)!important}
 html[data-theme="light"] .goalPage .initiativeProgressTooltip span{color:#64798d!important}
+
+
+/* V2.1 Goal light-theme surface lock — keep approved UX light canvas/tabs above desktop dark screenshot lock. */
+@media (min-width:1101px){
+ html[data-theme="light"] .app-shell:has(.goalPage) .goalPage{
+   background:radial-gradient(circle at 18% 0,#e6f0f9,#f7f9fc 52%)!important;
+   color:#17283a;
+ }
+ html[data-theme="light"] .app-shell:has(.goalPage) .goalTabs{
+   border-bottom-color:#d0dce6!important;
+ }
+ html[data-theme="light"] .app-shell:has(.goalPage) .goalTab{
+   background:transparent!important;
+   color:#667d91!important;
+   border-color:transparent!important;
+   border-bottom-color:transparent!important;
+ }
+ html[data-theme="light"] .app-shell:has(.goalPage) .goalTab.active{
+   background:transparent!important;
+   color:#17283a!important;
+   border-color:transparent!important;
+   border-bottom-color:#1597ff!important;
+ }
+}
