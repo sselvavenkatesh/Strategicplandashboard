@@ -602,3 +602,38 @@ html[data-theme="light"] .modalGauge{background:conic-gradient(var(--progress-co
 html[data-theme="light"] .timelineEndpoint>span{color:#687d91}.timelineLegend span{display:flex;align-items:center}
 html[data-theme="light"] .timelineMilestoneLabels div{background:#eaf1f7}.timelineMilestoneLabels strong{color:inherit}html[data-theme="light"] .timelineMilestoneLabels span{color:#5f768a}
 @media(max-width:800px){.timelineScale{overflow-x:auto;min-width:680px}.timelinePanel{overflow-x:auto}}
+
+
+/* V2.1 compact initiative popup timeline — fit primary popup content in one desktop viewport. */
+@media (min-width:901px){
+ .initiativeModal{padding:8px 12px 16px}
+ .initiativeModal .modalShell{max-height:calc(100vh - 24px);overflow:hidden}
+ .initiativeModal .modalGoal{padding:10px 22px 8px}
+ .initiativeModal .modalGoal .popupGoalIcon{width:34px;height:34px}
+ .initiativeModal .modalGoal h2{font-size:17px;margin:1px 0}
+ .initiativeModal .modalGoal p{font-size:9px}
+ .initiativeModal .modalInitiativeHead{padding:7px 22px}
+ .initiativeModal .modalInitiativeHead h3{font-size:12px}
+ .initiativeModal .timelinePanel{margin:8px 14px;padding:9px 12px}
+ .initiativeModal .timelineTitle{font-size:10px}
+ .initiativeModal .timelineScale{height:86px;margin:14px 14px 0}
+ .initiativeModal .timelineScale .timelineLine{top:10px}
+ .initiativeModal .timelineEndpoint i,.initiativeModal .timelineMilestoneGroup>i{width:21px;height:21px;font-size:10px}
+ .initiativeModal .timelineEndpoint b{font-size:7px;margin-top:3px}
+ .initiativeModal .timelineEndpoint>span{font-size:6px;margin-top:1px}
+ .initiativeModal .timelineMilestoneLabels{margin-top:3px;min-width:105px;max-width:145px;gap:2px}
+ .initiativeModal .timelineMilestoneLabels div{padding:2px 4px;background:transparent!important}
+ .initiativeModal .timelineMilestoneLabels strong{font-size:6.5px;line-height:1.05}
+ .initiativeModal .timelineMilestoneLabels span{font-size:6px;margin-top:1px}
+ .initiativeModal .timelineLegend{gap:12px;font-size:7px}
+ .initiativeModal .timelineLegend i{width:13px;height:13px;font-size:7px}
+ .initiativeModal .overallPanel{margin:0 14px;padding:7px 13px}
+ .initiativeModal .overallDone b{font-size:20px}
+ .initiativeModal .modalGauge{width:48px;height:48px}
+ .initiativeModal .modalGauge:after{width:35px;height:35px}
+ .initiativeModal .progressPanel{margin:8px 14px;padding:8px 12px}
+ .initiativeModal .progressTitle h3{font-size:12px}
+ .initiativeModal .modalProgressRow{margin:5px 0}
+ .initiativeModal .modalProgressBar{height:18px}
+ .initiativeModal .modalLegend{margin-top:6px}
+}
