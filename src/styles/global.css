@@ -53,3 +53,676 @@
   .summaryPage .varianceLine{margin-top:2px;height:14px}
   .kpiYear{margin-top:2px}
 }
+
+/* Goal page preview — frozen UX parity */
+.goalPage{min-height:100vh;padding:84px 4% 42px;width:100%;max-width:none;background:radial-gradient(circle at 18% 0,#122a43,#07111e 52%)}
+.goalPage .goalTabs{display:flex;gap:7px;overflow-x:auto;padding:0 0 9px;border-bottom:1px solid #20374d}
+.goalPage .goalTab{flex:0 0 auto;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#8295a8;padding:8px 15px;font-size:11px;cursor:pointer}
+.goalPage .goalTab.active{color:#fff;border-color:transparent;border-bottom-color:#1597ff;background:transparent}
+.goalPage .goalHero{display:flex;justify-content:space-between;align-items:center;border:0;padding:18px 4px 14px}
+.goalPage .goalHero small,.goalPage .goalSectionTitle small{font-size:9px;letter-spacing:1.5px;color:#6f9ec3}.goalPage .goalHero h2{font-size:28px;margin:5px 0}.goalPage .goalHero p{max-width:850px;margin:0;color:#aebdcc;font-size:12px;line-height:1.45}
+.goalPage .goalHeroIcon{width:48px;height:48px;display:grid;place-items:center;border:1px solid #31526d;border-radius:12px;background:#10263a;color:#70bdf3;font-size:21px}
+.goalSectionTitle{display:flex;align-items:end;justify-content:space-between;margin:10px 0 9px}.goalSectionTitle h3{font-size:18px;margin:3px 0}.goalSectionTitle>span{font-size:9px;color:#708397}
+.goalPage .initiativeGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.goalPage .initiativeCard.detailed{background:#0b1a2a;border:1px solid #29425b;border-radius:8px;padding:0;overflow:hidden;cursor:pointer;text-align:left;color:var(--text);transition:.18s}
+.goalPage .initiativeCard:hover,.goalPage .initiativeCard:focus-visible,.goalPage .indicatorCard:hover,.goalPage .indicatorCard:focus-visible{border-color:#3b83b7;background:#0e2134;outline:none;box-shadow:0 5px 18px rgba(21,151,255,.10);transform:translateY(-1px)}
+.goalPage .initiativeIntro{height:86px;padding:12px 14px;background:linear-gradient(90deg,#17283a,#102131)}.goalPage .initiativeIntro h4{margin:0 0 6px;font-size:13px}.goalPage .initiativeIntro p{margin:0;color:#c2ccd6;font-size:11px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.goalPage .initiativeSummary{margin:10px 12px 7px;padding:10px 12px;min-height:72px;background:#101b28;border:1px solid #22384d;border-radius:6px;display:flex;align-items:center;justify-content:space-between}.goalPage .initiativeSummary .duration{display:block;margin:0;font-size:9px;font-weight:700;color:#9eacba}.goalPage .donePct{margin-top:8px;font-size:10px}.goalPage .donePct b{font-size:20px;margin-right:4px}
+.goalPage .gauge{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#58ad54 var(--pct),#203247 0);position:relative}.goalPage .gauge:after{content:'';position:absolute;width:37px;height:37px;background:#0b1a2a;border-radius:50%}.goalPage .gauge b{z-index:1;font-size:9px}
+.goalPage .subChart{padding:3px 13px 11px}.goalPage .subRow{display:grid;grid-template-columns:145px 1fr;align-items:center;gap:8px;margin:6px 0}.goalPage .subRow>span{font-size:9px;color:#c0ccd7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}.goalPage .subBar{height:18px;display:flex;overflow:hidden;border-radius:2px}.goalPage .subBar i{display:grid;place-items:center;font-style:normal;font-size:8px;color:#101820;font-weight:700;min-width:0}.goalPage .subLegend{display:flex;gap:12px;margin:10px 0 0 153px;font-size:8px;color:#9babb9}.goalPage .subLegend span{display:flex;align-items:center;gap:4px}.goalPage .subLegend i{width:7px;height:7px;border-radius:2px}
+.goalPage .indicatorTitle{margin-top:18px}.goalPage .indicatorGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.goalPage .indicatorCard{background:#0b1a2a;border:1px solid #29425b;border-radius:8px;padding:11px;cursor:pointer;text-align:left;color:var(--text);transition:.18s}
+.goalPage .indicatorIntro h4{font-size:13px;margin:0 0 5px}.goalPage .indicatorIntro p{font-size:9px;color:#90a3b5;line-height:1.35;height:38px;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.goalPage .indicatorValueRow{display:flex;align-items:end;justify-content:space-between;margin:5px 0}.goalPage .indicatorValue{font-size:24px;font-weight:800}.goalPage .stateAvg{font-size:8px;color:#71879a;text-align:right}.goalPage .stateAvg b{display:block;color:#b4c2cf;font-size:10px}.goalPage .yearBars{height:42px;display:flex;align-items:end;gap:5px;border-bottom:1px solid #294057;padding:0 2px}.goalPage .yearBars i{flex:1;background:#2389d7;border-radius:2px 2px 0 0;opacity:.7;min-width:7px}.goalPage .yearLabels{display:flex;justify-content:space-between;color:#60788e;font-size:7px;margin-top:3px}.goalPage .varianceLine{margin-top:6px}
+.goalPage .modalCard .subChart{padding-left:0;padding-right:0}.goalPage .modalCard .subLegend{margin-left:153px}
+@media(max-width:1000px){.goalPage .initiativeGrid,.goalPage .indicatorGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.goalPage{padding:74px 14px 30px}.goalPage .goalHero{align-items:flex-start}.goalPage .goalHero h2{font-size:23px}.goalPage .goalHeroIcon{width:38px;height:38px}.goalPage .initiativeGrid,.goalPage .indicatorGrid{grid-template-columns:1fr}.goalPage .goalSectionTitle>span{display:none}.goalPage .initiativeCard{padding:0}.goalPage .indicatorGrid{gap:7px}.goalPage .subRow{grid-template-columns:115px 1fr}.goalPage .subLegend{margin-left:123px}}
+
+/* Goal page desktop screenshot parity — 4-up compact cards */
+@media (min-width:1101px){
+ .goalPage{padding:82px 3.75% 44px}
+ .goalPage .goalHero{padding:15px 4px 12px}
+ .goalPage .goalHero h2{font-size:27px;margin:4px 0}.goalPage .goalHero p{font-size:11px}
+ .goalSectionTitle{margin:8px 0 8px}.goalSectionTitle h3{font-size:18px}
+ .goalPage .initiativeGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+ .goalPage .initiativeIntro{height:76px;padding:10px 12px}.goalPage .initiativeIntro h4{font-size:12px;margin-bottom:4px}.goalPage .initiativeIntro p{font-size:9px;line-height:1.35;-webkit-line-clamp:3}
+ .goalPage .initiativeSummary{margin:7px 9px 5px;padding:7px 9px;min-height:60px}.goalPage .initiativeSummary .duration{font-size:7px}.goalPage .donePct{margin-top:5px;font-size:8px}.goalPage .donePct b{font-size:18px}
+ .goalPage .gauge{width:42px;height:42px}.goalPage .gauge:after{width:31px;height:31px}.goalPage .gauge b{font-size:8px}
+ .goalPage .subChart{padding:2px 9px 8px}.goalPage .subRow{grid-template-columns:96px minmax(0,1fr);gap:6px;margin:4px 0}.goalPage .subRow>span{font-size:7px}.goalPage .subBar{height:14px}.goalPage .subBar i{font-size:6.5px}
+ .goalPage .subLegend{gap:7px;margin:7px 0 0 102px;font-size:6.5px}.goalPage .subLegend i{width:6px;height:6px}
+ .goalPage .indicatorTitle{margin-top:14px}.goalPage .indicatorGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+ .goalPage .indicatorCard{padding:9px 10px;min-height:0}.goalPage .indicatorIntro h4{font-size:12px;margin-bottom:4px}.goalPage .indicatorIntro p{font-size:8px;line-height:1.3;height:31px;-webkit-line-clamp:3}
+ .goalPage .indicatorValueRow{margin:4px 0}.goalPage .indicatorValue{font-size:23px}.goalPage .stateAvg{font-size:7px}.goalPage .stateAvg b{font-size:9px}
+ .goalPage .yearBars{height:38px;gap:4px}.goalPage .yearLabels{font-size:6.5px}.goalPage .varianceLine{margin-top:3px}
+}
+
+/* Goal screenshot acceptance baseline — compensate for React flow header and lock desktop density */
+@media (min-width:1101px) and (min-height:760px){
+ .goalPage{padding:24px 3.75% 42px;min-height:calc(100vh - 58px)}
+ .goalPage .goalTabs{padding-bottom:7px}
+ .goalPage .goalTab{padding:7px 15px}
+ .goalPage .goalHero{padding:13px 4px 10px}
+ .goalPage .goalHero small{font-size:8px}.goalPage .goalHero h2{font-size:26px;margin:3px 0}.goalPage .goalHero p{font-size:10px;line-height:1.35}
+ .goalPage .goalHeroIcon{width:42px;height:42px;font-size:19px}
+ .goalPage .goalSectionTitle{margin:7px 0 7px}.goalPage .goalSectionTitle small{font-size:8px}.goalPage .goalSectionTitle h3{font-size:17px;margin:2px 0}.goalPage .goalSectionTitle>span{font-size:8px}
+ .goalPage .initiativeIntro{height:70px;padding:9px 11px}.goalPage .initiativeIntro h4{font-size:11px}.goalPage .initiativeIntro p{font-size:8px}
+ .goalPage .initiativeSummary{margin:6px 8px 4px;padding:6px 8px;min-height:55px}.goalPage .donePct b{font-size:17px}
+ .goalPage .gauge{width:39px;height:39px}.goalPage .gauge:after{width:29px;height:29px}
+ .goalPage .subChart{padding:1px 8px 7px}.goalPage .subRow{grid-template-columns:96px minmax(0,1fr);margin:3px 0}.goalPage .subBar{height:13px}.goalPage .subLegend{margin-top:5px}
+ .goalPage .indicatorTitle{margin-top:12px}
+ .goalPage .indicatorCard{padding:8px 10px}.goalPage .indicatorIntro h4{font-size:11px}.goalPage .indicatorIntro p{font-size:7.5px;height:27px}
+ .goalPage .indicatorValueRow{align-items:center;margin:4px 0 3px}
+ .goalPage .indicatorValueWrap{display:flex;align-items:center;gap:7px;min-width:0}
+ .goalPage .indicatorValue{font-size:23px;line-height:1;font-weight:800}
+ .goalPage .varianceLine{display:flex;align-items:center;gap:4px;margin:0;height:15px;min-height:15px;white-space:nowrap}
+ .goalPage .varianceLabel{font-size:7px!important;line-height:1!important}
+ .goalPage .variance{height:14px!important;min-height:14px!important;padding:1px 4px!important;font-size:7px!important}
+ .goalPage .stateAvg{display:flex;align-items:baseline;gap:8px;font-size:7px;white-space:nowrap}.goalPage .stateAvg b{display:inline;font-size:18px;line-height:1;color:#e4edf5}
+ .goalPage .yearBars{height:36px}.goalPage .yearLabels{font-size:6.5px}
+}
+
+/* Goal page final desktop acceptance pass — match frozen compact UX and fit short laptop viewports */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage){padding-bottom:38px}
+ .goalPage{padding-left:4%;padding-right:4%;max-width:none}
+ .goalPage .initiativeIntro h4,.goalPage .indicatorIntro h4{font-weight:700;letter-spacing:0}
+ .goalPage .initiativeIntro p,.goalPage .indicatorIntro p{font-weight:400}
+ .goalPage .indicatorValueWrap{display:flex;align-items:center;gap:6px}
+ .goalPage .indicatorValueRow{align-items:center}
+ .goalPage .varianceLine{display:flex;align-items:center;gap:4px;margin:0;white-space:nowrap}
+ .goalPage .stateAvg{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+ .goalPage .stateAvg b{display:inline;margin:0}
+}
+@media (min-width:1101px) and (max-height:820px){
+ .goalPage{padding-top:10px;padding-bottom:12px;min-height:0}
+ .goalPage .goalTabs{padding-bottom:4px}
+ .goalPage .goalTab{padding:6px 15px;font-size:10px}
+ .goalPage .goalHero{padding:8px 4px 6px}
+ .goalPage .goalHero small{font-size:7.5px}.goalPage .goalHero h2{font-size:23px;line-height:1.05;margin:2px 0 3px}.goalPage .goalHero p{font-size:9px;line-height:1.25}
+ .goalPage .goalHeroIcon{width:38px;height:38px;font-size:17px}
+ .goalPage .goalSectionTitle{margin:4px 0 5px}.goalPage .goalSectionTitle small{font-size:7.5px}.goalPage .goalSectionTitle h3{font-size:16px;line-height:1.05;margin:1px 0}.goalPage .goalSectionTitle>span{font-size:7.5px}
+ .goalPage .initiativeGrid{gap:8px}
+ .goalPage .initiativeIntro{height:57px;padding:7px 10px}.goalPage .initiativeIntro h4{font-size:10px;line-height:1.12;margin:0 0 2px}.goalPage .initiativeIntro p{font-size:7.5px;line-height:1.18;-webkit-line-clamp:2}
+ .goalPage .initiativeSummary{margin:5px 7px 3px;padding:5px 7px;min-height:47px}.goalPage .initiativeSummary .duration{font-size:6.5px}.goalPage .donePct{margin-top:2px;font-size:7px}.goalPage .donePct b{font-size:15px}
+ .goalPage .gauge{width:34px;height:34px}.goalPage .gauge:after{width:25px;height:25px}.goalPage .gauge b{font-size:7px}
+ .goalPage .subChart{padding:1px 7px 5px}.goalPage .subRow{grid-template-columns:82px minmax(0,1fr);gap:4px;margin:2px 0}.goalPage .subRow>span{font-size:6.5px}.goalPage .subBar{height:11px}.goalPage .subBar i{font-size:6px}.goalPage .subLegend{margin:4px 0 0 86px;gap:5px;font-size:6px}.goalPage .subLegend i{width:5px;height:5px}
+ .goalPage .indicatorTitle{margin-top:7px}
+ .goalPage .indicatorGrid{gap:8px}.goalPage .indicatorCard{padding:7px 9px}
+ .goalPage .indicatorIntro h4{font-size:10px;line-height:1.1;margin:0 0 2px}.goalPage .indicatorIntro p{font-size:7px;line-height:1.15;height:18px;-webkit-line-clamp:2}
+ .goalPage .indicatorValueRow{margin:3px 0 2px}.goalPage .indicatorValueWrap{gap:5px}.goalPage .indicatorValue{font-size:20px;line-height:1}
+ .goalPage .varianceLine{height:13px;min-height:13px}.goalPage .varianceLabel{font-size:6.5px!important}.goalPage .variance{height:13px!important;min-height:13px!important;font-size:6.5px!important;padding:1px 3px!important}
+ .goalPage .stateAvg{font-size:6.5px;gap:5px}.goalPage .stateAvg b{font-size:16px;line-height:1}
+ .goalPage .yearBars{height:28px;gap:4px}.goalPage .yearLabels{font-size:6px!important;margin-top:2px!important}
+ #globalFooter{height:30px;min-height:30px;padding:3px 3%}
+}
+
+/* Goal page UX screenshot lock — reference: approved GitHub UX screenshot */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .topbar{height:58px}
+ .app-shell:has(.goalPage) .goalPage{padding:58px 4% 42px;min-height:calc(100vh - 58px);background:radial-gradient(circle at 18% 0,#122a43,#07111e 52%)}
+ .app-shell:has(.goalPage) .goalTabs{padding-bottom:9px;border-bottom:1px solid #20374d}
+ .app-shell:has(.goalPage) .goalTab{padding:8px 15px;font-size:11px}
+ .app-shell:has(.goalPage) .goalHero{padding:12px 4px 10px}
+ .app-shell:has(.goalPage) .goalHero small{font-size:9px}.app-shell:has(.goalPage) .goalHero h2{font-size:23px;line-height:1.1;margin:2px 0}.app-shell:has(.goalPage) .goalHero p{font-size:10px;line-height:1.3;max-width:850px}
+ .app-shell:has(.goalPage) .goalHeroIcon{width:38px;height:38px;font-size:17px}
+ .app-shell:has(.goalPage) .goalSectionTitle{margin:5px 0 6px}.app-shell:has(.goalPage) .goalSectionTitle small{font-size:9px}.app-shell:has(.goalPage) .goalSectionTitle h3{font-size:16px;line-height:1.1;margin:1px 0}.app-shell:has(.goalPage) .goalSectionTitle>span{font-size:9px}
+ .app-shell:has(.goalPage) .initiativeGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+ .app-shell:has(.goalPage) .initiativeCard.detailed{height:219px}
+ .app-shell:has(.goalPage) .initiativeIntro{height:66px;padding:9px 10px}.app-shell:has(.goalPage) .initiativeIntro h4{font-size:11px;line-height:1.15;margin:0 0 3px;font-weight:700}.app-shell:has(.goalPage) .initiativeIntro p{font-size:9px;line-height:1.25;-webkit-line-clamp:2}
+ .app-shell:has(.goalPage) .initiativeSummary{height:54px;min-height:54px;margin:6px 8px 4px;padding:6px 8px}.app-shell:has(.goalPage) .initiativeSummary .duration{font-size:7.5px}.app-shell:has(.goalPage) .donePct{margin-top:4px;font-size:8px}.app-shell:has(.goalPage) .donePct b{font-size:15px}
+ .app-shell:has(.goalPage) .gauge{width:38px;height:38px}.app-shell:has(.goalPage) .gauge:after{width:28px;height:28px}.app-shell:has(.goalPage) .gauge b{font-size:8px}
+ .app-shell:has(.goalPage) .subChart{height:87px;padding:1px 8px 7px;overflow:hidden}.app-shell:has(.goalPage) .subRow{grid-template-columns:78px minmax(0,1fr);gap:5px;margin:3px 0}.app-shell:has(.goalPage) .subRow>span{font-size:7.5px}.app-shell:has(.goalPage) .subBar{height:13px}.app-shell:has(.goalPage) .subBar i{font-size:6.5px}.app-shell:has(.goalPage) .subLegend{margin:6px 0 0 83px;gap:6px;font-size:6.5px}
+ .app-shell:has(.goalPage) .indicatorTitle{margin-top:10px}
+ .app-shell:has(.goalPage) .indicatorGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+ .app-shell:has(.goalPage) .indicatorCard{height:157px;padding:9px 10px}
+ .app-shell:has(.goalPage) .indicatorIntro h4{font-size:11px;line-height:1.15;margin:0 0 3px;font-weight:700}.app-shell:has(.goalPage) .indicatorIntro p{font-size:9px;line-height:1.25;height:31px;-webkit-line-clamp:2}
+ .app-shell:has(.goalPage) .indicatorValueRow{height:34px;align-items:center;margin:3px 0}
+ .app-shell:has(.goalPage) .indicatorValueWrap{display:flex;align-items:center;gap:6px}.app-shell:has(.goalPage) .indicatorValue{font-size:21px;line-height:1;font-weight:800}
+ .app-shell:has(.goalPage) .varianceLine{display:flex;align-items:center;gap:4px;margin:0;height:16px;min-height:16px}.app-shell:has(.goalPage) .varianceLabel{font-size:8px!important}.app-shell:has(.goalPage) .variance{height:15px!important;min-height:15px!important;font-size:7.5px!important;padding:1px 4px!important}
+ .app-shell:has(.goalPage) .stateAvg{display:flex;align-items:baseline;gap:5px;font-size:10px;color:#f0f4f8;text-align:left}.app-shell:has(.goalPage) .stateAvg b{display:inline;margin:0;font-size:20px;line-height:1;color:#f0f4f8}
+ .app-shell:has(.goalPage) .yearBars{height:34px;gap:5px}.app-shell:has(.goalPage) .yearLabels{font-size:8.5px!important;margin-top:5px!important}
+}
+@media (min-width:1101px) and (max-height:820px){
+ .app-shell:has(.goalPage) .goalPage{padding-top:58px}
+}
+
+/* Goal indicators — exact UX typography / vertical rhythm / LY variance treatment */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorCard{height:157px;padding:9px 10px}
+ .app-shell:has(.goalPage) .indicatorIntro{height:52px}
+ .app-shell:has(.goalPage) .indicatorIntro h4{font-size:11px;line-height:1.15;margin:0 0 5px;font-weight:700}
+ .app-shell:has(.goalPage) .indicatorIntro p{font-size:9px;line-height:1.3;height:auto;max-height:25px;margin:0;color:#b9c6d2;-webkit-line-clamp:2}
+ .app-shell:has(.goalPage) .indicatorValueRow{height:30px;display:flex;align-items:center;justify-content:space-between;margin:0 0 3px}
+ .app-shell:has(.goalPage) .indicatorValueWrap{display:flex;align-items:center;gap:7px;min-width:0}
+ .app-shell:has(.goalPage) .indicatorValue{font-size:21px;line-height:1;font-weight:800;letter-spacing:-.02em}
+ .app-shell:has(.goalPage) .varianceLine{display:flex;align-items:center;gap:4px;margin:0;height:16px;min-height:16px;white-space:nowrap}
+ .app-shell:has(.goalPage) .varianceLabel{font-size:8px!important;line-height:1!important;color:#8799ab!important;font-weight:500!important}
+ .app-shell:has(.goalPage) .variance{display:inline-flex!important;align-items:center;gap:2px;height:15px!important;min-height:15px!important;padding:1px 4px!important;border-radius:5px!important;font-size:7.5px!important;line-height:1!important;font-weight:600!important;opacity:.78}
+ .app-shell:has(.goalPage) .variance.positive{background:rgba(71,148,116,.22)!important;color:#87c7a8!important}
+ .app-shell:has(.goalPage) .variance.negative{background:rgba(205,92,84,.20)!important;color:#e59a94!important}
+ .app-shell:has(.goalPage) .variance .trend{font-size:8px!important;line-height:1!important}
+ .app-shell:has(.goalPage) .stateAvg{display:flex;align-items:baseline;gap:5px;font-size:10px;color:#f0f4f8;white-space:nowrap}
+ .app-shell:has(.goalPage) .stateAvg b{display:inline;margin:0;font-size:20px;line-height:1;font-weight:800;color:#f0f4f8}
+ .app-shell:has(.goalPage) .yearBars{height:34px;margin:0 0 1px}
+}
+
+/* Goal indicator component — frozen UX source-of-truth override */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorCard{height:auto;min-height:0;padding:9px 10px;overflow:hidden}
+ .app-shell:has(.goalPage) .indicatorIntro{box-sizing:border-box;min-height:52px;height:52px;margin:-9px -10px 4px;padding:9px 10px 6px;background:linear-gradient(90deg,#17283a,#102131)}
+ .app-shell:has(.goalPage) .indicatorIntro h4{margin:0 0 4px;font-size:11px;line-height:1.2;color:#f0f4f8;font-weight:700}
+ .app-shell:has(.goalPage) .indicatorIntro p{height:auto;max-height:22px;margin:0;color:#c2ccd6;font-size:8.5px;line-height:1.3;-webkit-line-clamp:2}
+ .app-shell:has(.goalPage) .indicatorValueRow{height:auto;min-height:31px;margin:1px 0 2px!important;display:flex;align-items:center;justify-content:space-between}
+ .app-shell:has(.goalPage) .indicatorValueWrap{display:flex;align-items:center;gap:6px}
+ .app-shell:has(.goalPage) .indicatorValue{font-size:21px;line-height:1;font-weight:800}
+ .app-shell:has(.goalPage) .varianceLine{display:flex;align-items:center;gap:4px;margin:0!important;height:16px;min-height:16px}
+ .app-shell:has(.goalPage) .varianceLabel{font-size:8px!important;color:#74879a!important;line-height:1!important;font-weight:500!important}
+ .app-shell:has(.goalPage) .variance{display:inline-flex!important;align-items:center;gap:2px;height:15px!important;min-height:15px!important;padding:1px 4px!important;border-radius:5px!important;font-size:7.5px!important;font-weight:600!important;line-height:1!important;margin:0!important;opacity:.78}
+ .app-shell:has(.goalPage) .variance.positive{background:rgba(71,148,116,.22)!important;color:#87c7a8!important}
+ .app-shell:has(.goalPage) .variance.negative{background:rgba(205,92,84,.20)!important;color:#e59a94!important}
+ .app-shell:has(.goalPage) .stateAvg{display:flex;align-items:baseline;gap:5px;font-size:10px;color:#f0f4f8;text-align:left}
+ .app-shell:has(.goalPage) .stateAvg b{display:inline;margin:0 0 0 5px;font-size:20px;line-height:1;color:#f0f4f8}
+ .app-shell:has(.goalPage) .yearBars{height:34px;margin-top:1px!important;margin-bottom:1px}
+ .app-shell:has(.goalPage) .yearLabels{font-size:8.5px!important;color:#9eb0c1!important;margin-top:5px!important;font-weight:600}
+}
+
+/* Goal indicator feedback */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorIntro{height:48px;min-height:48px;margin-bottom:1px;padding-bottom:4px}
+ .app-shell:has(.goalPage) .indicatorValueRow{min-height:29px;margin:0 0 7px!important;transform:translateY(-2px)}
+ .app-shell:has(.goalPage) .yearBars{height:34px;margin-top:0!important}
+ .app-shell:has(.goalPage) .yearBars i{position:relative;overflow:visible}
+ .app-shell:has(.goalPage) .yearBars i b{position:absolute;left:0;right:0;top:2px;text-align:center;color:#dce8f2;font-size:7px;line-height:1;font-weight:700;white-space:nowrap}
+}
+
+/* Goal KPI variance stack + pointer affordance */
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .varianceLine{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:29px;min-height:29px;margin:0!important;white-space:nowrap}
+ .app-shell:has(.goalPage) .varianceLabel{order:2;font-size:7px!important;line-height:1!important;color:#74879a!important}
+ .app-shell:has(.goalPage) .variance{order:1}
+}
+a,button,[role="button"],.summaryGoal,.initiativeCard,.indicatorCard,.goalTab,.kpi{cursor:pointer}
+
+/* Goal KPI value typography aligned to Initiative progress percentage */
+.app-shell:has(.goalPage) .indicatorValue,
+.app-shell:has(.goalPage) .stateAvg b{
+  font-size:15px!important;
+  font-weight:700!important;
+  line-height:1!important;
+  color:#f0f4f8!important;
+}
+
+/* Initiative progress conditional color + detailed hover/focus tooltip */
+.goalPage .gauge{
+  background:conic-gradient(var(--progress-color,#58ad54) var(--pct),#203247 0)!important;
+  cursor:help;
+}
+.goalPage .initiativeProgressTooltip{
+  position:absolute;
+  z-index:80;
+  right:-8px;
+  bottom:calc(100% + 10px);
+  width:300px;
+  padding:10px 12px;
+  border:1px solid #35516a;
+  border-radius:7px;
+  background:#071523;
+  box-shadow:0 10px 26px rgba(0,0,0,.34);
+  color:#dbe7f1;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(4px);
+  transition:opacity .14s ease,transform .14s ease,visibility .14s;
+  pointer-events:none;
+  text-align:left;
+}
+.goalPage .initiativeProgressTooltip:after{
+  content:'';
+  position:absolute;
+  right:24px;
+  top:100%;
+  border:6px solid transparent;
+  border-top-color:#35516a;
+}
+.goalPage .initiativeProgressTooltip div{
+  display:grid;
+  grid-template-columns:116px 12px minmax(0,1fr);
+  column-gap:5px;
+  align-items:start;
+  margin:5px 0;
+  font-size:9px;
+  line-height:1.35;
+}
+.goalPage .initiativeProgressTooltip span{grid-column:1;color:#91a5b7;white-space:nowrap}
+.goalPage .initiativeProgressTooltip em{grid-column:2;font-style:normal;color:#91a5b7;text-align:center}
+.goalPage .initiativeProgressTooltip b{grid-column:3;font-size:9px;font-weight:600;color:#eef5fb;overflow-wrap:anywhere}
+.goalPage .gauge:hover .initiativeProgressTooltip,
+.goalPage .gauge:focus-visible .initiativeProgressTooltip{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.goalPage .gauge:focus-visible{outline:2px solid #1597ff;outline-offset:2px}
+
+/* V2 navigation loader — K12Matrix brand animation */
+.pageLoader{position:fixed;inset:0;z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#06111ef2;backdrop-filter:blur(3px)}
+.k12LoaderLogo{width:150px;max-height:48px;object-fit:contain;animation:k12LogoPulse 1s ease-in-out infinite}
+.k12LoaderPulse{width:96px;height:2px;border-radius:999px;background:#18334a;overflow:hidden;position:relative}
+.k12LoaderPulse:after{content:'';position:absolute;top:0;bottom:0;width:38%;border-radius:999px;background:#3ba8ef;animation:k12LoadSlide .85s ease-in-out infinite}
+.pageLoader small{font-size:8px;letter-spacing:1.1px;text-transform:uppercase;color:#7890a5}
+@keyframes k12LogoPulse{0%,100%{opacity:.72;transform:scale(.98)}50%{opacity:1;transform:scale(1.02)}}
+@keyframes k12LoadSlide{0%{left:-40%}100%{left:102%}}
+@media(prefers-reduced-motion:reduce){.k12LoaderLogo,.k12LoaderPulse:after{animation:none}.k12LoaderPulse:after{left:31%}}
+
+/* V2 header branding refinement — preserves the existing 70px header height */
+.topbar .brand{gap:11px}
+.topbar .brand>b{font-size:16px;font-weight:750;line-height:1.1;letter-spacing:-.01em}
+.districtLogo{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center}
+.districtLogo svg{width:38px;height:38px;overflow:visible}
+.districtLogo svg path{fill:none;stroke:#68bdf2;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.headerPowered{display:flex;align-items:center;gap:6px;margin-left:7px;padding-left:12px;border-left:1px solid #31506a;color:#71879a;font-size:7px;white-space:nowrap}
+.headerPowered img{width:76px;height:22px;object-fit:contain}
+.app-shell{padding-bottom:0}
+@media(max-width:650px){.topbar .brand>b{font-size:13px}.headerPowered{display:none}.districtLogo{width:32px;height:32px;flex-basis:32px}.districtLogo svg{width:32px;height:32px}}
+
+.navPowered img{width:78px;height:22px;object-fit:contain;vertical-align:middle;margin-left:6px}
+
+/* V2 canonical K12Matrix SVG sizing */
+.headerPowered img{display:block;width:95px;height:24px;object-fit:contain}
+.k12LoaderLogo{display:block;width:190px;height:48px;object-fit:contain}
+.navPowered img{display:inline-block;width:95px;height:24px;object-fit:contain}
+
+.signInK12Logo{display:block;width:120px;height:auto;max-height:34px;object-fit:contain;margin:0 0 14px}
+
+
+/* V2.1 approved light theme — color-only React parity with the frozen UX.
+   Dark remains the default. Layout, typography, dimensions, positioning and interactions are unchanged. */
+.themeBtn{border:1px solid var(--line);background:#0d2132;color:#fff;border-radius:9px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
+
+html[data-theme="light"]{color-scheme:light;--bg:#f4f7fb;--panel:#fff;--panel2:#f4f8fc;--text:#17283a;--muted:#64798d;--line:rgba(72,103,128,.18);--gray:#aebdca}
+html[data-theme="light"] body{background:radial-gradient(circle at 18% 0,#e6f0f9 0,transparent 28%),var(--bg);color:var(--text)}
+html[data-theme="light"] .topbar{background:linear-gradient(180deg,rgba(248,251,255,.98),rgba(248,251,255,.90),transparent)}
+html[data-theme="light"] .brand{color:#17283a}
+html[data-theme="light"] .districtLogo svg path{stroke:#1684c8}
+html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
+html[data-theme="light"] .headerPowered img,
+html[data-theme="light"] .navPowered img,
+html[data-theme="light"] .signInK12Logo,
+html[data-theme="light"] .k12LoaderLogo{content:url('/k12matrix-logo-light.svg')}
+html[data-theme="light"] .menuBtn,
+html[data-theme="light"] .themeBtn,
+html[data-theme="light"] .navTitle button{background:#fff;color:#203449;border-color:#c4d2df}
+html[data-theme="light"] .pageLoader{background:rgba(248,251,255,.97);color:#526a80}
+html[data-theme="light"] .pageLoader small{color:#64798d}
+
+html[data-theme="light"] .uxWelcome{background:linear-gradient(90deg,rgba(248,251,255,.98) 0%,rgba(248,251,255,.91) 55%,rgba(248,251,255,.72)),url('https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=2000&q=80') center/cover}
+html[data-theme="light"] .uxWelcome .welcomeCopy small{color:#59738b}
+html[data-theme="light"] .uxWelcome .welcomeCopy h1{color:#15283a}
+html[data-theme="light"] .uxWelcome .welcomeCopy>p,
+html[data-theme="light"] .uxWelcome .welcomeGoal p,
+html[data-theme="light"] .principles article p{color:#536a80}
+html[data-theme="light"] .uxWelcome .welcomeGoal,
+html[data-theme="light"] .principles article{background:rgba(255,255,255,.92);border-color:#c9d7e3;color:#17283a;box-shadow:0 5px 18px rgba(42,66,89,.07)}
+html[data-theme="light"] .uxWelcome .welcomeGoal .goalIcon{background:#e8f4fc;border-color:#b9d8ee;color:#147ebf}
+html[data-theme="light"] .uxWelcome .welcomeGoal:hover,
+html[data-theme="light"] .principles article:hover{background:#fff;border-color:#1597ff;box-shadow:0 8px 24px rgba(21,151,255,.12)}
+
+html[data-theme="light"] .summaryPage{background:radial-gradient(circle at 50% 0,#e6f0f9,#f6f8fb 58%);color:#17283a}
+html[data-theme="light"] .summaryGoal{background:#fff;border-color:#cbd8e4;box-shadow:0 5px 16px rgba(35,60,84,.07)}
+html[data-theme="light"] .summaryPage .goalImage:after{background:linear-gradient(transparent,#fff)}
+html[data-theme="light"] .summaryGoal>p,
+html[data-theme="light"] .summaryBody>small,
+html[data-theme="light"] .sectionLabel span,
+html[data-theme="light"] .legend{color:#61768a}
+html[data-theme="light"] .kpi{background:#f4f8fc;border-color:#d2dee8;color:#17283a}
+html[data-theme="light"] .kpi>span,
+html[data-theme="light"] .kpiYear{color:#5c7186}
+html[data-theme="light"] .up{background:#e1f3e8;color:#2f7650}
+html[data-theme="light"] .down{background:#fae5e3;color:#a74943}
+html[data-theme="light"] .summaryUnavailable{color:#64798d}
+
+html[data-theme="light"] .goalPage{background:radial-gradient(circle at 18% 0,#e6f0f9,#f7f9fc 52%);color:#17283a}
+html[data-theme="light"] .goalTabs{border-color:#d0dce6}
+html[data-theme="light"] .goalTabs button{background:#fff;color:#667d91;border-color:#d0dce6}
+html[data-theme="light"] .goalTabs .active{background:#e9f4fb;color:#17283a;border-color:#68a8d4}
+html[data-theme="light"] .goalHero{border-color:#d0dce6}
+html[data-theme="light"] .goalHero p:last-child{color:#526a80}
+html[data-theme="light"] .goalHeroIcon{color:#1684c8}
+html[data-theme="light"] .initiativeCard,
+html[data-theme="light"] .indicatorCard{background:#fff;border-color:#cbd8e4;color:#17283a;box-shadow:0 4px 14px rgba(35,60,84,.06)}
+html[data-theme="light"] .initiativeCard:hover,
+html[data-theme="light"] .indicatorCard:hover{background:#fbfdff;border-color:#68a8d4}
+html[data-theme="light"] .initiativeIntro,
+html[data-theme="light"] .indicatorIntro{background:linear-gradient(90deg,#edf4fa,#f7fafc)!important;color:#17283a}
+html[data-theme="light"] .initiativeIntro h4,
+html[data-theme="light"] .indicatorIntro h4,
+html[data-theme="light"] .indicatorValue{color:#20384e}
+html[data-theme="light"] .initiativeIntro p,
+html[data-theme="light"] .indicatorIntro p,
+html[data-theme="light"] .duration,
+html[data-theme="light"] .completion span,
+html[data-theme="light"] .subRow>span,
+html[data-theme="light"] .subLegend,
+html[data-theme="light"] .stateAvg{color:#64798d}
+html[data-theme="light"] .initiativeSummary{background:#f5f9fc!important;border-color:#d8e3ec!important}
+html[data-theme="light"] .gauge:after{background:#fff}
+html[data-theme="light"] .stateAvg b{color:#344c62}
+html[data-theme="light"] .yearBars{border-color:#ccd9e4}
+html[data-theme="light"] .yearBars i{background:#4d9ed5!important}
+html[data-theme="light"] .yearLabels{color:#71869a!important}
+
+html[data-theme="light"] .modal{background:rgba(31,50,68,.35)}
+html[data-theme="light"] .modalCard{background:#fff;border-color:#c9d7e3;color:#17283a;box-shadow:0 22px 60px rgba(31,53,73,.20)}
+html[data-theme="light"] .modalCard>p{color:#60758a}
+html[data-theme="light"] .close{background:#f4f7fa;color:#344b61;border-color:#ccd8e3}
+html[data-theme="light"] .timeline,
+html[data-theme="light"] .indicatorTop>div{background:#f7f9fc;color:#17283a}
+html[data-theme="light"] .timeline span,
+html[data-theme="light"] .bigCompletion span,
+html[data-theme="light"] .indicatorTop span{color:#657b8f}
+html[data-theme="light"] .historyBars,
+html[data-theme="light"] .groupBars{border-color:#d2dee8}
+html[data-theme="light"] .historyBars span,
+html[data-theme="light"] .groupBars span{color:#526a80}
+html[data-theme="light"] .historyBars i,
+html[data-theme="light"] .groupBars i{background:#5ba5d7}
+html[data-theme="light"] .chartChooser select{background:#f7f9fc;color:#17283a;border-color:#c8d5e0}
+html[data-theme="light"] .stateReference{color:#526a80}
+
+html[data-theme="light"] .scrim{background:rgba(20,39,58,.30)}
+html[data-theme="light"] .navPanel{background:#fff;border-left-color:#ccd8e3;color:#17283a;box-shadow:-10px 0 30px rgba(38,62,84,.12)}
+html[data-theme="light"] .navTitle{color:#17283a}
+html[data-theme="light"] .navUtilities{border-color:#dbe5ed;color:#687f93}
+html[data-theme="light"] .navUtilities button{background:#f5f9fc;border-color:#d1dde7;color:#334b62}
+html[data-theme="light"] .navPanel nav a{color:#435b70}
+html[data-theme="light"] .navPanel nav a:hover{background:#edf5fb;color:#173a55}
+html[data-theme="light"] .navPanel nav i{background:#e6f2fa;color:#167dbd}
+html[data-theme="light"] .navPanel nav small{color:#70869a}
+html[data-theme="light"] .navPowered{border-color:#dbe5ed;color:#687f93}
+
+html[data-theme="light"] .signInModal{background:rgba(31,50,68,.35)}
+html[data-theme="light"] .signInCard{background:#fff;border-color:#c9d7e3;color:#17283a;box-shadow:0 22px 60px rgba(31,53,73,.20)}
+html[data-theme="light"] .signInCard p,
+html[data-theme="light"] .signInHint{color:#60758a}
+html[data-theme="light"] .signInCard label{color:#536a80}
+html[data-theme="light"] .signInCard input{background:#f7f9fc;color:#17283a;border-color:#c8d5e0}
+html[data-theme="light"] .signInClose{background:#f4f7fa;color:#344b61;border-color:#ccd8e3}
+html[data-theme="light"] #globalFooter{background:rgba(248,251,255,.96)!important;border-top:1px solid #dce5ed!important;color:#667b8e!important}
+
+
+/* V2.1 light-theme parity correction — exact frozen UX color selectors.
+   Color-only: no layout, sizing, typography, positioning, data or interaction changes. */
+html[data-theme="light"] .summaryPage .summaryGoal .clamp3{color:#61768a!important}
+html[data-theme="light"] .summaryHeading>span{color:#61768a}
+html[data-theme="light"] .summaryPage .legend{color:#61768a}
+html[data-theme="light"] .summaryPage .varianceLine small{color:#71869a!important}
+
+html[data-theme="light"] .goalPage .goalTabs{border-color:#d0dce6}
+html[data-theme="light"] .goalPage .goalTab{background:transparent;color:#667d91;border-color:transparent}
+html[data-theme="light"] .goalPage .goalTab.active{background:transparent;color:#17283a;border-color:transparent;border-bottom-color:#1597ff}
+html[data-theme="light"] .goalPage .goalHero h2,
+html[data-theme="light"] .goalPage .goalSectionTitle h3{color:#17283a}
+html[data-theme="light"] .goalPage .goalHero p{color:#526a80}
+html[data-theme="light"] .goalPage .goalHero small,
+html[data-theme="light"] .goalPage .goalSectionTitle small{color:#3779a8}
+html[data-theme="light"] .goalPage .goalHeroIcon{border-color:#b9d4e7;background:#e9f4fb;color:#1684c8}
+html[data-theme="light"] .goalPage .goalSectionTitle>span{color:#708397}
+
+html[data-theme="light"] .goalPage .initiativeCard.detailed,
+html[data-theme="light"] .goalPage .indicatorCard{background:#fff;border-color:#cbd8e4;color:#17283a;box-shadow:0 4px 14px rgba(35,60,84,.06)}
+html[data-theme="light"] .goalPage .initiativeCard:hover,
+html[data-theme="light"] .goalPage .initiativeCard:focus-visible,
+html[data-theme="light"] .goalPage .indicatorCard:hover,
+html[data-theme="light"] .goalPage .indicatorCard:focus-visible{background:#fbfdff;border-color:#68a8d4}
+html[data-theme="light"] .goalPage .initiativeIntro,
+html[data-theme="light"] .goalPage .indicatorIntro{background:linear-gradient(90deg,#edf4fa,#f7fafc)!important;color:#17283a!important}
+html[data-theme="light"] .goalPage .initiativeIntro h4,
+html[data-theme="light"] .goalPage .indicatorIntro h4,
+html[data-theme="light"] .goalPage .donePct,
+html[data-theme="light"] .goalPage .indicatorValue{color:#20384e!important}
+html[data-theme="light"] .goalPage .initiativeIntro p,
+html[data-theme="light"] .goalPage .indicatorIntro p,
+html[data-theme="light"] .goalPage .subLegend{color:#657b8f!important}
+html[data-theme="light"] .goalPage .initiativeSummary{background:#f5f9fc!important;border-color:#d8e3ec!important;color:#20384e!important}
+html[data-theme="light"] .goalPage .initiativeSummary .duration{color:#61778b!important}
+html[data-theme="light"] .goalPage .gauge:after{background:#f5f9fc!important}
+html[data-theme="light"] .goalPage .gauge b{color:#20384e}
+html[data-theme="light"] .goalPage .subRow>span{color:#20384e!important}
+html[data-theme="light"] .goalPage .subBar i{color:#101820}
+html[data-theme="light"] .goalPage .stateAvg{color:#64798d!important}
+html[data-theme="light"] .goalPage .stateAvg b{color:#344c62!important}
+html[data-theme="light"] .goalPage .yearBars{border-color:#ccd9e4}
+html[data-theme="light"] .goalPage .yearBars i{background:#4d9ed5!important}
+html[data-theme="light"] .goalPage .yearLabels{color:#71869a!important}
+html[data-theme="light"] .goalPage .barValue{color:#fff}
+html[data-theme="light"] .goalPage .varianceLabel{color:#71869a!important}
+html[data-theme="light"] .goalPage .variance.positive{background:#e1f3e8!important;color:#2f7650!important;opacity:1}
+html[data-theme="light"] .goalPage .variance.negative{background:#fae5e3!important;color:#a74943!important;opacity:1}
+
+html[data-theme="light"] .goalPage .initiativeProgressTooltip{background:#fff!important;border-color:#c9d7e3!important;color:#17283a!important;box-shadow:0 12px 32px rgba(31,53,73,.18)!important}
+html[data-theme="light"] .goalPage .initiativeProgressTooltip span{color:#64798d!important}
+
+
+/* V2.1 Goal light-theme surface lock — keep approved UX light canvas/tabs above desktop dark screenshot lock. */
+@media (min-width:1101px){
+ html[data-theme="light"] .app-shell:has(.goalPage) .goalPage{
+   background:radial-gradient(circle at 18% 0,#e6f0f9,#f7f9fc 52%)!important;
+   color:#17283a;
+ }
+ html[data-theme="light"] .app-shell:has(.goalPage) .goalTabs{
+   border-bottom-color:#d0dce6!important;
+ }
+ html[data-theme="light"] .app-shell:has(.goalPage) .goalTab{
+   background:transparent!important;
+   color:#667d91!important;
+   border-color:transparent!important;
+   border-bottom-color:transparent!important;
+ }
+ html[data-theme="light"] .app-shell:has(.goalPage) .goalTab.active{
+   background:transparent!important;
+   color:#17283a!important;
+   border-color:transparent!important;
+   border-bottom-color:#1597ff!important;
+ }
+}
+
+
+/* V2.1 popup UX parity — initiative + indicator detail views.
+   Mirrors approved UX geometry while preserving React data/functionality. */
+.initiativeModal,.indicatorModal{position:fixed;inset:0;z-index:80;background:rgba(2,7,12,.82);backdrop-filter:blur(5px);padding:18px 18px 50px;overflow:auto}
+.indicatorModal{z-index:85;background:rgba(2,7,12,.84)}
+.modalShell,.indicatorModalShell{position:relative;max-width:1420px;margin:0 auto;background:#081421;border:1px solid #2a4157;border-radius:10px;box-shadow:0 24px 70px #0009;overflow:hidden;color:var(--text)}
+.indicatorModalShell{max-width:1450px;background:#091522;border-color:#2b4258;box-shadow:0 24px 70px #000a}
+.modalClose{position:absolute;right:14px;top:12px;z-index:2;width:34px;height:34px;border:1px solid #42586d;border-radius:50%;background:#0d1d2c;color:#fff;font-size:20px;cursor:pointer}
+.modalGoal,.indicatorModalGoal{display:flex;align-items:center;gap:14px;padding:18px 28px 14px;background:#26313b;border-bottom:1px solid #344655}
+.indicatorModalGoal{padding:17px 28px 13px;background:#29333d;border-bottom-color:#3a4855}
+.popupGoalIcon{flex:0 0 auto;width:40px;height:40px;display:grid;place-items:center;border:1px solid #4b657b;border-radius:9px;background:#172b3d;color:#70bdf3;font-size:18px}
+.modalGoal>div,.indicatorModalGoal>div{min-width:0}.modalGoal small,.indicatorModalGoal small{font-size:8px;letter-spacing:1.4px;color:#91a4b6}.modalGoal h2,.indicatorModalGoal h2{font-size:20px;margin:3px 0}.modalGoal p,.indicatorModalGoal p{font-size:10px;color:#bdc8d2;max-width:1050px;margin:0;line-height:1.35}
+.modalInitiativeHead,.indicatorModalHead{display:flex;align-items:center;gap:10px;padding:11px 28px;background:#121b24;border-bottom:1px solid #253747}.indicatorModalHead{padding:12px 28px;background:#151d25;border-bottom-color:#293847}.modalInitiativeHead small{font-size:7px;color:#758da1}.modalInitiativeHead h3{font-size:13px;margin:2px 0}.indicatorModalHead h3{font-size:15px;margin:0}.statusDot{width:13px;height:13px;border-radius:50%;background:#58ad54;flex:0 0 auto}
+.timelinePanel,.progressPanel{margin:14px 20px;border:1px solid #2b4055;border-radius:8px;background:#0b1726;padding:14px 16px}.timelineTitle{display:flex;justify-content:space-between;font-size:11px}.timelineTitle span{color:#b9c6d1}.timelineTrack{position:relative;display:grid;grid-template-columns:repeat(7,minmax(80px,1fr));gap:5px;margin:24px 0 8px;min-height:90px}.timelineLine{position:absolute;left:3%;right:3%;top:13px;height:1px;background:#3b5268}.milestone{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-width:0}.milestone i{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#132335;border:1px solid #41576c;font-style:normal}.milestone.start i{background:#16b95c}.milestone.end i{background:#d94d16}.milestone b{font-size:9px}.milestone span{max-width:100%;padding:5px 7px;background:#16283a;border-radius:4px;color:#c8d2dc;font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.timelineLegend{display:flex;gap:18px;color:#aebdca;font-size:8px}
+.overallPanel{margin:0 20px;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#0d1a2b;border-radius:7px}.overallPanel small{font-size:7px;color:#8296aa}.overallDone{display:flex;align-items:baseline;gap:6px;margin-top:3px}.overallDone b{font-size:25px}.overallDone span{font-size:10px}.modalGauge{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#58ad54 var(--pct),#33404c 0);position:relative}.modalGauge:after{content:'';position:absolute;width:45px;height:45px;border-radius:50%;background:#0d1a2b}.modalGauge b{z-index:1;font-size:10px}
+.progressTitle{display:flex;justify-content:space-between;align-items:end}.progressTitle small{font-size:7px;color:#7991a5}.progressTitle h3{font-size:14px;margin:2px 0}.progressTitle>span{font-size:8px;color:#8497a9}.modalProgressRow{display:grid;grid-template-columns:190px 1fr;gap:12px;align-items:center;margin:9px 0}.modalProgressRow>span{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.modalProgressBar{height:24px;display:flex;overflow:hidden;border-radius:3px}.modalProgressBar i{display:grid;place-items:center;font-style:normal;font-size:8px;color:#111;font-weight:700}.modalLegend{display:flex;gap:14px;margin:12px 0 0 202px;font-size:8px;color:#a9b8c5}.modalLegend span{display:flex;align-items:center;gap:4px}.modalLegend i{width:8px;height:8px;border-radius:2px}
+
+.currentKpi{margin:17px 20px 12px;width:450px;max-width:calc(100% - 40px);display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#0a1422;border-radius:7px}.currentKpi div{display:flex;flex-direction:column;gap:3px}.currentKpi small{font-size:10px;color:#9baaba;font-weight:700}.currentKpi span{font-size:12px;font-weight:700}.currentKpi b{font-size:21px}
+.indicatorChartPanel{margin:0 20px 18px;padding:17px;border:1px solid #2d4258;border-radius:9px;background:#0c1828}.indicatorChartTitle{display:flex;justify-content:space-between;align-items:center}.indicatorChartTitle h3{font-size:16px;margin:0}.indicatorChartTitle span{color:#92a3b4;cursor:help;position:relative}.yearChooser{margin:14px 0 22px;padding:8px 10px;background:#1a2a3b;border-radius:5px;display:flex;align-items:center;gap:7px;font-size:9px}.yearChooser select{width:210px;padding:7px 9px;background:#0d1a2c;color:#e9eef4;border:0;border-radius:4px}
+.studentChart{position:relative;height:270px;margin:0 18px 0 45px;border-left:1px solid #40536a;border-bottom:1px solid #40536a;background:repeating-linear-gradient(to top,transparent 0,transparent 53px,#273a50 54px)}.studentBars{position:absolute;inset:0 10px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));align-items:end;gap:24px}.studentBarCol{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative}.studentBar{width:56%;background:#f1cd48;border-radius:4px 4px 0 0;position:relative;z-index:2;min-height:10px}.studentBar b{position:absolute;top:-16px;width:100%;text-align:center;font-size:8px}.studentBarCol>span{position:absolute;top:calc(100% + 7px);font-size:7px;text-align:center;line-height:1.1;width:100%;color:#d1dae3}.stateAvgLine{position:absolute;left:0;right:0;height:1px;background:#9d9d91;z-index:3}.stateAvgLine span{position:absolute;right:5px;bottom:5px;font-size:8px;font-weight:700}.yAxisLabel{position:absolute;left:-50px;top:50%;transform:rotate(-90deg) translateY(-50%);transform-origin:center;font-size:8px;white-space:nowrap}.xAxisLabel{text-align:center;font-size:9px;margin-top:34px}.chartNote{font-size:9px;color:#aebac6;margin:22px 0 0}
+.indicatorChartTitle>span:hover:after{content:'Chart options and full indicator details';position:absolute;right:0;top:12px;padding:7px 9px;background:#17283a;border:1px solid #40566a;border-radius:5px;color:#dbe4ec;font-size:8px;white-space:nowrap;z-index:10}
+
+/* Approved light treatment for popup-specific surfaces. */
+html[data-theme="light"] .initiativeModal,html[data-theme="light"] .indicatorModal{background:rgba(31,50,68,.35)}
+html[data-theme="light"] .modalShell,html[data-theme="light"] .indicatorModalShell{background:#fff!important;border-color:#c9d7e3!important;color:#17283a!important;box-shadow:0 22px 60px rgba(31,53,73,.20)}
+html[data-theme="light"] .modalGoal,html[data-theme="light"] .indicatorModalGoal{background:#edf3f8!important;border-bottom-color:#d1dce6!important;color:#17283a!important}
+html[data-theme="light"] .modalGoal small,html[data-theme="light"] .indicatorModalGoal small{color:#55758f!important}
+html[data-theme="light"] .modalGoal h2,html[data-theme="light"] .indicatorModalGoal h2{color:#17283a!important}
+html[data-theme="light"] .modalGoal p,html[data-theme="light"] .indicatorModalGoal p{color:#60758a!important}
+html[data-theme="light"] .popupGoalIcon{background:#e3f1fa!important;border-color:#b9d4e7!important;color:#1684c8!important}
+html[data-theme="light"] .modalInitiativeHead,html[data-theme="light"] .indicatorModalHead{background:#f7f9fb!important;border-bottom-color:#d8e2ea!important;color:#20384e!important}
+html[data-theme="light"] .modalInitiativeHead small,html[data-theme="light"] .currentKpi small,html[data-theme="light"] .progressTitle small{color:#617b91!important}
+html[data-theme="light"] .timelinePanel,html[data-theme="light"] .overallPanel,html[data-theme="light"] .progressPanel,html[data-theme="light"] .currentKpi,html[data-theme="light"] .indicatorChartPanel{background:#f7f9fc!important;border-color:#d2dee8!important;color:#17283a!important}
+html[data-theme="light"] .timelineTitle span,html[data-theme="light"] .progressTitle>span,html[data-theme="light"] .indicatorChartTitle>span{color:#657b8f!important}
+html[data-theme="light"] .timelineLine{background:#cad7e2!important}
+html[data-theme="light"] .milestone i{background:#fff!important;border-color:#b9c9d6!important;color:#314b62!important}
+html[data-theme="light"] .milestone.start i{background:#16b95c!important;color:#fff!important;border-color:#16b95c!important}
+html[data-theme="light"] .milestone.end i{background:#d94d16!important;color:#fff!important;border-color:#d94d16!important}
+html[data-theme="light"] .milestone span{background:#eaf1f7!important;color:#40596f!important}
+html[data-theme="light"] .timelineLegend,html[data-theme="light"] .modalLegend,html[data-theme="light"] .chartNote,html[data-theme="light"] .xAxisLabel,html[data-theme="light"] .yAxisLabel{color:#687d91!important}
+html[data-theme="light"] .modalGauge{background:conic-gradient(#58ad54 var(--pct),#d7e1e9 0)!important}
+html[data-theme="light"] .modalGauge:after{background:#f7f9fc!important}
+html[data-theme="light"] .modalProgressRow>span{color:#334d63!important}
+html[data-theme="light"] .currentKpi span,html[data-theme="light"] .currentKpi b,html[data-theme="light"] .indicatorChartTitle h3,html[data-theme="light"] .yearChooser{color:#20384e!important}
+html[data-theme="light"] .yearChooser{background:#eaf1f7!important}
+html[data-theme="light"] .yearChooser select{background:#fff!important;color:#17283a!important;border:1px solid #c8d5e0!important}
+html[data-theme="light"] .studentChart{border-left-color:#c5d3df!important;border-bottom-color:#c5d3df!important;background:repeating-linear-gradient(to top,transparent 0,transparent 53px,#e2e9ef 54px)!important}
+html[data-theme="light"] .studentBarCol>span,html[data-theme="light"] .studentBar b,html[data-theme="light"] .stateAvgLine span{color:#29445b!important}
+html[data-theme="light"] .stateAvgLine{background:#8497a8!important}
+html[data-theme="light"] .indicatorChartTitle>span:hover:after{background:#fff!important;border-color:#c7d4df!important;color:#334c62!important;box-shadow:0 5px 16px rgba(35,60,84,.12)!important}
+
+@media(max-width:700px){.initiativeModal,.indicatorModal{padding:7px 7px 42px}.modalGoal,.indicatorModalGoal{padding:15px}.modalInitiativeHead,.indicatorModalHead{padding:10px 15px}.timelinePanel,.progressPanel{margin:8px;padding:11px}.timelineTrack{display:flex;overflow-x:auto;gap:36px;padding-bottom:8px}.milestone{min-width:80px}.overallPanel{margin:8px}.modalProgressRow{grid-template-columns:95px 1fr}.modalLegend{margin-left:107px}.currentKpi{margin:9px;width:auto;max-width:none}.indicatorChartPanel{margin:9px;padding:11px}.studentChart{height:230px;margin-left:30px}.studentBars{gap:7px}.studentBar{width:75%}.studentBarCol>span{font-size:6px}.yearChooser select{width:150px}.popupGoalIcon{width:34px;height:34px;font-size:15px}}
+
+
+/* V2.1 interaction/timeline correction from review feedback. */
+.goalPage .initiativeCard.detailed{transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease,background .18s ease}
+.goalPage .initiativeCard.detailed:hover,.goalPage .initiativeCard.detailed:focus-visible{border-color:#1597ff!important;background:#0e2639;transform:translateY(-2px);box-shadow:0 0 24px rgba(21,151,255,.16);outline:none}
+html[data-theme="light"] .goalPage .initiativeCard.detailed:hover,html[data-theme="light"] .goalPage .initiativeCard.detailed:focus-visible{background:#fff!important;border-color:#1597ff!important;box-shadow:0 7px 22px rgba(21,151,255,.15)!important}
+.goalPage .goalIndicatorCard{cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+.goalPage .goalIndicatorCard:hover,.goalPage .goalIndicatorCard:focus-visible{border-color:#1597ff!important;transform:translateY(-2px);box-shadow:0 0 24px rgba(21,151,255,.16);outline:none}
+html[data-theme="light"] .goalPage .goalIndicatorCard:hover,html[data-theme="light"] .goalPage .goalIndicatorCard:focus-visible{background:#fff!important;box-shadow:0 7px 22px rgba(21,151,255,.15)!important}
+
+.timelineScale{position:relative;height:150px;margin:24px 18px 4px}
+.timelineScale .timelineLine{left:0;right:0;top:13px}
+.timelineEndpoint,.timelineMilestoneGroup{position:absolute;top:0;z-index:2;display:flex;flex-direction:column;align-items:center}
+.timelineEndpoint i,.timelineMilestoneGroup>i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid transparent;font-style:normal;color:#fff}
+.timelineEndpoint b{font-size:8px;margin-top:6px}.timelineEndpoint>span{font-size:7px;margin-top:3px;color:#aebdca}
+.timelineStart{left:0;align-items:flex-start}.timelineEnd{right:0;align-items:flex-end}
+.timelineMilestoneGroup{transform:translateX(-50%);max-width:180px}
+.timelineMilestoneLabels{display:flex;flex-direction:column;gap:5px;margin-top:6px;min-width:120px;max-width:180px;text-align:center}
+.timelineMilestoneLabels div{display:flex;flex-direction:column;padding:4px 6px;border-radius:4px;background:#16283a}
+.timelineMilestoneLabels strong{font-size:7px;line-height:1.2;white-space:normal}.timelineMilestoneLabels span{font-size:7px;color:#9fb0bf;margin-top:2px}
+.greenFlag{background:#16b95c!important;border-color:#16b95c!important;color:#fff!important}.redFlag{background:#d94d16!important;border-color:#d94d16!important;color:#fff!important}
+.timelineLegend i{display:inline-grid;width:16px;height:16px;border-radius:50%;place-items:center;font-style:normal;margin-right:4px}
+.modalGauge{background:conic-gradient(var(--progress-color,#58ad54) var(--pct),#33404c 0)!important}
+html[data-theme="light"] .modalGauge{background:conic-gradient(var(--progress-color,#58ad54) var(--pct),#d7e1e9 0)!important}
+html[data-theme="light"] .timelineEndpoint>span{color:#687d91}.timelineLegend span{display:flex;align-items:center}
+html[data-theme="light"] .timelineMilestoneLabels div{background:#eaf1f7}.timelineMilestoneLabels strong{color:inherit}html[data-theme="light"] .timelineMilestoneLabels span{color:#5f768a}
+@media(max-width:800px){.timelineScale{overflow-x:auto;min-width:680px}.timelinePanel{overflow-x:auto}}
+
+
+/* V2.1 compact initiative popup timeline — fit primary popup content in one desktop viewport. */
+@media (min-width:901px){
+ .initiativeModal{padding:8px 12px 16px}
+ .initiativeModal .modalShell{max-height:calc(100vh - 24px);overflow:hidden}
+ .initiativeModal .modalGoal{padding:10px 22px 8px}
+ .initiativeModal .modalGoal .popupGoalIcon{width:34px;height:34px}
+ .initiativeModal .modalGoal h2{font-size:17px;margin:1px 0}
+ .initiativeModal .modalGoal p{font-size:9px}
+ .initiativeModal .modalInitiativeHead{padding:7px 22px}
+ .initiativeModal .modalInitiativeHead h3{font-size:12px}
+ .initiativeModal .timelinePanel{margin:8px 14px;padding:9px 12px}
+ .initiativeModal .timelineTitle{font-size:10px}
+ .initiativeModal .timelineScale{height:86px;margin:14px 14px 0}
+ .initiativeModal .timelineScale .timelineLine{top:10px}
+ .initiativeModal .timelineEndpoint i,.initiativeModal .timelineMilestoneGroup>i{width:21px;height:21px;font-size:10px}
+ .initiativeModal .timelineEndpoint b{font-size:7px;margin-top:3px}
+ .initiativeModal .timelineEndpoint>span{font-size:6px;margin-top:1px}
+ .initiativeModal .timelineMilestoneLabels{margin-top:3px;min-width:105px;max-width:145px;gap:2px}
+ .initiativeModal .timelineMilestoneLabels div{padding:2px 4px;background:transparent!important}
+ .initiativeModal .timelineMilestoneLabels strong{font-size:6.5px;line-height:1.05}
+ .initiativeModal .timelineMilestoneLabels span{font-size:6px;margin-top:1px}
+ .initiativeModal .timelineLegend{gap:12px;font-size:7px}
+ .initiativeModal .timelineLegend i{width:13px;height:13px;font-size:7px}
+ .initiativeModal .overallPanel{margin:0 14px;padding:7px 13px}
+ .initiativeModal .overallDone b{font-size:20px}
+ .initiativeModal .modalGauge{width:48px;height:48px}
+ .initiativeModal .modalGauge:after{width:35px;height:35px}
+ .initiativeModal .progressPanel{margin:8px 14px;padding:8px 12px}
+ .initiativeModal .progressTitle h3{font-size:12px}
+ .initiativeModal .modalProgressRow{margin:5px 0}
+ .initiativeModal .modalProgressBar{height:18px}
+ .initiativeModal .modalLegend{margin-top:6px}
+}
+
+
+/* V2.1 popup refinement — readable timeline labels + matching compact indicator popup. */
+@media (min-width:901px){
+ .initiativeModal .timelineScale{margin-left:34px;margin-right:34px}
+ .initiativeModal .timelineMilestoneGroup{max-width:170px}
+ .initiativeModal .timelineMilestoneLabels{min-width:125px;max-width:170px}
+ .initiativeModal .timelineMilestoneLabels strong{font-size:7.5px;line-height:1.12}
+ .initiativeModal .timelineMilestoneLabels span{font-size:7px;line-height:1.05}
+ .initiativeModal .timelineStart{transform:translateX(-10px)}
+ .initiativeModal .timelineEnd{transform:translateX(10px)}
+
+ .indicatorModal{padding:8px 12px 16px}
+ .indicatorModal .indicatorModalShell{max-width:1420px;max-height:calc(100vh - 24px);overflow:hidden}
+ .indicatorModal .indicatorModalGoal{padding:10px 22px 8px}
+ .indicatorModal .indicatorModalGoal .popupGoalIcon{width:34px;height:34px}
+ .indicatorModal .indicatorModalGoal h2{font-size:17px;margin:1px 0}
+ .indicatorModal .indicatorModalGoal p{font-size:9px}
+ .indicatorModal .indicatorModalHead{padding:7px 22px}
+ .indicatorModal .indicatorModalHead h3{font-size:12px}
+ .indicatorModal .currentKpi{margin:8px 14px 7px;padding:8px 13px;width:410px}
+ .indicatorModal .currentKpi b{font-size:19px}
+ .indicatorModal .indicatorChartPanel{margin:0 14px 10px;padding:10px 12px}
+ .indicatorModal .indicatorChartTitle h3{font-size:13px}
+ .indicatorModal .yearChooser{margin:8px 0 12px;padding:5px 8px}
+ .indicatorModal .yearChooser select{padding:5px 8px}
+ .indicatorModal .studentChart{height:245px;margin-left:40px}
+ .indicatorModal .xAxisLabel{margin-top:28px}
+ .indicatorModal .chartNote{margin-top:15px}
+}
+.indicatorLoader{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(8,20,33,.78);backdrop-filter:blur(2px);font-size:9px;color:#dbe7f0}
+.indicatorLoader i{width:26px;height:26px;border:3px solid #52697d;border-top-color:#1597ff;border-radius:50%;animation:indicatorSpin .75s linear infinite}
+@keyframes indicatorSpin{to{transform:rotate(360deg)}}
+html[data-theme="light"] .indicatorLoader{background:rgba(247,250,252,.82);color:#334d63}
+html[data-theme="light"] .indicatorLoader i{border-color:#c3d1dc;border-top-color:#1597ff}
+
+
+/* V2.1 timeline end-label separation — reserve bottom of timeline for sub-initiatives only. */
+.timelineTitle .timelineEndDate{display:flex;align-items:baseline;gap:7px;color:#b9c6d1}
+.timelineTitle .timelineEndDate small{font-size:7px;letter-spacing:.8px;color:#7f94a7}
+.timelineTitle .timelineEndDate strong{font-size:10px;color:inherit}
+.timelineEnd{align-items:center}
+.timelineEnd b,.timelineEnd>span{display:none!important}
+.initiativeModal .timelineMilestoneGroup[style*="100%"]{transform:translateX(-100%);align-items:flex-end}
+.initiativeModal .timelineMilestoneGroup[style*="100%"] .timelineMilestoneLabels{text-align:right;align-items:flex-end}
+html[data-theme="light"] .timelineTitle .timelineEndDate{color:#40596f}
+html[data-theme="light"] .timelineTitle .timelineEndDate small{color:#71869a}
+
+
+/* V2.1 final timeline milestone: one flag, Initiative End above last sub-initiative. */
+.initiativeEndLabel{display:block;font-style:normal;font-weight:600;font-size:6px;line-height:1.05;color:#9fb0bf;margin-bottom:2px}
+@media (min-width:901px){.initiativeModal .initiativeEndLabel{font-size:6px}}
+html[data-theme="light"] .initiativeEndLabel{color:#687d91}
+
+
+/* V2.1 Goal Key Resources action. */
+.goalHeroActions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.keyResourcesBtn{height:38px;padding:0 16px;border:1px solid #39749e;border-radius:6px;background:#12334a;color:#eaf4fb;font:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease}
+.keyResourcesBtn:hover:not(:disabled),.keyResourcesBtn:focus-visible:not(:disabled){background:#174560;border-color:#55a7dc;transform:translateY(-1px);outline:none}
+.keyResourcesBtn:disabled{opacity:.55;cursor:not-allowed}
+html[data-theme="light"] .keyResourcesBtn{background:#fff;color:#245a7e;border-color:#8ebbd7}
+html[data-theme="light"] .keyResourcesBtn:hover:not(:disabled),html[data-theme="light"] .keyResourcesBtn:focus-visible:not(:disabled){background:#edf7fd;border-color:#4d9fd1}
+@media(max-width:700px){.goalHeroActions{gap:6px}.keyResourcesBtn{height:34px;padding:0 10px;font-size:9px}}
+
+
+/* V2.1 goal-count scalability. Existing 1-4 goal desktop layout remains unchanged. */
+.uxWelcome .welcomeGoals{grid-template-columns:repeat(4,minmax(0,1fr))}
+.goalPage .goalTabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.goalPage .goalTab{flex:0 0 auto}
+.navPanel nav{min-height:0;max-height:calc(100vh - 120px);overflow-y:auto;padding-bottom:72px}
+@media(max-width:1000px){.uxWelcome .welcomeGoals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.uxWelcome .welcomeGoals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* V2.1 indicator KPI row final alignment: variance sits slightly below KPI; LY Var stays beside it. */
+.goalPage .indicatorValueRow{align-items:flex-end}
+.goalPage .indicatorValueWrap{display:flex;align-items:flex-end;gap:7px;min-width:0;flex:1}
+.goalPage .varianceLine{display:flex!important;flex-direction:row!important;align-items:center!important;gap:4px!important;height:16px!important;min-height:16px!important;margin:0 0 1px!important;white-space:nowrap}
+.goalPage .varianceLabel{order:2!important;white-space:nowrap}
+.goalPage .variance{order:1!important}
+.goalPage .stateAvg{flex:0 0 auto;margin-left:12px;white-space:nowrap}
+@media (min-width:1101px){
+ .app-shell:has(.goalPage) .indicatorValueRow{align-items:flex-end!important}
+ .app-shell:has(.goalPage) .indicatorValueWrap{align-items:flex-end!important;gap:7px!important;min-width:0;flex:1}
+ .app-shell:has(.goalPage) .varianceLine{display:flex!important;flex-direction:row!important;align-items:center!important;gap:4px!important;height:16px!important;min-height:16px!important;margin:0 0 1px!important;white-space:nowrap}
+ .app-shell:has(.goalPage) .varianceLabel{order:2!important}
+ .app-shell:has(.goalPage) .variance{order:1!important}
+ .app-shell:has(.goalPage) .stateAvg{flex:0 0 auto;margin-left:12px!important;white-space:nowrap}
+}

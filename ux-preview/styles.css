@@ -124,3 +124,278 @@ body{padding-bottom:42px!important}
 #summary .kpi .summaryKpiValue .variance{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:3px!important;position:static!important;height:18px!important;min-width:0!important;padding:0 6px!important;border-radius:7px!important;overflow:visible!important;line-height:18px!important}
 #summary .kpi .summaryKpiValue .variance .trend{position:static!important;inset:auto!important;transform:none!important;width:auto!important;height:auto!important;margin:0!important;padding:0!important;line-height:1!important;font-size:8px!important}
 #summary .kpi{overflow:visible!important}
+
+/* Light-theme UX preview — color-only overrides. Layout, typography and positioning remain unchanged. */
+.themeToggle{font-size:17px!important}
+html[data-theme="light"]{color-scheme:light}
+html[data-theme="light"],html[data-theme="light"] body{color:#17283a;background:#f4f7fb}
+html[data-theme="light"] .topTools{background:linear-gradient(180deg,rgba(248,251,255,.98),rgba(248,251,255,.90),transparent)}
+html[data-theme="light"] .identity{color:#17283a}
+html[data-theme="light"] .identity span{color:#64788d}
+html[data-theme="light"] .logo{border-color:#168fff;color:#0879df;background:#fff}
+html[data-theme="light"] .tools button,
+html[data-theme="light"] .panel button,
+html[data-theme="light"] .pager button{border-color:#c4d2df;background:#fff;color:#203449}
+html[data-theme="light"] .signInBtn,
+html[data-theme="light"] .signInSubmit,
+html[data-theme="light"] .apply{background:#087ff5!important;color:#fff!important;border-color:#087ff5!important}
+html[data-theme="light"] .panel{background:#fff;border-color:#ccd8e3;color:#17283a;box-shadow:0 12px 35px rgba(38,62,84,.16)}
+html[data-theme="light"] .panel>p,
+html[data-theme="light"] .navPanel .panelTitle b{color:#334b62!important}
+html[data-theme="light"] .navUtilities{border-color:#dbe4ec!important}
+html[data-theme="light"] .navUtilities button,
+html[data-theme="light"] .navLinks>a,
+html[data-theme="light"] .navLinks #goalNavLinks>a{color:#334b62!important;border-color:transparent!important;background:transparent!important}
+html[data-theme="light"] .navUtilities button:hover,
+html[data-theme="light"] .navLinks>a:hover,
+html[data-theme="light"] .navLinks #goalNavLinks>a:hover{background:#edf5fb!important;color:#122b42!important;border-color:#d4e2ee!important}
+html[data-theme="light"] .navMainIcon,
+html[data-theme="light"] .navGoalIcon{background:#e5f2fb;color:#167dbd}
+html[data-theme="light"] .navGroupLabel,
+html[data-theme="light"] .navPowered span{color:#71869a}
+html[data-theme="light"] .navPowered{border-color:#dbe5ed}
+html[data-theme="light"] #scrim{background:rgba(20,39,58,.30)}
+html[data-theme="light"] .filterPanel select{background:#fff;color:#203449;border-color:#c4d2df}
+
+html[data-theme="light"] .welcome{background:linear-gradient(90deg,rgba(248,251,255,.98) 0%,rgba(248,251,255,.91) 55%,rgba(248,251,255,.72)),url('https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=2000&q=80') center/cover}
+html[data-theme="light"] .welcomeCopy small{color:#59738b}
+html[data-theme="light"] .welcome h1{color:#15283a}
+html[data-theme="light"] .welcomeCopy>p,
+html[data-theme="light"] .welcomeGoal p,
+html[data-theme="light"] .principles p{color:#536a80}
+html[data-theme="light"] .welcomeGoal,
+html[data-theme="light"] .principles article{background:rgba(255,255,255,.92);border-color:#c9d7e3;color:#17283a;box-shadow:0 5px 18px rgba(42,66,89,.07)}
+html[data-theme="light"] .welcomeGoal .goalIcon{background:#e8f4fc;border-color:#b9d8ee;color:#147ebf}
+html[data-theme="light"] .welcomeGoal:hover,
+html[data-theme="light"] .principles article:hover{background:#fff;border-color:#1597ff;box-shadow:0 8px 24px rgba(21,151,255,.12)}
+
+html[data-theme="light"] .summary{background:radial-gradient(circle at 50% 0,#e6f0f9,#f6f8fb 58%);color:#17283a}
+html[data-theme="light"] .goal{background:#fff;border-color:#cbd8e4;box-shadow:0 5px 16px rgba(35,60,84,.07)}
+html[data-theme="light"] .goal .pic:after{background:linear-gradient(transparent,#fff)}
+html[data-theme="light"] .body small,
+html[data-theme="light"] .desc,
+html[data-theme="light"] .legend,
+html[data-theme="light"] .pager span{color:#61768a}
+html[data-theme="light"] .kpi{background:#f4f8fc;border-color:#d2dee8;color:#17283a}
+html[data-theme="light"] .kpi span{color:#5c7186}
+html[data-theme="light"] .varianceLabel{color:#71869a!important}
+html[data-theme="light"] .variance.positive{background:#e1f3e8!important;color:#2f7650!important}
+html[data-theme="light"] .variance.negative{background:#fae5e3!important;color:#a74943!important}
+html[data-theme="light"] .dots i{background:#b6c4d0}
+
+html[data-theme="light"] .goalPage{background:radial-gradient(circle at 18% 0,#e6f0f9,#f7f9fc 52%);color:#17283a}
+html[data-theme="light"] .goalTabs{border-color:#d0dce6}
+html[data-theme="light"] .goalTab{color:#667d91}
+html[data-theme="light"] .goalTab.active{color:#17283a;border-bottom-color:#1597ff}
+html[data-theme="light"] .goalHero p{color:#526a80}
+html[data-theme="light"] .goalHero small,
+html[data-theme="light"] .goalSectionTitle small{color:#3779a8}
+html[data-theme="light"] .goalHeroIcon{border-color:#b9d4e7;background:#e9f4fb;color:#1684c8}
+html[data-theme="light"] .goalSectionTitle>span{color:#708397}
+html[data-theme="light"] .initiativeCard,
+html[data-theme="light"] .indicatorCard{background:#fff;border-color:#cbd8e4;color:#17283a;box-shadow:0 4px 14px rgba(35,60,84,.06)}
+html[data-theme="light"] .initiativeCard:hover,
+html[data-theme="light"] .indicatorCard:hover{background:#fbfdff;border-color:#68a8d4}
+html[data-theme="light"] .initiativeIntro p,
+html[data-theme="light"] .indicatorIntro p,
+html[data-theme="light"] .duration,
+html[data-theme="light"] .completionText small,
+html[data-theme="light"] .subLabel,
+html[data-theme="light"] .indicatorCard>small,
+html[data-theme="light"] .stateAvg{color:#64798d}
+html[data-theme="light"] .initiativeSummary{background:#f5f9fc!important;border-color:#d8e3ec!important}
+html[data-theme="light"] .gauge:after{background:#fff}
+html[data-theme="light"] .stateAvg b{color:#344c62}
+html[data-theme="light"] .yearBars{border-color:#ccd9e4}
+html[data-theme="light"] .yearBars i{background:#4d9ed5!important}
+html[data-theme="light"] .yearLabels{color:#71869a}
+
+html[data-theme="light"] .signInModal,
+html[data-theme="light"] .initiativeModal,
+html[data-theme="light"] .indicatorModal{background:rgba(31,50,68,.35)}
+html[data-theme="light"] .signInCard,
+html[data-theme="light"] .modalShell,
+html[data-theme="light"] .indicatorModalShell{background:#fff!important;border-color:#c9d7e3!important;color:#17283a!important;box-shadow:0 22px 60px rgba(31,53,73,.20)}
+html[data-theme="light"] .signInCard p,
+html[data-theme="light"] .signInHint,
+html[data-theme="light"] .modalGoal p,
+html[data-theme="light"] .indicatorModalGoal p{color:#60758a!important}
+html[data-theme="light"] .signInCard input,
+html[data-theme="light"] .yearChooser select{background:#f7f9fc!important;color:#17283a!important;border-color:#c8d5e0!important}
+html[data-theme="light"] .signInClose,
+html[data-theme="light"] .modalClose{background:#f4f7fa!important;color:#344b61!important;border-color:#ccd8e3!important}
+html[data-theme="light"] .timelinePanel,
+html[data-theme="light"] .overallPanel,
+html[data-theme="light"] .progressPanel,
+html[data-theme="light"] .currentKpi,
+html[data-theme="light"] .indicatorChartPanel{background:#f7f9fc!important;border-color:#d2dee8!important;color:#17283a!important}
+html[data-theme="light"] .timelineLine{background:#cad7e2!important}
+html[data-theme="light"] .timelineLegend,
+html[data-theme="light"] .modalLegend,
+html[data-theme="light"] .chartNote,
+html[data-theme="light"] .xAxisLabel,
+html[data-theme="light"] .yAxisLabel{color:#687d91!important}
+html[data-theme="light"] .studentChart{border-color:#d2dee8!important}
+html[data-theme="light"] .studentBar{background:#5ba5d7!important}
+html[data-theme="light"] .studentBarCol span{color:#526a80!important}
+
+html[data-theme="light"] #globalFooter{background:rgba(248,251,255,.96)!important;border-top:1px solid #dce5ed!important;color:#667b8e!important}
+
+
+/* Light-theme Goal page completion — tiles + initiative/indicator detail popups.
+   Color-only overrides: no layout, typography, spacing or positioning changes. */
+html[data-theme="light"] .initiativeIntro,
+html[data-theme="light"] .indicatorIntro{
+  background:linear-gradient(90deg,#edf4fa,#f7fafc)!important;
+  color:#17283a!important;
+}
+html[data-theme="light"] .initiativeIntro h4,
+html[data-theme="light"] .indicatorIntro h4,
+html[data-theme="light"] .initiativeSummary,
+html[data-theme="light"] .donePct,
+html[data-theme="light"] .subRow>span,
+html[data-theme="light"] .indicatorValue,
+html[data-theme="light"] .indicatorCard>small{
+  color:#20384e!important;
+}
+html[data-theme="light"] .initiativeIntro p,
+html[data-theme="light"] .indicatorIntro p,
+html[data-theme="light"] .subLegend{
+  color:#657b8f!important;
+}
+html[data-theme="light"] .initiativeCard.detailed .gauge:after{background:#f5f9fc!important}
+html[data-theme="light"] .initiativeSummary .duration{color:#61778b!important}
+
+html[data-theme="light"] .modalGoal,
+html[data-theme="light"] .indicatorModalGoal{
+  background:#edf3f8!important;
+  border-bottom-color:#d1dce6!important;
+  color:#17283a!important;
+}
+html[data-theme="light"] .modalGoal small,
+html[data-theme="light"] .indicatorModalGoal small{
+  color:#55758f!important;
+}
+html[data-theme="light"] .modalGoal h2,
+html[data-theme="light"] .indicatorModalGoal h2{
+  color:#17283a!important;
+}
+html[data-theme="light"] .popupGoalIcon{
+  background:#e3f1fa!important;
+  border-color:#b9d4e7!important;
+  color:#1684c8!important;
+}
+html[data-theme="light"] .modalInitiativeHead,
+html[data-theme="light"] .indicatorModalHead{
+  background:#f7f9fb!important;
+  border-bottom-color:#d8e2ea!important;
+  color:#20384e!important;
+}
+html[data-theme="light"] .modalInitiativeHead small,
+html[data-theme="light"] .currentKpi small,
+html[data-theme="light"] .progressTitle small{
+  color:#617b91!important;
+}
+html[data-theme="light"] .timelineTitle span,
+html[data-theme="light"] .progressTitle>span,
+html[data-theme="light"] .indicatorChartTitle>span{
+  color:#657b8f!important;
+}
+html[data-theme="light"] .milestone i{
+  background:#fff!important;
+  border-color:#b9c9d6!important;
+  color:#314b62!important;
+}
+html[data-theme="light"] .milestone.start i{background:#16b95c!important;color:#fff!important;border-color:#16b95c!important}
+html[data-theme="light"] .milestone.end i{background:#d94d16!important;color:#fff!important;border-color:#d94d16!important}
+html[data-theme="light"] .milestone span{
+  background:#eaf1f7!important;
+  color:#40596f!important;
+}
+html[data-theme="light"] .modalGauge{background:conic-gradient(#58ad54 var(--pct),#d7e1e9 0)!important}
+html[data-theme="light"] .modalGauge:after{background:#f7f9fc!important}
+html[data-theme="light"] .modalProgressRow>span{color:#334d63!important}
+html[data-theme="light"] .modalLegend{color:#60768a!important}
+
+html[data-theme="light"] .currentKpi small,
+html[data-theme="light"] .currentKpi span,
+html[data-theme="light"] .currentKpi b,
+html[data-theme="light"] .indicatorChartTitle h3,
+html[data-theme="light"] .yearChooser{
+  color:#20384e!important;
+}
+html[data-theme="light"] .yearChooser{
+  background:#eaf1f7!important;
+}
+html[data-theme="light"] .studentChart{
+  border-left-color:#c5d3df!important;
+  border-bottom-color:#c5d3df!important;
+  background:repeating-linear-gradient(to top,transparent 0,transparent 53px,#e2e9ef 54px)!important;
+}
+html[data-theme="light"] .studentBar b,
+html[data-theme="light"] .stateAvgLine span{
+  color:#29445b!important;
+}
+html[data-theme="light"] .stateAvgLine{background:#8497a8!important}
+html[data-theme="light"] .indicatorChartTitle>span:hover:after{
+  background:#fff!important;
+  border-color:#c7d4df!important;
+  color:#334c62!important;
+  box-shadow:0 5px 16px rgba(35,60,84,.12)!important;
+}
+
+
+/* Light-theme K12Matrix branding: use dark K12 wordmark for contrast on light surfaces. */
+html[data-theme="light"] .k12MatrixLogo,
+html[data-theme="light"] .navPowered img{
+  content:url('./assets/k12matrix-logo-light.svg');
+}
+
+
+/* Light-theme navigation completion — overrides late dark nav rules. */
+html[data-theme="light"] .navPanel{
+  background:#ffffff!important;
+  border-left-color:#ccd8e3!important;
+  color:#17283a!important;
+  box-shadow:-10px 0 30px rgba(38,62,84,.12)!important;
+}
+html[data-theme="light"] .navPanel .panelTitle{
+  border-bottom-color:#dbe5ed!important;
+}
+html[data-theme="light"] .navPanel .panelTitle b{color:#17283a!important}
+html[data-theme="light"] .navPanel .panelTitle button{
+  background:#f5f8fb!important;
+  border-color:#cbd8e3!important;
+  color:#334b62!important;
+}
+html[data-theme="light"] .navUtilities button{
+  background:#f5f9fc!important;
+  border-color:#d1dde7!important;
+  color:#334b62!important;
+}
+html[data-theme="light"] .navUtilities button:hover{
+  background:#eaf4fb!important;
+  border-color:#bdd5e6!important;
+  color:#173a55!important;
+}
+html[data-theme="light"] .navLinks>a,
+html[data-theme="light"] .navLinks #goalNavLinks>a{
+  color:#435b70!important;
+  background:transparent!important;
+}
+html[data-theme="light"] .navLinks>a:hover,
+html[data-theme="light"] .navLinks #goalNavLinks>a:hover{
+  background:#edf5fb!important;
+  color:#173a55!important;
+  border-color:#d4e2ee!important;
+}
+html[data-theme="light"] .navMainIcon,
+html[data-theme="light"] .navGoalIcon{
+  background:#e6f2fa!important;
+  color:#167dbd!important;
+}
+html[data-theme="light"] .navGroupLabel{color:#70869a!important}
+html[data-theme="light"] .navPowered{
+  border-top-color:#dbe5ed!important;
+}
+html[data-theme="light"] .navPowered span{color:#687f93!important}
