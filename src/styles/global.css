@@ -750,3 +750,7 @@ html[data-theme="light"] .keyResourcesBtn:hover:not(:disabled),html[data-theme="
 
 /* V2.2 Goal validation/deletion confirmation */
 .goalDeleteWarning{margin:12px 0;padding:13px 14px;border:1px solid #e5b4b4;border-radius:8px;background:#fff4f4;color:#742d2d;font-size:10px}.goalDeleteWarning b{font-size:11px}.goalDeleteWarning p{margin:5px 0 10px;color:#7d4848}.goalDeleteWarning>div{display:flex;gap:8px}.goalDeleteWarning button{border:1px solid #d4b5b5;background:#fff;border-radius:6px;padding:7px 10px;cursor:pointer;font-size:10px}.goalDeleteWarning button.danger{background:#b42318;border-color:#b42318;color:#fff}.goalDeleteWarning button:disabled{opacity:.5;cursor:not-allowed}
+
+/* V2.2 explicit Goal delete and District logo editor */
+.goalEditorHead{display:flex;align-items:center;justify-content:space-between;gap:10px}.goalEditorHead>b{font-size:11px;color:#20384e}.goalDeleteBtn{border:1px solid #e0b2b2;background:#fff5f5;color:#a42620;border-radius:6px;padding:5px 8px;font-size:9px;cursor:pointer}.goalDeleteBtn:hover{background:#fee8e8}.districtLogoAdmin{display:flex;align-items:center;gap:12px;margin-top:6px;min-height:62px;border:1px solid #ced8e0;border-radius:7px;padding:8px}.districtLogoAdmin img{width:64px;height:46px;object-fit:contain;border:1px solid #e4e9ed;border-radius:5px;background:#fff}.districtLogoAdmin span{font-size:9px;color:#7a8997}.districtLogoAdmin input{margin:0;border:0;padding:5px;width:auto;max-width:260px}
+.districtLogo img{width:100%;height:100%;object-fit:contain;border-radius:inherit}
