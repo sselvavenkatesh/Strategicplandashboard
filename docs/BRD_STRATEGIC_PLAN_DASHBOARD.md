@@ -1,6 +1,6 @@
 # Strategic Plan Dashboard — Business Requirements Document (BRD)
 
-**Document status:** V2.0 production baseline / V2.1 planning input  
+**Document status:** V2.1 frozen public-dashboard baseline / V2.2 Admin planning input  
 **Product:** Strategic Plan Dashboard  
 **Audience:** Product owner, school-district stakeholders, UX/design, engineering, QA, AI development agents
 
@@ -446,3 +446,25 @@ Required future screenshot assets:
 - `docs/screenshots/sign-in.png`
 
 Once approved captures are added, replace the notes above with Markdown image references. The functional BRD, schemas and architecture visualization are complete independently of those binary captures.
+
+
+---
+
+## 13. V2.1 frozen public-dashboard baseline — 26 Sep 2026
+
+V2.1 is approved and frozen as the current public-dashboard functional/UX baseline. Where this section conflicts with historical V2.0 statements above, this section is authoritative.
+
+V2.1 includes approved dark and light themes; Welcome, Summary and Goal experiences; dynamic/scalable Goal presentation; Initiative and Indicator tiles; Initiative Detail and Indicator Detail popups; right-side navigation; Key Resources external navigation; K12Matrix branding; and Supabase-backed reporting.
+
+Important V2.1 behavior:
+- Indicator Detail is enabled and opens from Indicator tiles.
+- Initiative and Indicator popup titles show short name followed by long name.
+- Goal tabs horizontally scroll when required and Welcome supports additional Goal rows while preserving four cards per desktop row.
+- Goal identity supports eight distinct icons consistently across Welcome, Goal/popups and navigation.
+- Navigation Help and Filter controls are hidden.
+- Goal page includes a Key Resources button that opens the configured strategic-plan resource folder.
+- Indicator LY variance is positioned beside/below the KPI value with LY Var inline and protected from overlap with Statewide Average.
+- Initiative timeline uses Sub-Initiative End Dates, completion-driven flag status, collision handling, and a single final milestone labeled Initiative End.
+- Theme preference is persisted; dark remains default.
+
+The frozen V2.1 branch/checkpoint must remain unchanged after freeze. V2.2 is reserved for Admin-page development and should start from the frozen V2.1 code/documentation state.
