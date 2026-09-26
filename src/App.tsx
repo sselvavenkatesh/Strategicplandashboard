@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { ThemeProvider } from './app/ThemeProvider'
 import { AppShell } from './components/layout/AppShell'
 import { AdminHomePage } from './pages/admin/AdminHomePage'
+import { SuperAdminPage } from './pages/admin/SuperAdminPage'
 import { GoalPage } from './pages/dashboard/GoalPage'
 import { SummaryPage } from './pages/dashboard/SummaryPage'
 import { WelcomePage } from './pages/dashboard/WelcomePage'
@@ -10,6 +11,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <Routes>
+        <Route path="/superadmin" element={<SuperAdminPage />} />
         <Route element={<AppShell />}>
           <Route path="/" element={<WelcomePage />} />
           <Route path="/summary" element={<SummaryPage />} />

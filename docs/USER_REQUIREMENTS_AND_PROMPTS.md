@@ -1,4 +1,4 @@
-# District 360 Strategic Plan Dashboard — User Requirements & Prompt Log
+# Strategic Plan Dashboard — User Requirements & Prompt Log
 
 > Living document capturing the product requirements, decisions, and implementation instructions provided by the product owner. Update this document as new requirements are supplied. It complements `MASTER_PRODUCT_SPEC.md`; it does not replace the approved specification or live schema inspection.
 
@@ -414,3 +414,260 @@ Release discipline:
 5. Perform desktop visual parity review page-by-page against frozen UX before requesting stakeholder review.
 6. Do not call a deployment review-ready merely because it builds or deploys.
 7. A release candidate must pass code/build checks, data checks, interaction checks, and visual-parity checks.
+
+
+---
+
+## Product naming clarification — 26 Sep 2026
+
+The product owner explicitly instructed: **Do not call the product “District 360.” The product name is “Strategic Plan Dashboard.”**
+
+Use **Strategic Plan Dashboard** in product documentation and future product discussions. Existing historical code identifiers, database values, storage/session keys, commit messages, or old screenshots may still contain “District 360”; do not rename technical identifiers without a separate migration requirement.
+
+## React implementation and release history — 24–26 Sep 2026
+
+The following prompt/decision history supplements the earlier UX and reporting requirements and records the product-owner instructions that drove the production React implementation.
+
+### React parity and QA discipline
+
+- The frozen UX is a strict visual specification, not general inspiration.
+- React must reproduce each approved UX component and use Supabase data rather than screenshot/sample KPI values.
+- The product owner explicitly required component-by-component comparison against the frozen UX before pushing a React candidate.
+- When QA finds a failure, do not stop at reporting it: investigate the cause, correct it, retest, and make the candidate stable.
+- A successful build alone is not sufficient to call a version review-ready.
+- Preview deployments are preferred during iteration. Production deployment happens only after explicit approval.
+- The product owner asked for basic automated/unit testing as part of the quality process.
+- Responsive behavior is required for web/desktop, laptop, tablet and mobile. Final release QA should explicitly cover representative viewport sizes rather than assuming media queries are sufficient.
+
+### Welcome page
+
+- Welcome React implementation was brought into parity with the frozen UX.
+- The primary CTA text was changed from **“Explore Full Dashboard →”** to **“Explore Strategic Plan →”** for V2.0.
+- Goal tiles on Welcome navigate to Summary.
+- Current page navigation uses a route-change loader carrying K12Matrix branding.
+
+### Summary / Goal Summary page
+
+- The generic **STRATEGIC PLAN** label above Goal Summary was replaced with the actual Strategic Plan Name and Strategic Plan Duration from District Profile.
+- Summary Goal cards use real Supabase Goal, Initiative and Indicator data.
+- Summary Key Indicator cards use **Indicator short names**.
+- Fund Balance is displayed in millions using the format **$x.xxM**.
+- LY variance respects KPI Nature: for Negative-nature indicators, a decrease is favorable; for Positive-nature indicators, an increase is favorable.
+- Percent indicators retain the percent suffix in LY variance.
+- Missing Indicator/Initiative data must use the approved unavailable state rather than fabricated data.
+
+### Goal page — Initiative requirements implemented
+
+- Initiative cards use Initiative short names and descriptions.
+- Four Initiative cards per row remain the desktop UX target.
+- Initiative progress is calculated from Action Item status rows.
+- Overall completion gauge and Done percentage use the same calculated completion.
+- Gauge color varies with progress; exactly 100% uses the same green as the Done status bar.
+- Gauge hover/focus detail includes Initiative name, Sub-Initiative names, Start Date, End Date, Total Action Items and Completed %.
+- Sub-Initiative stacked bars retain the compact/native tooltip behavior after the custom large stacked-bar tooltip experiment was explicitly rejected and reverted.
+- Initiative charts were explicitly approved/frozen for V1.0.
+
+### Goal page — Indicator requirements implemented / current behavior
+
+- Indicator cards use Indicator short names and descriptions.
+- Latest value, LY variance, Statewide Average and historical School Year bars are displayed.
+- Fund Balance uses **$x.xxM**.
+- Indicator and Statewide Average typography was aligned with the Initiative progress percentage treatment.
+- **Current V2.0 behavior supersedes the earlier frozen UX interaction:** the product owner explicitly requested that clicking a Goal Page Indicator card **must not open the Indicator detail popup**. The click and keyboard activation trigger was disabled in React. The underlying Indicator data/card remains visible.
+- The old Indicator detail implementation may remain in code temporarily, but it is not reachable from Goal Indicator cards unless the product owner explicitly re-enables that interaction.
+
+### Header, branding and loader
+
+- Riverside School District name in the header was enlarged while preserving the existing header height.
+- A professional district-style inline mark was added for the Riverside School District prototype.
+- **Powered By K12Matrix** branding was moved from the fixed global footer into the header.
+- The footer was removed from the current V2 React shell.
+- The canonical K12Matrix asset is the existing repository SVG: `ux-preview/assets/k12matrix-logo.svg`.
+- The frozen UX asset itself must not be edited.
+- A React-served copy is published at `public/k12matrix-logo.svg`; React references `/k12matrix-logo.svg` so Netlify/Vite can serve it reliably.
+- The same canonical K12Matrix SVG is used in the header, navigation panel and route-change loader.
+- On narrow mobile widths, header K12Matrix branding may be hidden to prevent collision/overflow while preserving the district identity and navigation controls.
+
+### Sign In
+
+- Sign In remains a compact pill action in the header.
+- Sign In opens a modal/popup.
+- The Sign In popup now includes the canonical **K12Matrix logo**.
+- Product-owner copy change: **“Sign in with your administrator account.”**
+- The previous copy “Sign in with your District 360 administrator account.” is obsolete.
+- Current Admin Sign In is a custom database-backed login using the `validate_admin_login(p_email,p_password)` RPC and pgcrypto password verification; it is not Supabase Auth.
+- Current browser session key is `district360_admin` (historical technical identifier; do not rename solely because the product display name changed).
+- Google/Microsoft SSO remains a future capability.
+
+### K12Matrix asset deployment correction
+
+A V2 preview initially showed broken K12Matrix images because React referenced `/ux-preview/assets/k12matrix-logo.svg`, which was not guaranteed to be copied into the Vite production bundle. The correction was:
+1. preserve the frozen source SVG;
+2. copy it to `public/k12matrix-logo.svg`;
+3. reference `/k12matrix-logo.svg` from React.
+
+This is the required deployment-safe pattern unless the asset pipeline is deliberately redesigned.
+
+### Responsive requirement and QA status
+
+Responsive CSS currently contains desktop/laptop/tablet/mobile adaptations. A separate experimental QA branch (`qa/v2.0-responsive`) was created to investigate additional responsive hardening, but the product owner later instructed **not to continue work on that branch**. Do not treat that branch as the active product branch.
+
+Active V2 development continued on `release/v2.0-dev`. Any V2.1 responsive work should start from the approved production baseline and be validated through a new preview branch.
+
+Representative release-QA viewport targets previously agreed:
+- 1920×1080 desktop
+- 1366×768 laptop
+- 768×1024 tablet
+- 390×844 mobile
+- 360×800 small mobile
+
+### Release/version control history
+
+- Frozen UX commit: `c75815e76e79b8fa97599d924265d7bd8015d0f7`.
+- V1.0 immutable release baseline branch: `release/v1.0`.
+- Goal Summary V1.0 merge into `react-dashboard`: `69791ec6c5558f9458c563bad3084d2f4c5aad28`.
+- V2.0 development branch: `release/v2.0-dev`.
+- V2.0 frozen checkpoint: `release/v2.0-frozen-checkpoint-1`.
+- Responsive experiment branch: `qa/v2.0-responsive` — no longer the active branch by explicit product-owner instruction.
+- Production hosting: Netlify.
+- Production site: `https://vocal-twilight-54ee43.netlify.app/#/`.
+- V2.0 was manually promoted/published in Netlify after successful preview deployment.
+- Current production candidate lineage includes disabling the Goal Indicator popup and adding the K12Matrix logo/revised copy to Sign In.
+
+### Netlify release discipline
+
+- Avoid unnecessary production publishes because production deploys consume Netlify credits.
+- Use Deploy Previews/branch previews for iteration where possible.
+- Do not claim Netlify built/passed a commit without checking deployment/status evidence.
+- The product owner may manually use Netlify **Publish deploy** to promote a successful Deploy Preview to production.
+- Public visibility is acceptable for stakeholder/product evaluation provided public users remain read-only and Admin capabilities/data remain protected.
+
+## V2.1 planning instruction
+
+V2.0 is the current production milestone. Before V2.1 feature development:
+1. preserve the production baseline;
+2. maintain this prompt/requirements log;
+3. maintain an AI handoff/context document in `docs`;
+4. maintain a functional BRD in `docs`;
+5. define V2.1 scope before implementation;
+6. use preview → QA → owner approval → freeze → production release discipline.
+
+## Documentation precedence
+
+When requirements conflict, use this order:
+1. the latest explicit product-owner instruction;
+2. the current production behavior when explicitly approved;
+3. the frozen UX baseline for areas not superseded;
+4. earlier exploratory requirements.
+
+Do not silently revive superseded behavior. In particular, the current product name is **Strategic Plan Dashboard**, Goal Indicator click-to-detail is disabled, K12Matrix branding is in the header/current shell rather than a fixed footer, and the Sign In copy is the revised administrator-account wording.
+
+
+---
+
+## V2.1 final prompt history and frozen requirements — 26 Sep 2026
+
+The product owner completed the V2.1 public-dashboard review and explicitly requested that **V2.1 be frozen**. The following requirements supersede conflicting V2.0/frozen-UX notes above where applicable.
+
+### Theme and visual parity
+- Light Theme is approved across Welcome, Summary, Goal, Initiative Detail, Indicator Detail, K12Matrix branding, and right-side navigation.
+- Dark remains the default theme; theme preference is persisted.
+- Theme changes affect surfaces, typography, borders and colors without changing business behavior.
+
+### Goal page and scalable goal navigation
+- Goal icons on Goal pages and popups must match the Goal identity used on the Welcome page.
+- Support districts with up to at least eight Goals without changing the approved four-goal desktop presentation:
+  - Welcome retains four Goal tiles per desktop row; additional Goals flow to subsequent rows.
+  - Goal tabs remain single-line and horizontally scroll when required.
+  - Navigation pane scrolls when its Goal list exceeds viewport height.
+  - Eight distinct Goal icons are available and used consistently.
+- Add **Key Resources** beside the Goal icon. It opens the district strategic-plan resource location in a new tab.
+- Current Key Resources destination is the approved district Zoho WorkDrive strategic-plan folder.
+- Hide Help and Filter controls from the navigation pane.
+
+### Initiative tile and Initiative Detail
+- Initiative tiles retain hover/focus interaction.
+- Initiative Detail popup is compact enough for normal desktop use without unnecessary scrolling.
+- Popup title displays **Initiative short name - Initiative long name**.
+- Plan of Action timeline:
+  - initiative minimum Start Date is the left boundary;
+  - initiative maximum End Date is the right boundary;
+  - Sub-Initiative flags are positioned from Sub-Initiative End Date;
+  - flag is green only when every Action Item in that Sub-Initiative is Done, otherwise red;
+  - same-date Sub-Initiatives stack rather than overlap;
+  - the final Sub-Initiative flag doubles as the Initiative End milestone, with **Initiative End** shown above it rather than a duplicate end flag.
+- Initiative gauge uses the same dynamic progress-color logic as Goal-level progress.
+- Approved data-readability adjustment: public Sub-Initiative End Dates were distributed across Jun-2025 / Jun-2026 / Jun-2027 by Initiative where needed to avoid excessive timeline overlap.
+
+### Indicator tile and Indicator Detail
+- Indicator Detail popup is enabled from Indicator tiles.
+- Popup title displays **Indicator short name - Indicator long name**.
+- Popup is compact and includes a loading treatment while selected-year data loads.
+- Changing School Year updates both the Student Group chart and the displayed KPI value.
+- Indicator tile LY variance remains beside the KPI area, positioned slightly lower than the KPI value.
+- **LY Var** text is immediately beside the variance pill/value.
+- Statewide Average has reserved independent space and must not overlap the KPI/variance area.
+
+### Branding/navigation
+- K12Matrix logo treatment is approved in both themes.
+- Right-side navigation contains Home, Summary and dynamic Goal entries.
+- Help and Filter utilities are hidden.
+- Do not use the legacy product name in user-facing product copy; use **Strategic Plan Dashboard**.
+
+### Release decision
+- Product owner instruction: **“i want to freeze v2.1.”**
+- V2.1 is the approved public-dashboard feature baseline.
+- After documentation and freeze checkpoint creation, subsequent Admin-page development begins on **v2.2**.
+- Do not modify the frozen V2.1 checkpoint for V2.2 work.
+
+
+---
+
+## V2.2 final requirements and freeze decision — 27 Sep 2026
+
+The product owner explicitly decided to stop the proposed V2.4/V2.5 split and instead **freeze all functionality completed to this point as Version 2.2**. GitHub documentation and release branching must reflect V2.2 as the current frozen product baseline.
+
+### Super Admin requirements captured in V2.2
+
+- Super Admin is reached by adding `/superadmin` to the product URL.
+- Dedicated Super Admin login is separate from the existing public-dashboard Admin login.
+- Super Admin Home shows counts of configured Goals, Indicators and Initiatives. Do not show Indicator_Data/Initiative_Data row counts as the Home KPIs.
+- Strategic Plan Configuration manages District Name, Strategic Plan Name, Strategic Plan Duration, Mission, Vision, Number of Goals, district logo and Admin Signin method.
+- Admin Signin choices: Userbased, Google, Microsoft. Provider-specific identifiers are shown conditionally. Sensitive OAuth secrets must not be exposed in browser code or persisted in District_Profile.
+- Intended SSO operating model: configuration is entered through the Super Admin interface and a secure backend applies provider configuration to Supabase Auth. The backend provider-configuration layer is not yet complete at this V2.2 freeze; do not claim otherwise.
+- Public Admin login switches between Userbased, Google and Microsoft based on District_Profile configuration. SSO-authenticated emails must still map to an active authorized Admin record.
+- District Logo uses a compact upload/change action; after update, the configured image is used in the public dashboard header.
+- Goal Master is editable from Super Admin. Goal ID is not displayed to the user and new IDs are intended to be backend-managed while existing IDs remain unchanged.
+- Goal Names must be distinct after trimming/case normalization. Duplicate names block save in both UI and backend validation.
+- Number of Goals cannot be reduced below the count of saved Goals through the count field. The user must explicitly delete the unwanted Goal.
+- Every saved Goal exposes a Delete action. Deletion requires a confirmation dialog. Cancel leaves the Goal unchanged. Successful deletion produces a push/toast notification.
+- Goal deletion is blocked when dependent Indicator/Initiative master or data records exist; no automatic cascading deletion of reporting data is allowed.
+- Implemented Super Admin CRUD operations must use professional transient push/toast notifications for success, warning and failure instead of persistent bottom-of-form messages.
+- Strategic Plan/Goal configuration Save is enabled and protected by server-validated Super Admin authorization.
+- Indicator/Initiative screens display Supabase data; Initiative data has pagination.
+- CSV templates/uploads are intended to omit user-managed Goal/Indicator/Initiative IDs and use backend-generated IDs for new records, but the Indicator/Initiative write/upload flow remains disabled at this freeze until full validation/atomic-write safeguards are implemented.
+- Goal-context sample image generation was requested as a future enhancement but was not completed as part of this V2.2 freeze.
+
+### Final V2.2 UX corrections
+
+- Super Admin configuration should remain compact.
+- Number of Goals is a narrow control.
+- Admin Signin is aligned beneath the Strategic Plan Duration column rather than consuming unnecessary width.
+- District Logo uses an Upload Logo / Change Logo button with a compact preview rather than a large upload box.
+- Delete Goal uses a centered confirmation modal with clear Cancel and Delete Goal actions; unnecessary/extraneous warning icon treatment was removed in the final source correction.
+
+### Freeze instruction
+
+Product-owner instruction: **“We can freeze till now and make the product release as V2.2.”**
+
+Release handling:
+1. Update README, AI context, BRD and this requirements log to V2.2 frozen status.
+2. Treat the resulting `v2.2` head as the release checkpoint.
+3. Do not add subsequent features to frozen V2.2; start a new version branch from it.
+4. Preserve `v2.1-frozen` as the previous public-dashboard checkpoint.
+5. Do not infer production deployment/merge approval from the freeze instruction alone.
+
+
+### V2.2 final indicator-popup correction — 27 Sep 2026
+
+Product-owner requested one final correction before validation: the Indicator Detail popup Y-axis label must be data-driven rather than fixed, and the selected-year control must have visible separation from the chart. The implementation now derives the axis wording from Indicator Type/context (for example percentage proficiency, SAT score, fund balance, or generic indicator value) and adds spacing below the year selector. This correction is part of the V2.2 release candidate and must be included when the frozen checkpoint is advanced after validation.

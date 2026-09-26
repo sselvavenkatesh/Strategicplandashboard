@@ -13,3 +13,10 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+
+# SPA fallback: allow direct URLs such as /superadmin to load the React application.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

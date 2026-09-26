@@ -1,6 +1,6 @@
 import {useEffect,useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {getGoals,getIndicators,getInitiatives,Goal,Indicator,Initiative} from '../../lib/dashboard';
+import {getGoals,getIndicators,getInitiatives,getProfile,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 
 type Bundle={goal:Goal;indicators:Indicator[];initiatives:Initiative[]};
@@ -11,13 +11,19 @@ const goalImages=[
   'https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=900&q=80'
 ];
 
+function summaryIndicatorValue(k:Indicator){
+  const isFundBalance=k.shortName.toLowerCase().includes('fund balance')||k.name.toLowerCase().includes('fund balance');
+  if(isFundBalance&&k.numeric!=null)return '$'+(k.numeric/1000000).toFixed(2)+'M';
+  return k.value;
+}
+
 export function SummaryPage(){
- const nav=useNavigate(),goals=useDashboard(getGoals),[bundles,setBundles]=useState<Bundle[]>([]),[err,setErr]=useState('');
+ const nav=useNavigate(),goals=useDashboard(getGoals),profile=useDashboard(getProfile),[bundles,setBundles]=useState<Bundle[]>([]),[err,setErr]=useState('');
  useEffect(()=>{if(!goals.data)return;Promise.all(goals.data.map(async goal=>({goal,indicators:await getIndicators(goal.id),initiatives:await getInitiatives(goal.id)}))).then(setBundles).catch(e=>setErr(e.message))},[goals.data]);
- if(goals.loading||(!bundles.length&&!err))return <main className="page state">Loading strategic plan summary…</main>;
- if(goals.error||err)return <main className="page state error">{goals.error||err}</main>;
+ if(goals.loading||profile.loading||(!bundles.length&&!err))return <main className="page state">Loading strategic plan summary…</main>;
+ if(goals.error||profile.error||err)return <main className="page state error">{goals.error||profile.error||err}</main>;
  return <main className="page summaryPage">
-  <div className="summaryHeading"><div><small>STRATEGIC PLAN</small><h1>Goal Summary</h1></div><span>{bundles.length} Goals</span></div>
+  <div className="summaryHeading"><div><small>{profile.data?.planName||'Strategic Plan'}{profile.data?.duration?` · ${profile.data.duration}`:''}</small><h1>Goal Summary</h1></div><span>{bundles.length} Goals</span></div>
   <section className="summaryGrid">{bundles.map(({goal,indicators,initiatives},idx)=>{
    const all=initiatives.reduce((a,x)=>({d:a.d+x.done,p:a.p+x.inProgress,n:a.n+x.notStarted}),{d:0,p:0,n:0}),total=all.d+all.p+all.n;
    const pct=(n:number)=>total?Math.round(100*n/total):0;
@@ -32,7 +38,7 @@ export function SummaryPage(){
       </div><div className="legend"><span>■ Done</span><span>■ In Progress</span><span>■ Not Yet Started</span></div></>:<div className="summaryUnavailable" title="No initiative action-item data is currently available for this goal.">Initiative data unavailable</div>}
      <div className="sectionLabel"><b>Key Indicators</b><span>View All →</span></div>
      <div className="kpis">{indicators.map(k=><div className="kpi" key={k.id} title={k.description||`${k.name}: latest available value ${k.value}`} onClick={e=>e.stopPropagation()}>
-       <span>{k.name}</span><div className="kpiValue"><b>{k.value}</b>{k.variance!=null&&<span className="varianceLine"><small>LY Var</small><em className={(k.nature==='Negative'?k.variance<=0:k.variance>=0)?'up':'down'}>{k.variance>=0?'↗':'↘'} {k.variance.toFixed(1)}{k.isPercent?'%':''}</em></span>}</div>{k.year!=='—'&&<small className="kpiYear">{k.year}</small>}
+       <span>{k.shortName}</span><div className="kpiValue"><b>{summaryIndicatorValue(k)}</b>{k.variance!=null&&<span className="varianceLine"><small>LY Var</small><em className={(k.nature==='Negative'?k.variance<=0:k.variance>=0)?'up':'down'}>{k.variance>=0?'↗':'↘'} {k.variance.toFixed(1)}{k.isPercent?'%':''}</em></span>}</div>{k.year!=='—'&&<small className="kpiYear">{k.year}</small>}
       </div>)}</div>
     </div>
    </article>})}</section>

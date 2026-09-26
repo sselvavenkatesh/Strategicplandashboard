@@ -27,3 +27,24 @@ function closeIndicatorModal(){const m=document.getElementById('indicatorModal')
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeIndicatorModal();closeInitiativeModal();closeSignIn()}});
 function renderGoalNavigation(){const el=document.getElementById('goalNavLinks');if(!el)return;el.innerHTML=goals.map((g,i)=>'<a href="#goal" onclick="renderGoalPage('+i+');closePanels()" title="'+g[1]+'"><span class="navGoalIcon">'+(goalIcons[i]||'◆')+'</span><span>'+g[1]+'</span></a>').join('')}
 renderGoalNavigation();
+
+
+function applyTheme(theme){
+  const light=theme==='light';
+  document.documentElement.setAttribute('data-theme',light?'light':'dark');
+  const btn=document.getElementById('themeToggle');
+  if(btn){
+    btn.textContent=light?'☾':'☀';
+    btn.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');
+    btn.title=light?'Switch to dark theme':'Switch to light theme';
+  }
+  try{localStorage.setItem('strategic-plan-theme',light?'light':'dark')}catch(e){}
+}
+function toggleTheme(){
+  applyTheme(document.documentElement.getAttribute('data-theme')==='light'?'dark':'light');
+}
+(function initTheme(){
+  let saved='dark';
+  try{saved=localStorage.getItem('strategic-plan-theme')||'dark'}catch(e){}
+  applyTheme(saved==='light'?'light':'dark');
+})();
