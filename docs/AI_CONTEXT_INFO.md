@@ -511,3 +511,59 @@ For subsequent work:
 - do not alter the V2.1 frozen checkpoint to implement Admin functionality;
 - preserve existing public-dashboard behavior while Admin work proceeds;
 - follow build/test → Deploy Preview → QA → product-owner approval before any production promotion.
+
+
+---
+
+## 15. V2.2 frozen release checkpoint — 27 Sep 2026
+
+**Product-owner decision:** freeze the product completed to this point and treat it as **Version 2.2**. This section supersedes earlier text that describes V2.2 only as future Admin-page work.
+
+### Release scope
+
+V2.2 combines the approved V2.1 public-dashboard baseline with the V2.2 Super Admin work completed through the freeze checkpoint.
+
+Public/Admin baseline retained:
+- Welcome, Summary and Goal-specific dashboard experiences;
+- Initiative Detail and Indicator Detail popups;
+- approved dark/light themes and persisted theme preference;
+- scalable Goal rendering/navigation and up to eight distinct Goal identities from the V2.1 baseline;
+- Key Resources, K12Matrix branding, Supabase-backed reporting and existing Admin sign-in/public-vs-admin behavior.
+
+Super Admin included at `/superadmin`:
+- dedicated Super Admin sign-in and server-validated temporary Super Admin session token;
+- Home tiles for Goals, configured Indicators and configured Initiatives;
+- Strategic Plan configuration for district/plan name, duration, mission, vision and Goal count;
+- editable Goal Master with hidden/internal Goal IDs, case-insensitive distinct Goal-name validation, safe Goal-count behavior and explicit delete confirmation;
+- Goal deletion is blocked when dependent Indicator/Initiative records exist rather than cascading data loss;
+- district-logo upload/update with configured logo used by the public header;
+- Admin Signin method selection: Userbased, Google or Microsoft;
+- Google/Microsoft provider identifier fields and public Admin-login UI switching foundation;
+- SSO users are checked against active Admin authorization before an Admin session is accepted;
+- Indicator and Initiative data review screens, with Initiative pagination;
+- professional push/toast feedback for implemented Super Admin CRUD actions.
+
+### Important incomplete/protected scope
+
+- Indicator/Initiative CSV upload/write remains intentionally disabled until template validation, automatic ID creation, FK/duplicate validation and atomic write behavior are completed.
+- Google/Microsoft provider identifiers in District_Profile do not by themselves configure Supabase Auth provider secrets. A secure backend provider-configuration layer is still required before interface-only SSO administration can be called complete. Never store OAuth client secrets in React or District_Profile.
+- Goal sample-image generation discussed during V2.2 is not part of this frozen release unless separately implemented and verified.
+
+### Data/security additions used by V2.2
+
+- District_Profile includes Admin Signin Method and non-secret Google/Microsoft provider identifier fields.
+- Super Admin uses `validate_superadmin_login` and server-side session validation for privileged configuration operations.
+- Public Admin SSO authorization foundation uses `validate_sso_admin` and remains separate from Super Admin authorization.
+- Goal configuration/deletion and district-logo changes use protected RPCs rather than granting broad browser table-write permissions.
+
+### Version-control rule
+
+- `v2.2` is the frozen V2.2 release branch/checkpoint after the release documentation commit.
+- Do not add new features directly to frozen V2.2.
+- Any subsequent development must begin on a new version branch created from the frozen V2.2 head.
+- `v2.1-frozen` remains the prior immutable public-dashboard checkpoint.
+- Freezing V2.2 does **not** by itself authorize merging to production or publishing a Netlify production deploy.
+
+### QA/release caution
+
+The final V2.2 Super Admin visual adjustments were source-validated, but no successful deployment/check result was available at the last status check. Therefore the frozen source checkpoint must not be described as production-deployed or fully visual-QA-certified unless deployment evidence is subsequently verified.
