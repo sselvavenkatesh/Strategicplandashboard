@@ -41,7 +41,7 @@ export function SuperAdminPage(){
  function logout(){sessionStorage.removeItem('strategic_superadmin');setAuthenticated(false)}
  if(!authenticated)return <main className="superAdminLogin"><form className="superAdminLoginCard" onSubmit={login}>
   <img src="/k12matrix-logo.svg" alt="K12Matrix"/><small>SUPER ADMIN ACCESS</small><h1>Sign In</h1><p>Manage district strategic plan configuration and reporting data.</p>
-  <label>Email</label><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="selva@k12matrix.com"/>
+  <label>Email</label><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter SuperAdmin email"/>
   <label>Password</label><input type="password" required value={password} onChange={e=>setPassword(e.target.value)}/>
   {error&&<div className="superAdminError">{error}</div>}<button disabled={busy}>{busy?'Signing in…':'Sign In'}</button>
  </form></main>;
