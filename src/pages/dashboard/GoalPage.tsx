@@ -197,7 +197,7 @@ export function GoalPage(){
           <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
-        <div className="modalInitiativeHead"><span className="statusDot"/><div><small>INITIATIVE</small><h3>{initiative.shortName}</h3></div></div>
+        <div className="modalInitiativeHead"><span className="statusDot"/><div><small>INITIATIVE</small><h3>{initiative.shortName} - {initiative.name}</h3></div></div>
         <InitiativeTimeline initiative={initiative}/>
         <section className="overallPanel">
           <div><small>INITIATIVE OVERALL PROGRESS</small><div className="overallDone"><b>{initiative.completion.toFixed(0)}%</b><span>Done</span></div></div>
@@ -227,7 +227,7 @@ export function GoalPage(){
           <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
-        <div className="indicatorModalHead"><span className="statusDot"/><h3>{indicator.shortName}</h3></div>
+        <div className="indicatorModalHead"><span className="statusDot"/><h3>{indicator.shortName} - {indicator.name}</h3></div>
         <section className="currentKpi">
           <div><small>CY: {selectedYear||indicator.year}</small><span>{indicator.shortName}{indicator.isPercent?' Proficient %':''}</span></div>
           <b>{(()=>{
