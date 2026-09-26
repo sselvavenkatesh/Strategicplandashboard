@@ -3,7 +3,8 @@ import {BarChart3,Building2,Download,FileSpreadsheet,Home,LogOut,Settings2,Uploa
 import {supabase} from '../../lib/supabase';
 
 type Section='home'|'plan'|'indicators'|'initiatives';
-type Profile={districtName:string;planName:string;duration:string;mission:string;vision:string;goals:number};
+type SigninMethod='Userbased'|'Google'|'Microsoft';
+type Profile={districtName:string;planName:string;duration:string;mission:string;vision:string;goals:number;signinMethod:SigninMethod;googleClientId:string;googleAuthId:string;microsoftClientId:string;microsoftTenantId:string;microsoftAuthId:string};
 
 const menu=[
   {id:'home' as Section,label:'Home',icon:Home},
@@ -16,7 +17,8 @@ export function SuperAdminPage(){
  const[authenticated,setAuthenticated]=useState(()=>sessionStorage.getItem('strategic_superadmin')==='true');
  const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[error,setError]=useState('');const[busy,setBusy]=useState(false);
  const[section,setSection]=useState<Section>('home');
- const[profile,setProfile]=useState<Profile>({districtName:'',planName:'',duration:'',mission:'',vision:'',goals:0});
+ const[profile,setProfile]=useState<Profile>({districtName:'',planName:'',duration:'',mission:'',vision:'',goals:0,signinMethod:'Userbased',googleClientId:'',googleAuthId:'',microsoftClientId:'',microsoftTenantId:'',microsoftAuthId:''});
+ const[initiativePage,setInitiativePage]=useState(1);const initiativePageSize=20;
  const[goals,setGoals]=useState<any[]>([]);const[indicators,setIndicators]=useState<any[]>([]);const[initiatives,setInitiatives]=useState<any[]>([]);
 
  useEffect(()=>{if(!authenticated)return;(async()=>{
@@ -26,7 +28,7 @@ export function SuperAdminPage(){
    supabase.from('Indicator_Data').select('*'),
    supabase.from('Initiative_Data').select('*')
   ]);
-  if(p)setProfile({districtName:p['School District Name']||'',planName:p['Strategic Plan Name']||'',duration:p['Strategic Plan Duration']||'',mission:p['Mission Statement']||'',vision:p['Vision Statement']||'',goals:Number(p['Total Goals']||0)});
+  if(p)setProfile({districtName:p['School District Name']||'',planName:p['Strategic Plan Name']||'',duration:p['Strategic Plan Duration']||'',mission:p['Mission Statement']||'',vision:p['Vision Statement']||'',goals:Number(p['Total Goals']||0),signinMethod:(p['Admin Signin Method']||'Userbased') as SigninMethod,googleClientId:p['Google Client ID']||'',googleAuthId:p['Google Auth ID']||'',microsoftClientId:p['Microsoft Client ID']||'',microsoftTenantId:p['Microsoft Tenant ID']||'',microsoftAuthId:p['Microsoft Auth ID']||''});
   setGoals(g||[]);setIndicators(i||[]);setInitiatives(n||[]);
  })()},[authenticated]);
 
@@ -47,7 +49,9 @@ export function SuperAdminPage(){
   {error&&<div className="superAdminError">{error}</div>}<button disabled={busy}>{busy?'Signing in…':'Sign In'}</button>
  </form></main>;
 
- const data=section==='indicators'?indicators:initiatives;
+ const initiativePages=Math.max(1,Math.ceil(initiatives.length/initiativePageSize));
+ const pagedInitiatives=initiatives.slice((initiativePage-1)*initiativePageSize,initiativePage*initiativePageSize);
+ const data=section==='indicators'?indicators:pagedInitiatives;
  return <div className="superAdmin">
   <aside className="superAdminSide"><div className="superAdminBrand"><img src="/k12matrix-logo.svg" alt="K12Matrix"/><div><b>Strategic Plan</b><span>Super Admin</span></div></div>
    <nav>{menu.map(x=>{const Icon=x.icon;return <button key={x.id} className={section===x.id?'active':''} onClick={()=>setSection(x.id)}><Icon size={17}/><span>{x.label}</span></button>})}</nav>
@@ -62,10 +66,15 @@ export function SuperAdminPage(){
     <label>Number of Goals<input type="number" min="1" max="20" value={profile.goals} onChange={e=>setProfile({...profile,goals:Number(e.target.value)})}/></label>
     <label className="wide">Mission Statement<textarea value={profile.mission} onChange={e=>setProfile({...profile,mission:e.target.value})}/></label>
     <label className="wide">Vision Statement<textarea value={profile.vision} onChange={e=>setProfile({...profile,vision:e.target.value})}/></label>
+    <label>Admin Signin<select value={profile.signinMethod} onChange={e=>setProfile({...profile,signinMethod:e.target.value as SigninMethod})}><option value="Userbased">Userbased</option><option value="Google">Google</option><option value="Microsoft">Microsoft</option></select></label>
+    {profile.signinMethod==='Google'&&<><label>Google Client ID<input value={profile.googleClientId} onChange={e=>setProfile({...profile,googleClientId:e.target.value})}/></label><label>Google Auth ID<input value={profile.googleAuthId} onChange={e=>setProfile({...profile,googleAuthId:e.target.value})}/></label></>}
+    {profile.signinMethod==='Microsoft'&&<><label>Microsoft Client ID<input value={profile.microsoftClientId} onChange={e=>setProfile({...profile,microsoftClientId:e.target.value})}/></label><label>Microsoft Tenant ID<input value={profile.microsoftTenantId} onChange={e=>setProfile({...profile,microsoftTenantId:e.target.value})}/></label><label>Microsoft Auth ID<input value={profile.microsoftAuthId} onChange={e=>setProfile({...profile,microsoftAuthId:e.target.value})}/></label></>}
+    <div className="adminNotice wide">OAuth client secrets are intentionally not stored in browser code or District_Profile. Configure provider secrets securely in Supabase Auth. These fields hold non-secret provider identifiers used by the Admin configuration.</div>
    </div><h3>Goal Master</h3><div className="adminTableWrap"><table><thead><tr>{goals[0]&&Object.keys(goals[0]).map(k=><th key={k}>{k}</th>)}</tr></thead><tbody>{goals.map((r,i)=><tr key={i}>{Object.keys(r).map(k=><td key={k}>{String(r[k]??'')}</td>)}</tr>)}</tbody></table></div><div className="adminNotice">Goal editing and database-write controls will be enabled in the write phase.</div><button className="adminPrimary" disabled>Save Configuration</button></section>}
    {(section==='indicators'||section==='initiatives')&&<section className="adminPanel"><div className="adminPanelHead"><div><h2>{section==='indicators'?'Indicator':'Initiative'} Data</h2><p>Review Supabase data and manage bulk updates using the approved CSV template.</p></div><div className="adminActions"><button><Download size={15}/> Download Template</button><label className="adminUpload"><Upload size={15}/> Upload CSV<input type="file" accept=".csv" disabled/></label></div></div>
     <div className="adminNotice">Upload is intentionally disabled in this first UI build. Validation and database-write controls will be added before uploads are enabled.</div>
     <div className="adminTableWrap"><table><thead><tr>{data[0]&&Object.keys(data[0]).map(k=><th key={k}>{k}</th>)}</tr></thead><tbody>{data.map((r,i)=><tr key={i}>{Object.keys(r).map(k=><td key={k}>{String(r[k]??'')}</td>)}</tr>)}</tbody></table></div>
+    {section==='initiatives'&&<div className="adminPagination"><span>Showing {(initiativePage-1)*initiativePageSize+1}–{Math.min(initiativePage*initiativePageSize,initiatives.length)} of {initiatives.length}</span><div><button disabled={initiativePage===1} onClick={()=>setInitiativePage(p=>Math.max(1,p-1))}>Previous</button><b>Page {initiativePage} of {initiativePages}</b><button disabled={initiativePage===initiativePages} onClick={()=>setInitiativePage(p=>Math.min(initiativePages,p+1))}>Next</button></div></div>}
    </section>}
   </main>
  </div>
