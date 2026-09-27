@@ -780,3 +780,44 @@ html[data-theme="light"] .keyResourcesBtn:hover:not(:disabled),html[data-theme="
 .indicatorModal .yAxisTicks span{position:absolute;right:4px;transform:translateY(50%);font-size:7px;line-height:1;color:#aebac6;white-space:nowrap}
 .indicatorModal .yAxisTicks span:last-child{transform:translateY(0)}
 html[data-theme="light"] .indicatorModal .yAxisTicks span{color:#60758a}
+
+
+/* V2.3 AI Assistant — isolated from V2.2 dashboard styles */
+.aiHeaderBtn,.themeBtn{border:1px solid var(--line);background:#0d2132;color:var(--text);border-radius:9px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
+.aiHeaderBtn:hover{border-color:#2d8dcc;background:#102b40}
+.aiPage{padding-top:92px;padding-bottom:150px;max-width:1040px}
+.aiHero{display:flex;gap:14px;align-items:flex-start;border-bottom:1px solid var(--line);padding:16px 0 22px}.aiHeroIcon{width:42px;height:42px;border-radius:12px;background:#12324a;color:#63bdf8;display:grid;place-items:center;flex:none}.aiHero small{font-size:9px;letter-spacing:.14em;color:#63bdf8;font-weight:800}.aiHero h1{font-size:28px;margin:5px 0 7px}.aiHero p{margin:0;color:var(--muted);font-size:11px;line-height:1.6}
+.aiChat{padding:24px 0;display:flex;flex-direction:column;gap:15px}.aiMessage{display:flex}.aiMessage.user{justify-content:flex-end}.aiBubble{max-width:min(760px,88%);padding:13px 15px;border:1px solid var(--line);border-radius:14px;background:var(--panel);font-size:12px;line-height:1.65;white-space:pre-wrap}.aiMessage.user .aiBubble{background:#0c65ad;border-color:#1b79c3;color:#fff}.aiSources{margin-top:12px;padding-top:9px;border-top:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap}.aiSources b{width:100%;font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.aiSources span{font-size:8px;border:1px solid var(--line);border-radius:999px;padding:3px 7px;color:var(--muted)}.aiActions{display:flex;gap:6px;margin-top:10px}.aiActions button{display:flex;align-items:center;gap:4px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:7px;padding:5px 8px;font-size:9px;cursor:pointer}.aiThinking{color:var(--muted)}
+.aiComposer{position:fixed;z-index:50;left:50%;bottom:48px;transform:translateX(-50%);width:min(900px,90vw);background:var(--panel2);border:1px solid #2b4b64;border-radius:14px;padding:9px 52px 20px 10px;box-shadow:0 18px 50px #0008}.aiComposer textarea{width:100%;resize:none;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:12px;line-height:1.5}.aiComposer>button{position:absolute;right:10px;top:10px;width:34px;height:34px;border:0;border-radius:9px;background:#087ff5;color:#fff;display:grid;place-items:center;cursor:pointer}.aiComposer>button:disabled{opacity:.4;cursor:not-allowed}.aiComposer>small{position:absolute;left:11px;bottom:6px;color:var(--muted);font-size:7px}
+@media(max-width:650px){.aiPage{padding-top:75px}.aiHero h1{font-size:22px}.aiBubble{max-width:94%}.aiComposer{bottom:44px;width:94vw}}
+
+
+/* V2.3 AI compact public-facing refinement */
+.aiHeaderBtn{position:relative;font-weight:800;letter-spacing:-.04em}.aiMarkText{font-size:12px;line-height:1}.aiMarkSpark{position:absolute;right:3px;top:2px}
+.aiPage{padding-top:78px;padding-bottom:118px;max-width:900px}.aiHero{gap:11px;padding:10px 0 14px}.aiHeroIcon{position:relative;width:36px;height:36px;border-radius:9px}.aiHeroIcon span{font-size:13px;font-weight:900}.aiHeroIcon svg{position:absolute;right:2px;top:1px}.aiHero h1{font-size:22px;margin:3px 0 4px}.aiHero p{font-size:10px}.aiChat{padding:14px 0;gap:10px}.aiBubble{max-width:min(720px,90%);padding:10px 12px;border-radius:11px;font-size:11px;line-height:1.6}.aiSources{margin-top:9px;padding-top:7px}.aiActions{margin-top:7px}.aiActions button{padding:4px 7px}.aiThinking{display:flex;align-items:center;gap:9px}.aiThinking b{display:block;font-size:10px;color:var(--text)}.aiThinking small{display:block;margin-top:2px;font-size:8px;color:var(--muted)}.aiLoader{width:17px;height:17px;border:2px solid var(--line);border-top-color:#1597ff;border-radius:50%;animation:aiSpin .75s linear infinite;flex:none}@keyframes aiSpin{to{transform:rotate(360deg)}}.aiComposer{bottom:45px;width:min(780px,88vw);padding:8px 47px 18px 10px;border-radius:11px}.aiComposer textarea{font-size:11px;line-height:1.35}.aiComposer>button{right:8px;top:7px;width:32px;height:32px}.aiComposer>small{bottom:4px}
+@media(max-width:650px){.aiPage{padding-top:66px;padding-bottom:110px}.aiHero{padding-top:8px}.aiHero h1{font-size:19px}.aiComposer{width:92vw}.aiBubble{max-width:95%}}
+
+
+
+/* V2.3 K12 AI Assistant workspace */
+.aiHeaderBtn{width:29px!important;height:29px!important;border-radius:7px!important}.aiMarkText{font-size:10px!important}.aiMarkSpark{right:2px!important;top:1px!important}
+.aiPage{max-width:1120px;padding-top:72px;padding-bottom:24px}.aiHero{padding:8px 0 11px}.aiHeroIcon{width:31px;height:31px;border-radius:8px}.aiHeroIcon span{font-size:11px}.aiHero h1{font-size:20px}.aiWorkspace{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;min-height:calc(100vh - 180px);padding-top:12px}.aiPopular{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:11px;height:max-content;position:sticky;top:76px}.aiPopularTitle{display:flex;align-items:center;gap:6px;font-size:11px}.aiPopular>p{margin:4px 0 9px;color:var(--muted);font-size:8px}.aiPopular>button{width:100%;display:flex;align-items:flex-start;gap:7px;text-align:left;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text);padding:7px 2px;font-size:8.5px;line-height:1.35;cursor:pointer}.aiPopular>button:hover{color:#63bdf8}.aiPopular>button:disabled{opacity:.45;cursor:not-allowed}.aiPopular>button span{display:grid;place-items:center;flex:none;width:15px;height:15px;border-radius:50%;background:var(--panel2);color:var(--muted);font-size:7px}.aiConversation{position:relative;min-width:0;padding-bottom:72px}.aiConversation .aiChat{padding:0;gap:9px}.aiConversation .aiComposer{position:sticky;left:auto;bottom:10px;transform:none;width:100%;margin-top:14px;box-sizing:border-box}.aiBubble{max-width:min(680px,92%)}
+@media(max-width:760px){.aiPage{padding-top:65px}.aiWorkspace{grid-template-columns:1fr}.aiPopular{position:static;display:flex;gap:6px;overflow-x:auto;padding:8px}.aiPopularTitle,.aiPopular>p{display:none}.aiPopular>button{min-width:190px;border:1px solid var(--line);border-radius:7px;padding:7px}.aiConversation{padding-bottom:20px}.aiConversation .aiComposer{bottom:6px}}
+
+/* V2.3 header AI control: match theme button dimensions and balance AI/sparkle spacing */
+.tools .aiHeaderBtn{box-sizing:border-box;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:3px!important}
+.tools .aiHeaderBtn .aiMarkText{display:inline-block;font-size:12px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.tools .aiHeaderBtn .aiMarkSpark{position:static!important;width:9px;height:9px;flex:none;align-self:flex-start;margin-top:6px}
+
+/* V2.3 Super Admin sign-in refinement */
+.superAdminLoginCard .superAdminAccessLabel{display:block;width:100%;text-align:center}
+
+
+/* V2.3 freeze candidate: keep AI marks legible in both themes */
+.aiHeaderBtn{background:var(--panel2);color:var(--text);border-color:var(--line)}
+.aiHeaderBtn:hover{background:var(--panel);border-color:#2d8dcc}
+.aiMarkText{color:var(--text)}
+.aiMarkSpark{color:#1597ff}
+.aiHeroIcon{background:var(--panel2);border:1px solid var(--line);color:var(--text)}
+.aiHeroIcon span{color:var(--text)}
+.aiHeroIcon svg{color:#1597ff}

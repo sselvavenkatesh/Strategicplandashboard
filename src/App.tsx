@@ -6,6 +6,7 @@ import { SuperAdminPage } from './pages/admin/SuperAdminPage'
 import { GoalPage } from './pages/dashboard/GoalPage'
 import { SummaryPage } from './pages/dashboard/SummaryPage'
 import { WelcomePage } from './pages/dashboard/WelcomePage'
+import { AiAssistantPage } from './pages/dashboard/AiAssistantPage'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route path="/" element={<WelcomePage />} />
           <Route path="/summary" element={<SummaryPage />} />
+          <Route path="/ai" element={<AiAssistantPage />} />
           <Route path="/goals/:goalId" element={<GoalPage />} />
           <Route path="/admin" element={<AdminHomePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
