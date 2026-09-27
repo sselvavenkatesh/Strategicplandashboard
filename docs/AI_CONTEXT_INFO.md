@@ -596,3 +596,8 @@ Version boundary is mandatory:
 K12 AI Assistant is intentionally lightweight: text-only grounded answers, no chart generation, plain-language response rules, special-character/Markdown cleanup, Popular Questions, Copy/Download, loader feedback and audit logging. The protected district-ai Edge Function is the server boundary and Ollama credentials remain server-side in Supabase secrets.
 
 Detailed architecture is maintained in docs/TECHNICAL_ARCHITECTURE.md.
+
+
+## V2.4 release checkpoint — 27 Sep 2026
+
+V2.4 branches from V2.3 and is intentionally limited to responsive branding fixes. Mobile CSS no longer hides the header Powered By K12Matrix treatment; instead the district name and branding scale progressively at <=650px and <=430px. The canonical React assets public/k12matrix-logo.svg and public/k12matrix-logo-light.svg were widened and the Matrix text origin moved right to prevent K12/Matrix glyph overlap. Preserve these fixes in future releases. Existing V2.3 dashboard/AI behavior is otherwise unchanged.
