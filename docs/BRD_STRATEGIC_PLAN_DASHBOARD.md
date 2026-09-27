@@ -515,3 +515,12 @@ The assistant supports strategic-plan Goals, Indicators, Initiatives, student-gr
 The current V2.3 design is intentionally lightweight. AI chart generation is not included. AI is read-only and must not modify strategic-plan records. Availability is controlled by Product_Feature_Flags. Development uses Ollama Cloud through a protected Supabase Edge Function; model/provider infrastructure may be upgraded for future client implementations without redesigning the user experience.
 
 See `docs/TECHNICAL_ARCHITECTURE.md` for detailed application, database, security, AI and deployment architecture.
+
+
+## 15. V2.3 frozen release definition — 27 Sep 2026
+
+V2.3 is approved as the AI-enabled successor to V2.2. V2.2 remains the frozen non-AI release and is not retrofitted with AI functionality.
+
+V2.3 adds K12 AI Assistant under database feature control. The assistant is read-only, district-data scoped, parent/general-public friendly, backed by the protected Supabase Edge Function and Ollama Cloud during this release, and provides Popular Questions, free-text questions, Copy/Download, processing feedback and audit logging. Responses are intentionally lightweight text; AI chart generation is excluded.
+
+The release also retains the approved V2.3 reporting-data maintenance refinements documented in the requirements. All V2.2 public, Admin and Super Admin behavior remains the inherited baseline unless an explicit V2.3 requirement supersedes it.
