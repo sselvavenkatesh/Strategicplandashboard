@@ -705,3 +705,15 @@ Architecture reference: `docs/TECHNICAL_ARCHITECTURE.md`.
 - Indicator match key: Indicator ID + Indicator Name + School Year + Category + Student Group.
 - Initiative match key: Initiative ID + Initiative Name + Sub Initiative Name + Action Item.
 - Whole-Child Environments test templates use existing master entities G3 / ID7 (Chronic Absenteeism) and G3 / IN8 (Ensure safe, welcoming school communities) so foreign-key/master validation succeeds.
+
+
+## V2.3 freeze decision — 27 Sep 2026
+
+Product-owner instruction: all V2.3 functionality is approved for freeze and production promotion.
+
+Release identity:
+- V2.2 remains the immutable release without K12 AI Assistant.
+- V2.3 is the release with the feature-flagged K12 AI Assistant.
+- V2.3 AI uses lightweight text responses; chart generation is excluded.
+- K12 AI Assistant includes the compact AI control, ten Popular Questions, plain-language district-data answers, special-character/Markdown cleanup, Copy/Download and visible review loader.
+- Existing V2.2 behavior must remain preserved within V2.3 except for explicitly approved V2.3 additions.
