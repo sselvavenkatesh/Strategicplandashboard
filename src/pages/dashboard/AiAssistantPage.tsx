@@ -16,7 +16,7 @@ const popularQuestions=[
   'What are the most important takeaways from our strategic plan data?'
 ];
 
-function cleanAiText(text:string){return text.replace(/\*\*/g,'').replace(/^\s*---+\s*$/gm,'').replace(/^#{1,6}\s*/gm,'').replace(/\n{3,}/g,'\n\n').trim()}
+function cleanAiText(text:string){return text.replace(/[*#`|]+/g,'').replace(/^\s*[-_=]{3,}\s*$/gm,'').replace(/^\s*[-•]+\s*/gm,'').replace(/\n{3,}/g,'\n\n').trim()}
 
 export function AiAssistantPage(){
   const sessionId=useMemo(()=>crypto.randomUUID(),[]);
