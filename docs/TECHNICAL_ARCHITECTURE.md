@@ -25,6 +25,53 @@ User -> React -> Supabase district-ai Edge Function -> approved PostgreSQL data 
 
 GitHub is source control. Netlify creates Deploy Previews and hosts the React application. Supabase provides PostgreSQL, API/RPC, authentication capabilities and Edge Functions.
 
+
+## Architecture visual
+
+The diagram below is the canonical connection workflow for V2.3.
+
+```mermaid
+flowchart LR
+    U["Public / Parent / District Staff"] -->|HTTPS| N["Netlify CDN + Web Hosting"]
+    N --> R["React 19 + TypeScript + Vite"]
+    R -->|Anon/publishable client| SA["Supabase API / RPC"]
+    SA --> PG[("PostgreSQL")]
+    PG --> DP["District_Profile"]
+    PG --> GM["Goal_master"]
+    PG --> IM["Indicator_master"]
+    PG --> ID["Indicator_Data"]
+    PG --> XM["Initiative_master"]
+    PG --> XD["Initiative_Data"]
+    PG --> FF["Product_Feature_Flags"]
+    PG --> AL["AI_Conversation_Log"]
+
+    R -->|Question + session ID| EF["Supabase Edge Function: district-ai"]
+    EF -->|Read-only approved context| PG
+    EF -->|HTTPS + server-side secret| OL["Ollama Cloud / Open Model"]
+    OL -->|Grounded plain-text answer| EF
+    EF -->|Answer + sources| R
+
+    DEV["Developer / Product Owner"] --> GH["GitHub Repository"]
+    GH -->|PR / branch build webhook| N
+    GH -->|Versioned SQL / app source| DEV
+
+    R -->|Admin OAuth when configured| AUTH["Supabase Auth"]
+    AUTH --> R
+    R -->|Protected Super Admin RPC| SA
+```
+
+### Connection workflow
+
+| Connection | Protocol / contract | Security boundary | Purpose |
+| --- | --- | --- | --- |
+| Browser -> Netlify | HTTPS | Public edge | Deliver the compiled React application and static assets. |
+| React -> Supabase | HTTPS via Supabase client | Publishable/anon browser credential + RLS/RPC | Read dashboard data, call approved RPCs, Auth and Edge Functions. |
+| Supabase -> PostgreSQL | Managed internal service | RLS, SQL permissions, protected functions | Store district configuration, goals, indicators, initiatives, sessions, flags and logs. |
+| React -> district-ai | HTTPS Edge Function invocation | JWT verification + server function boundary | Submit K12 AI questions without exposing provider credentials. |
+| district-ai -> PostgreSQL | Supabase service context | Backend only | Retrieve approved district context and write AI audit events. |
+| district-ai -> Ollama Cloud | HTTPS | OLLAMA_API_KEY stored only as Supabase secret | Generate a grounded, plain-language response from supplied district context. |
+| GitHub -> Netlify | Repository integration | Branch/PR controls | Build Deploy Previews and production candidates from versioned source. |
+
 ## 3. Frontend architecture
 
 Technology: React 19, TypeScript, Vite, React Router, Lucide React and responsive CSS with dark/light themes.
@@ -164,6 +211,75 @@ For client scale, introduce district/tenant IDs throughout authorization, AI ret
 Included: K12 AI Assistant, feature flag, Ollama Cloud integration, scope/safety controls, audit log, popular questions, plain-language answers, Copy/Download and loading feedback.
 
 Not included: AI database writes, public-internet answers, autonomous actions, model fine-tuning, chart generation, unrestricted text-to-SQL, or production multi-tenant AI billing.
+
+
+## 16. Component ownership and change boundaries
+
+| Component | Primary responsibility | Change discipline |
+| --- | --- | --- |
+| React AppShell | Global branding, navigation, theme, Admin entry, AI feature entry | Preserve inherited V2.2 behavior unless explicitly superseded. |
+| Dashboard pages / dashboard.ts | Public strategic-plan presentation and reporting calls | Data-driven; no hard-coded KPI facts. |
+| Supabase PostgreSQL | Authoritative district configuration and reporting data | Schema changes through reviewed migrations. |
+| Reporting views/functions | Reusable KPI and initiative calculations | Keep business formulas centralized and consistent. |
+| Supabase Auth/RPC | Authentication and protected server operations | Secrets and privileged logic remain server-side. |
+| Supabase Edge Functions | AI orchestration and server-side integrations | Never expose service/provider credentials to the browser. |
+| Ollama Cloud | V2.3 development inference provider | Replaceable provider; not a system of record. |
+| Netlify | Web build, Deploy Preview and hosting | Preview before production; build success is not product approval. |
+| GitHub | Source/version/release history | Frozen branches remain immutable. |
+
+## 17. Data-flow detail
+
+### Public dashboard request
+1. Netlify serves the compiled React application.
+2. React loads district profile and visible Goal/reporting data through Supabase.
+3. Supabase applies the caller's permissions/RLS and executes reporting SQL/RPCs.
+4. React formats and renders the approved dashboard experience.
+
+### K12 AI request
+1. The AI feature flag is read from Supabase. A disabled flag hides the entry point.
+2. The user types a district question or selects a Popular Question.
+3. React invokes district-ai with the question and a session identifier.
+4. district-ai rejects unsupported/offensive/out-of-scope input before normal answering.
+5. The function retrieves approved district context from PostgreSQL.
+6. The function sends only that grounded context and the question to Ollama Cloud.
+7. Ollama returns text; the server applies lightweight formatting cleanup.
+8. The response and source metadata return to React.
+9. The interaction is written to AI_Conversation_Log.
+10. React presents the answer with Copy/Download. No AI chart-generation path is used.
+
+### Super Admin request
+1. Super Admin signs in through the dedicated validation flow.
+2. The backend issues/validates a temporary Super Admin session token.
+3. Protected configuration RPCs validate the token before writes.
+4. Goal deletion checks dependencies before allowing removal.
+5. Browser code never receives service-role or AI-provider secrets.
+
+## 18. Deployment topology
+
+```text
+Developer workstation
+        |
+        v
+GitHub: v2.3 branch / Draft PR
+        |
+        +----> Netlify Deploy Preview ----> QA / product-owner review
+        |
+        +----> Supabase project
+                |-- PostgreSQL + RLS + RPC
+                |-- Auth
+                |-- Edge Functions
+                |-- Secrets
+                         |
+                         +----> Ollama Cloud
+
+After explicit release approval:
+v2.3 frozen checkpoint -> production integration branch -> Netlify production verification
+```
+
+## 19. Production hardening roadmap
+
+For a multi-client school-district rollout, extend the current architecture with tenant/district isolation across every business table and AI request, per-district feature entitlements, AI rate limits and quotas, centralized telemetry, timeout/retry/circuit-breaker controls, provider/model configuration, prompt-injection and adversarial testing, retention policies for AI logs, and formal backup/disaster-recovery procedures. The existing React-to-Edge-Function contract should remain stable so the model provider can be upgraded without redesigning the user experience.
+
 
 Update this document whenever architecture, security boundaries, hosting, data contracts, authentication or AI-provider design changes.
 
