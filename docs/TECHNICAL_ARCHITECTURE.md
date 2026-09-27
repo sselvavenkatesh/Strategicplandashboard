@@ -166,3 +166,10 @@ Included: K12 AI Assistant, feature flag, Ollama Cloud integration, scope/safety
 Not included: AI database writes, public-internet answers, autonomous actions, model fine-tuning, chart generation, unrestricted text-to-SQL, or production multi-tenant AI billing.
 
 Update this document whenever architecture, security boundaries, hosting, data contracts, authentication or AI-provider design changes.
+
+
+## 15. V2.3 release architecture checkpoint — 27 Sep 2026
+
+This architecture is frozen with V2.3. V2.2 remains the immutable non-AI baseline; V2.3 layers K12 AI Assistant and its supporting feature flag, Edge Function, audit data and UX on top of that baseline. The AI path is read-only and text-only in this release. No AI chart-generation path is part of the frozen architecture.
+
+Production promotion must merge the frozen V2.3 source into the production integration branch without modifying either frozen V2.2 branch.
