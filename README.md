@@ -53,3 +53,10 @@ New development must start from the frozen V2.2 release baseline on a new versio
 ## Release note
 
 V2.2 is frozen at the documented release checkpoint. Production promotion/merge is a separate action and must not be assumed from the branch freeze alone.
+
+
+## V2.3 development - K12 AI Assistant
+
+V2.3 is isolated on the `v2.3` branch created from `v2.2-frozen`; V2.2 remains immutable. V2.3 adds a feature-flagged K12 AI Assistant using a Supabase Edge Function and Ollama Cloud. The lightweight AI experience includes a compact header icon, plain-language district-data answers, ten Popular Questions, Copy/Download, loading feedback, scope/safety controls and AI audit logging. AI chart generation is intentionally excluded from the current lightweight design.
+
+See `docs/TECHNICAL_ARCHITECTURE.md` for the end-to-end application, data, security, AI and deployment architecture.
