@@ -60,3 +60,10 @@ V2.2 is frozen at the documented release checkpoint. Production promotion/merge 
 V2.3 is isolated on the `v2.3` branch created from `v2.2-frozen`; V2.2 remains immutable. V2.3 adds a feature-flagged K12 AI Assistant using a Supabase Edge Function and Ollama Cloud. The lightweight AI experience includes a compact header icon, plain-language district-data answers, ten Popular Questions, Copy/Download, loading feedback, scope/safety controls and AI audit logging. AI chart generation is intentionally excluded from the current lightweight design.
 
 See `docs/TECHNICAL_ARCHITECTURE.md` for the end-to-end application, data, security, AI and deployment architecture.
+
+
+## V2.3 frozen release — 27 Sep 2026
+
+V2.3 is the AI-enabled release of the Strategic Plan Dashboard. It preserves the complete V2.2 baseline and adds the feature-flagged K12 AI Assistant, Popular Questions, plain-language grounded responses, Copy/Download, processing feedback, audit logging, dashboard access logging, and V2.3 reporting-data maintenance refinements. AI charts were deliberately removed to keep responses lightweight.
+
+Release separation is explicit: **V2.2 remains the frozen non-AI release; V2.3 is the AI-enabled release.** The immutable V2.2 branches are not modified by the V2.3 release.
