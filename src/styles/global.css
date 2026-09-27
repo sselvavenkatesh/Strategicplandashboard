@@ -808,3 +808,6 @@ html[data-theme="light"] .indicatorModal .yAxisTicks span{color:#60758a}
 .tools .aiHeaderBtn{box-sizing:border-box;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:3px!important}
 .tools .aiHeaderBtn .aiMarkText{display:inline-block;font-size:12px;line-height:1;font-weight:800;letter-spacing:-.03em}
 .tools .aiHeaderBtn .aiMarkSpark{position:static!important;width:9px;height:9px;flex:none;align-self:flex-start;margin-top:6px}
+
+/* V2.3 Super Admin sign-in refinement */
+.superAdminLoginCard .superAdminAccessLabel{display:block;width:100%;text-align:center}
