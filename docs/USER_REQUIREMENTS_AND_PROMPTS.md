@@ -693,3 +693,15 @@ Product-owner requirements for V2.3:
 - retain AI conversation/audit logging and read-only AI access to strategic-plan business data.
 
 Architecture reference: `docs/TECHNICAL_ARCHITECTURE.md`.
+
+
+## V2.3 — Super Admin reporting-data maintenance refinement (2026-09-27)
+
+- Indicator Data must use the same 20-row pagination pattern as Initiative Data, with Previous/Next controls and visible row/page counts.
+- Bulk reporting-data upload is an upsert, not a destructive replacement:
+  - a row with a new composite key is inserted;
+  - a row matching the existing composite key is updated with the supplied values;
+  - unrelated existing rows remain untouched.
+- Indicator match key: Indicator ID + Indicator Name + School Year + Category + Student Group.
+- Initiative match key: Initiative ID + Initiative Name + Sub Initiative Name + Action Item.
+- Whole-Child Environments test templates use existing master entities G3 / ID7 (Chronic Absenteeism) and G3 / IN8 (Ensure safe, welcoming school communities) so foreign-key/master validation succeeds.
