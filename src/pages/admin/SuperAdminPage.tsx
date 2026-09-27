@@ -38,14 +38,14 @@ export function SuperAdminPage(){
   if(email.trim().toLowerCase()!=='selva@k12matrix.com'){setError('This account is not authorized for Super Admin access.');return}
   setBusy(true);
   const{data,error:authError}=await supabase.rpc('validate_superadmin_login',{p_email:email.trim(),p_password:password});
-  const row=Array.isArray(data)?data[0]:null;
+  const row=Array.isArray(data)?data[0]:(data&&typeof data==='object'?data:null);
   setBusy(false);
   if(authError||!row){setError('Sign in failed. Please check your email and password.');return}
   sessionStorage.setItem('strategic_superadmin','true');sessionStorage.setItem('strategic_superadmin_token',row.session_token);setAuthenticated(true);setPassword('');
  }
  function logout(){sessionStorage.removeItem('strategic_superadmin');sessionStorage.removeItem('strategic_superadmin_token');setAuthenticated(false)}
  if(!authenticated)return <main className="superAdminLogin"><form className="superAdminLoginCard" onSubmit={login}>
-  <img src="/k12matrix-logo.svg" alt="K12Matrix"/><small>SUPER ADMIN ACCESS</small><h1>Sign In</h1><p>Manage district strategic plan configuration and reporting data.</p>
+  <img src="/k12matrix-logo.svg" alt="K12Matrix"/><small className="superAdminAccessLabel">SUPER ADMIN ACCESS</small><h1>Sign In</h1><p>Manage district strategic plan configuration and reporting data.</p>
   <label>Email</label><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter SuperAdmin email"/>
   <label>Password</label><input type="password" required value={password} onChange={e=>setPassword(e.target.value)}/>
   {error&&<div className="superAdminError">{error}</div>}<button disabled={busy}>{busy?'Signing in…':'Sign In'}</button>
