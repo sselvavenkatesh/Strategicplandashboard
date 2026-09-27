@@ -570,3 +570,14 @@ Super Admin included at `/superadmin`:
 ### QA/release caution
 
 The final V2.2 Super Admin visual adjustments were source-validated, but no successful deployment/check result was available at the last status check. Therefore the frozen source checkpoint must not be described as production-deployed or fully visual-QA-certified unless deployment evidence is subsequently verified.
+
+
+## V2.3 development context - K12 AI Assistant
+
+V2.3 is developed only on `v2.3`, created from immutable `v2.2-frozen`. Do not modify V2.2 checkpoints for V2.3 work.
+
+K12 AI Assistant is feature-gated by `Product_Feature_Flags` using V2.3 / AI Assistant. The React route is `/ai`; the global header shows a compact AI icon only when enabled. The page includes a left Popular Questions pane with ten strategic-plan prompts and a conversational area with free-text entry, Copy/Download and processing feedback.
+
+AI backend: Supabase Edge Function `district-ai` -> approved Supabase district data -> Ollama Cloud. `OLLAMA_API_KEY` is a Supabase secret. AI access to strategic-plan business data is read-only. `AI_Conversation_Log` provides audit records. Responses must be parent/general-public friendly, evidence-grounded and district-scope only. Formatting cleanup removes Markdown decoration/filler. AI chart generation is intentionally excluded to keep latency and model usage low.
+
+Detailed architecture: `docs/TECHNICAL_ARCHITECTURE.md`.
