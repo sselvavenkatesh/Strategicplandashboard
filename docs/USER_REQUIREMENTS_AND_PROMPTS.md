@@ -717,3 +717,13 @@ Release identity:
 - V2.3 AI uses lightweight text responses; chart generation is excluded.
 - K12 AI Assistant includes the compact AI control, ten Popular Questions, plain-language district-data answers, special-character/Markdown cleanup, Copy/Download and visible review loader.
 - Existing V2.2 behavior must remain preserved within V2.3 except for explicitly approved V2.3 additions.
+
+
+## V2.4 requirements — 27 Sep 2026
+
+Product-owner release request: create V2.4 for two isolated branding/responsive fixes without changing existing dashboard functionality.
+
+1. Keep the Powered By K12Matrix branding visible and responsive on mobile rather than hiding it at the mobile breakpoint.
+2. Correct the K12Matrix logo so K12 and Matrix do not visually overlap on affected laptops, with a small explicit gap between the text groups.
+3. Apply the corrected canonical logo to both dark and light theme assets in GitHub.
+4. Treat these fixes as the V2.4 release scope.
