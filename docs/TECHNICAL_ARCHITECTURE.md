@@ -289,3 +289,8 @@ Update this document whenever architecture, security boundaries, hosting, data c
 This architecture is frozen with V2.3. V2.2 remains the immutable non-AI baseline; V2.3 layers K12 AI Assistant and its supporting feature flag, Edge Function, audit data and UX on top of that baseline. The AI path is read-only and text-only in this release. No AI chart-generation path is part of the frozen architecture.
 
 Production promotion must merge the frozen V2.3 source into the production integration branch without modifying either frozen V2.2 branch.
+
+
+## V2.4 architecture note — responsive branding
+
+V2.4 does not alter the application, database, security, authentication, reporting or AI architecture. It is a presentation-layer maintenance release. Mobile header behavior now retains Powered By K12Matrix through progressive responsive sizing instead of hiding the branding. The canonical dark and light K12Matrix SVG assets were widened and the Matrix word origin shifted right to provide a stable visual gap between K12 and Matrix across browser/font-rendering environments.
