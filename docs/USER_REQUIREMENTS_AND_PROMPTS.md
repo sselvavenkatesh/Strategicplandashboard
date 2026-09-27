@@ -671,3 +671,25 @@ Release handling:
 ### V2.2 final indicator-popup correction — 27 Sep 2026
 
 Product-owner requested one final correction before validation: the Indicator Detail popup Y-axis label must be data-driven rather than fixed, and the selected-year control must have visible separation from the chart. The implementation now derives the axis wording from Indicator Type/context (for example percentage proficiency, SAT score, fund balance, or generic indicator value) and adds spacing below the year selector. This correction is part of the V2.2 release candidate and must be included when the frozen checkpoint is advanced after validation.
+
+
+## V2.3 - K12 AI Assistant requirements
+
+Product-owner requirements for V2.3:
+- all V2.3 work must remain isolated from the frozen V2.2 baseline;
+- expose AI only when Product_Feature_Flags has V2.3 / AI Assistant enabled;
+- use a compact AI icon beside the Theme control and name the experience K12 AI Assistant;
+- provide a compact conversational page consistent with dashboard light/dark themes;
+- provide a left-side Popular Questions pane with ten strategic-plan questions; selecting one must immediately submit it to the same AI flow;
+- allow free-text questions, Copy with a Copied confirmation, and Download;
+- while processing, show a small loader and state that K12 AI is reviewing district data;
+- answers are for parents/general public and district staff: use descriptive, layman-friendly language and avoid unnecessary technical terminology;
+- strip Markdown decoration/filler such as double-asterisk markers, horizontal-rule separators and heading hashes;
+- keep responses lightweight; AI-generated charts are excluded after latency/usage concerns;
+- reject out-of-scope/offensive requests and do not answer them from general model knowledge;
+- ground district answers in approved strategic-plan data and do not invent unsupported facts, causes or recommendations;
+- use open/free model infrastructure during development, currently Ollama Cloud through the protected Supabase district-ai Edge Function;
+- keep Ollama credentials in Supabase secrets and never expose them in React/GitHub;
+- retain AI conversation/audit logging and read-only AI access to strategic-plan business data.
+
+Architecture reference: `docs/TECHNICAL_ARCHITECTURE.md`.
