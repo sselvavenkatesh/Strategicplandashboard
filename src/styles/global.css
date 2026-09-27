@@ -821,3 +821,26 @@ html[data-theme="light"] .indicatorModal .yAxisTicks span{color:#60758a}
 .aiHeroIcon{background:var(--panel2);border:1px solid var(--line);color:var(--text)}
 .aiHeroIcon span{color:var(--text)}
 .aiHeroIcon svg{color:#1597ff}
+
+
+/* V2.4 responsive branding fixes */
+@media(max-width:650px){
+  .topbar{padding-left:3%;padding-right:3%}
+  .topbar .brand{gap:7px;min-width:0}
+  .topbar .brand>b{font-size:11px;max-width:34vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .headerPowered{display:flex;margin-left:3px;padding-left:7px;gap:4px;font-size:6px;border-left:1px solid #31506a}
+  .headerPowered img{display:block;width:68px;height:20px;object-fit:contain}
+  .districtLogo{width:28px;height:28px;flex-basis:28px}
+  .districtLogo svg{width:28px;height:28px}
+  .tools{gap:5px;flex:0 0 auto}
+  .signInBtn{padding:6px 10px;font-size:9px}
+  .aiHeaderBtn,.themeBtn,.menuBtn{width:31px;height:31px;border-radius:8px}
+}
+@media(max-width:430px){
+  .topbar .brand>b{max-width:25vw;font-size:10px}
+  .headerPowered{padding-left:5px}
+  .headerPowered>span{display:none}
+  .headerPowered img{width:61px;height:19px}
+  .signInBtn{padding:6px 8px}
+}
+html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
