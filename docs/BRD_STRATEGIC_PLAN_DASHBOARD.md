@@ -504,3 +504,14 @@ Indicator/Initiative CSV upload is not released for database writes in V2.2. Bef
 ### Release governance
 
 V2.2 is frozen after documentation is committed to the V2.2 release branch. New product development must use a later version branch. The freeze is a source/version checkpoint and does not itself mean that production deployment has been approved or completed.
+
+
+## V2.3 business scope - K12 AI Assistant
+
+V2.3 introduces K12 AI Assistant as an optional, feature-flagged public/district-user experience. Its purpose is to make strategic-plan information easier for parents, community members and district staff to understand using natural-language questions.
+
+The assistant supports strategic-plan Goals, Indicators, Initiatives, student-group performance and related district reporting. It uses plain-language, evidence-grounded answers and refuses unrelated/offensive requests. The page provides ten Popular Questions, free-text entry, Copy, Download and visible processing feedback. The interface follows existing dark/light themes and uses a compact AI entry beside the Theme control.
+
+The current V2.3 design is intentionally lightweight. AI chart generation is not included. AI is read-only and must not modify strategic-plan records. Availability is controlled by Product_Feature_Flags. Development uses Ollama Cloud through a protected Supabase Edge Function; model/provider infrastructure may be upgraded for future client implementations without redesigning the user experience.
+
+See `docs/TECHNICAL_ARCHITECTURE.md` for detailed application, database, security, AI and deployment architecture.
