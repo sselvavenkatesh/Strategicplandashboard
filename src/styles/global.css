@@ -844,3 +844,25 @@ html[data-theme="light"] .indicatorModal .yAxisTicks span{color:#60758a}
   .signInBtn{padding:6px 8px}
 }
 html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
+
+
+/* V2.4 AI Assistant hero icon: mirror the proven header AI mark spacing without affecting other UI */
+.aiHeroIcon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+}
+.aiHeroIcon span{
+  display:inline-block;
+  line-height:1;
+  letter-spacing:-.03em;
+}
+.aiHeroIcon svg{
+  position:static;
+  width:9px;
+  height:9px;
+  flex:none;
+  align-self:flex-start;
+  margin-top:6px;
+}
