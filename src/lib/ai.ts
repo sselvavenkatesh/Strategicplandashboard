@@ -1,6 +1,7 @@
 import {supabase} from './supabase';
 
-export type AiAnswer={answer:string;sources:string[];outOfScope?:boolean};
+export type AiChart={type:'line'|'bar';title:string;xKey:string;yKey:string;yLabel?:string;suffix?:string;data:Array<Record<string,string|number>>};
+export type AiAnswer={answer:string;sources:string[];outOfScope?:boolean;chart?:AiChart};
 
 export async function isAiEnabled(){
   const{data,error}=await supabase.rpc('is_feature_enabled',{p_version:'V2.3',p_feature:'AI Assistant'});
