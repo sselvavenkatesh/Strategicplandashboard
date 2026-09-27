@@ -28,6 +28,16 @@ export function AppShell(){
   useEffect(()=>{isAiEnabled().then(setAiEnabled).catch(()=>setAiEnabled(false))},[]);
 
   useEffect(()=>{
+    const key='strategic_access_session';
+    let sessionId=sessionStorage.getItem(key);
+    if(!sessionId){sessionId=crypto.randomUUID();sessionStorage.setItem(key,sessionId)}
+    const saved=sessionStorage.getItem('district360_admin');
+    let userName:string|undefined,userEmail:string|undefined;
+    if(saved){try{const x=JSON.parse(saved);userName=x?.name;userEmail=x?.email}catch{}}
+    supabase.functions.invoke('log-dashboard-access',{body:{sessionId,userName,userEmail,userType:saved?'Admin':'Public',pagePath:location.pathname}}).catch(()=>{});
+  },[]);
+
+  useEffect(()=>{
     setPageLoading(true);
     const timer=window.setTimeout(()=>setPageLoading(false),450);
     return()=>window.clearTimeout(timer);
