@@ -108,3 +108,15 @@ def validate_superadmin_session(token: str):
 def log_dashboard_access(session_id: str, user_id, user_name, user_email, user_type, region, country, page_path, user_agent):
     with connection() as conn, conn.cursor() as cur:
         cur.execute("select public.log_dashboard_access(%s::uuid,%s,%s,%s,%s,%s,%s,%s,%s)", (session_id,user_id,user_name,user_email,user_type,region,country,page_path,user_agent))
+
+
+def admin_auth_config():
+    return fetch_one("select * from public.get_admin_auth_config()")
+
+def save_oauth_secrets(token: str, google_secret: str | None, microsoft_secret: str | None):
+    with connection() as conn, conn.cursor() as cur:
+        cur.execute("select public.save_district_oauth_secrets(%s::uuid,%s,%s)", (token,google_secret,microsoft_secret))
+
+def oauth_secret(provider: str):
+    column='"Google Client Secret"' if provider=="google" else '"Microsoft Client Secret"'
+    return fetch_one(f'''select c.{column} as secret from public."District_Auth_Config" c join public."District_Profile" p on p."District ID"=c."District ID" limit 1''')
