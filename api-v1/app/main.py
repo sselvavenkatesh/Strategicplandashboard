@@ -128,6 +128,11 @@ class AdminLogin(BaseModel):
 class SsoAdminValidation(BaseModel):
     email: str
 
+class OAuthSecrets(BaseModel):
+    token: str
+    googleClientSecret: str | None = None
+    microsoftClientSecret: str | None = None
+
 class AccessLog(BaseModel):
     sessionId: str
     userId: str | None = None
@@ -154,8 +159,19 @@ class SuperAdminBulkData(BaseModel):
 
 @app.get("/api/v1/admin/signin-config")
 def get_admin_signin_config():
-    row=repo.admin_signin_config() or {}
-    return {"signinMethod": row.get("Admin Signin Method") or "Userbased"}
+    row=repo.admin_auth_config() or {}
+    return {
+      "districtId":row.get("district_id"),
+      "signinMethod":row.get("signin_method") or "Userbased",
+      "google":{"clientId":row.get("google_client_id"),"authId":row.get("google_auth_id"),"configured":bool(row.get("google_configured"))},
+      "microsoft":{"clientId":row.get("microsoft_client_id"),"tenantId":row.get("microsoft_tenant_id"),"authId":row.get("microsoft_auth_id"),"configured":bool(row.get("microsoft_configured"))}
+    }
+
+@app.put("/api/v1/superadmin/oauth-secrets")
+def put_oauth_secrets(body: OAuthSecrets):
+    if not repo.validate_superadmin_session(body.token): raise HTTPException(401,"Invalid or expired Super Admin session")
+    repo.save_oauth_secrets(body.token,body.googleClientSecret,body.microsoftClientSecret)
+    return {"saved":True,"googleSecretConfigured":bool(body.googleClientSecret),"microsoftSecretConfigured":bool(body.microsoftClientSecret)}
 
 @app.post("/api/v1/auth/admin/login")
 def admin_login(body: AdminLogin):
