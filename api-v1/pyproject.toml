@@ -1,13 +1,13 @@
 [project]
 name = "strategicplan-api"
 version = "0.1.0"
-description = "Open-source REST API for District 360 strategic plan reporting"
-requires-python = ">=3.11"
+description = "Open-source REST API for StrategicPlan reporting"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 dependencies = [
   "fastapi==0.138.2",
   "uvicorn[standard]==0.37.0",
-  "psycopg[binary,pool]==3.2.10",
+  "psycopg[binary]==3.2.10",
   "pydantic-settings==2.11.0"
 ]
 
