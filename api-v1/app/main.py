@@ -214,7 +214,8 @@ def _validation_checks():
             out=_ask_ai(question,"api-v1-validation"); answer=str(out.get("answer") or "")
             normalized=unicodedata.normalize("NFKC",answer)
             expected_number=expected_value.replace("%","")
-            compact=re.sub(r"[^0-9.%]+","",normalized)\n            matched=expected_number+"%" in compact
+            compact=re.sub(r"[^0-9.%]+","",normalized)
+            matched=expected_number+"%" in compact
             add(label,ep,f"answer contains {expected_value}",f"answer contains {expected_value}" if matched else answer[:240])
         except Exception as e: checks.append({"name":label,"endpoint":ep,"expected":f"answer contains {expected_value}","actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
     return checks
