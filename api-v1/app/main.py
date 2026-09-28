@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
-import json, os, urllib.request, re, unicodedata
+import json, os, urllib.request, urllib.parse, re, unicodedata
 from .config import get_settings
 from . import repository as repo
 
@@ -181,6 +181,90 @@ def admin_login(body: AdminLogin):
         raise HTTPException(500, f"Admin authentication unavailable: {type(e).__name__}")
     if not row: raise HTTPException(401,"Invalid credentials")
     return {"name":row.get("user_name") or row.get("user_email"),"email":row.get("user_email")}
+
+def _safe_return_to(value: str | None):
+    fallback=os.getenv("FRONTEND_URL","https://k12matrix-strategicplan.vercel.app")
+    if not value: return fallback
+    allowed=[x.rstrip("/") for x in settings.allowed_origins]
+    return value if any(value==x or value.startswith(x+"/") for x in allowed) else fallback
+
+def _oauth_callback(provider: str):
+    base=os.getenv("API_PUBLIC_URL","https://strategicplan-apiv1.vercel.app").rstrip("/")
+    return f"{base}/api/v1/auth/admin/oauth/{provider}/callback"
+
+def _form_post(url: str, values: dict):
+    data=urllib.parse.urlencode(values).encode()
+    req=urllib.request.Request(url,data=data,headers={"Content-Type":"application/x-www-form-urlencoded","Accept":"application/json"},method="POST")
+    with urllib.request.urlopen(req,timeout=20) as resp: return json.loads(resp.read().decode())
+
+def _json_get(url: str, token: str):
+    req=urllib.request.Request(url,headers={"Authorization":"Bearer "+token,"Accept":"application/json"})
+    with urllib.request.urlopen(req,timeout=20) as resp: return json.loads(resp.read().decode())
+
+@app.get("/api/v1/auth/admin/oauth/{provider}/start")
+def admin_oauth_start(provider: str, return_to: str | None = None):
+    provider=provider.lower()
+    if provider not in ("google","microsoft"): raise HTTPException(404,"Unsupported SSO provider")
+    cfg=repo.admin_auth_config() or {}
+    expected="Google" if provider=="google" else "Microsoft"
+    if cfg.get("signin_method")!=expected: raise HTTPException(409,f"{expected} is not the configured district sign-in method")
+    secret=repo.oauth_secret(provider)
+    if provider=="google":
+        client_id=cfg.get("google_client_id")
+        if not client_id or not secret: raise HTTPException(503,"Google SSO is not fully configured")
+        authorize="https://accounts.google.com/o/oauth2/v2/auth"
+        params={"client_id":client_id,"redirect_uri":_oauth_callback(provider),"response_type":"code","scope":"openid email profile","access_type":"online","prompt":"select_account"}
+    else:
+        client_id=cfg.get("microsoft_client_id"); tenant=cfg.get("microsoft_tenant_id")
+        if not client_id or not tenant or not secret: raise HTTPException(503,"Microsoft SSO is not fully configured")
+        authorize=f"https://login.microsoftonline.com/{urllib.parse.quote(tenant,safe='')}/oauth2/v2.0/authorize"
+        params={"client_id":client_id,"redirect_uri":_oauth_callback(provider),"response_type":"code","scope":"openid profile email User.Read","response_mode":"query"}
+    state=repo.create_admin_oauth_state(provider,_safe_return_to(return_to))
+    params["state"]=state
+    return RedirectResponse(authorize+"?"+urllib.parse.urlencode(params),status_code=302)
+
+@app.get("/api/v1/auth/admin/oauth/{provider}/callback")
+def admin_oauth_callback(provider: str, code: str | None = None, state: str | None = None, error: str | None = None):
+    provider=provider.lower()
+    if provider not in ("google","microsoft") or not state: raise HTTPException(400,"Invalid OAuth callback")
+    try: return_to=repo.consume_admin_oauth_state(state,provider)
+    except Exception: return_to=None
+    if not return_to: raise HTTPException(400,"OAuth state is invalid or expired")
+    if error or not code:
+        return RedirectResponse(return_to+"?"+urllib.parse.urlencode({"authError":error or "oauth_failed"}),status_code=302)
+    cfg=repo.admin_auth_config() or {}; secret=repo.oauth_secret(provider)
+    try:
+        if provider=="google":
+            tokens=_form_post("https://oauth2.googleapis.com/token",{"code":code,"client_id":cfg.get("google_client_id"),"client_secret":secret,"redirect_uri":_oauth_callback(provider),"grant_type":"authorization_code"})
+            user=_json_get("https://openidconnect.googleapis.com/v1/userinfo",tokens["access_token"])
+            email=user.get("email")
+            if not user.get("email_verified"): raise ValueError("Google email is not verified")
+        else:
+            tenant=cfg.get("microsoft_tenant_id")
+            tokens=_form_post(f"https://login.microsoftonline.com/{urllib.parse.quote(str(tenant),safe='')}/oauth2/v2.0/token",{"code":code,"client_id":cfg.get("microsoft_client_id"),"client_secret":secret,"redirect_uri":_oauth_callback(provider),"grant_type":"authorization_code","scope":"openid profile email User.Read"})
+            user=_json_get("https://graph.microsoft.com/v1.0/me?$select=displayName,mail,userPrincipalName",tokens["access_token"])
+            email=user.get("mail") or user.get("userPrincipalName")
+        if not email: raise ValueError("Provider did not return an email address")
+        admin=repo.validate_sso_admin(email)
+        if not admin:
+            return RedirectResponse(return_to+"?"+urllib.parse.urlencode({"authError":"not_authorized"}),status_code=302)
+        token=repo.create_admin_session(admin.get("user_id"))
+        params={"adminSession":token,"email":admin.get("user_email") or email,"name":admin.get("user_name") or email}
+        return RedirectResponse(return_to+"?"+urllib.parse.urlencode(params),status_code=302)
+    except Exception:
+        return RedirectResponse(return_to+"?"+urllib.parse.urlencode({"authError":"provider_validation_failed"}),status_code=302)
+
+@app.get("/api/v1/auth/admin/session")
+def admin_session(token: str = Query(...)):
+    row=repo.validate_admin_session(token)
+    if not row: raise HTTPException(401,"Invalid or expired Admin session")
+    return {"name":row.get("user_name") or row.get("user_email"),"email":row.get("user_email")}
+
+@app.post("/api/v1/auth/admin/logout", status_code=204)
+def admin_logout(token: str = Query(...)):
+    try: repo.revoke_admin_session(token)
+    except Exception: pass
+    return None
 
 @app.post("/api/v1/auth/admin/sso/validate")
 def admin_sso_validate(body: SsoAdminValidation):
