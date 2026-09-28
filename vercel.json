@@ -1,7 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/v1/:path*",
+      "destination": "https://strategicplan-apiv1.vercel.app/api/v1/:path*"
+    },
+    {
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]
