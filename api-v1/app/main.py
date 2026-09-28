@@ -43,7 +43,7 @@ def get_goals():
              "totalInitiatives":int(r.get("Total Initiatives") or 0)} for r in repo.goals()]
 
 @app.get("/api/v1/goals/{goal_id}/indicators")
-def get_indicators(goal_id: str, school: str | None = Query(default=None)):
+def get_indicators(goal_id: str, school: str | None = None):
     masters=repo.indicator_master(goal_id)
     values={r["indicator_id"]:r for r in repo.indicator_key_values(goal_id,school)}
     result=[]
@@ -65,19 +65,19 @@ def get_indicators(goal_id: str, school: str | None = Query(default=None)):
     return result
 
 @app.get("/api/v1/indicators/{indicator_id}/history")
-def get_indicator_history(indicator_id: str, school: str | None = Query(default=None)):
+def get_indicator_history(indicator_id: str, school: str | None = None):
     return repo.indicator_history(indicator_id,school)
 
 @app.get("/api/v1/indicators/{indicator_id}/student-groups")
-def get_student_groups(indicator_id: str, school_year: str, school: str | None = Query(default=None)):
+def get_student_groups(indicator_id: str, school_year: str, school: str | None = None):
     return repo.indicator_student_groups(indicator_id,school_year,school)
 
 @app.get("/api/v1/goals/{goal_id}/initiative-progress")
-def get_goal_progress(goal_id: str, school: str | None = Query(default=None)):
+def get_goal_progress(goal_id: str, school: str | None = None):
     return repo.goal_initiative_progress(goal_id,school)
 
 @app.get("/api/v1/goals/{goal_id}/initiatives")
-def get_initiatives(goal_id: str, school: str | None = Query(default=None)):
+def get_initiatives(goal_id: str, school: str | None = None):
     masters={r["Initiative ID"]:r for r in repo.initiative_master(goal_id)}
     rows=repo.initiative_progress(goal_id,school)
     return [{**r,
@@ -86,7 +86,7 @@ def get_initiatives(goal_id: str, school: str | None = Query(default=None)):
                 or r["initiative_id"]} for r in rows if r["initiative_id"] in masters]
 
 @app.get("/api/v1/goals/{goal_id}/initiatives/{initiative_id}/subinitiatives")
-def get_subinitiatives(goal_id: str, initiative_id: str, school: str | None = Query(default=None)):
+def get_subinitiatives(goal_id: str, initiative_id: str, school: str | None = None):
     return repo.subinitiative_progress(goal_id,initiative_id,school)
 
 @app.get("/api/v1/features/{version}/{feature}")
