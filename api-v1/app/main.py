@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-import json, os, urllib.request
+import json, os, urllib.request, re, unicodedata
 from .config import get_settings
 from . import repository as repo
 
@@ -212,7 +212,10 @@ def _validation_checks():
         ep="/api/v1/ai/ask"
         try:
             out=_ask_ai(question,"api-v1-validation"); answer=str(out.get("answer") or "")
-            add(label,ep,f"answer contains {expected_value}",f"answer contains {expected_value}" if expected_value in answer else answer[:240])
+            normalized=unicodedata.normalize("NFKC",answer).replace("\\u202f"," ").replace("\\u00a0"," ")
+            expected_number=expected_value.replace("%","")
+            matched=bool(re.search(rf"(?<!\\d){re.escape(expected_number)}\\s*%(?!\\d)",normalized))
+            add(label,ep,f"answer contains {expected_value}",f"answer contains {expected_value}" if matched else answer[:240])
         except Exception as e: checks.append({"name":label,"endpoint":ep,"expected":f"answer contains {expected_value}","actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
     return checks
 
