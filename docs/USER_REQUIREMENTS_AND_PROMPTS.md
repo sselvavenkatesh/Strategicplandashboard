@@ -727,3 +727,20 @@ Product-owner release request: create V2.4 for two isolated branding/responsive 
 2. Correct the K12Matrix logo so K12 and Matrix do not visually overlap on affected laptops, with a small explicit gap between the text groups.
 3. Apply the corrected canonical logo to both dark and light theme assets in GitHub.
 4. Treat these fixes as the V2.4 release scope.
+
+
+## V2.4 API migration decisions — 28 Sep 2026
+
+Latest product-owner decisions:
+
+- Freeze the accepted API approach and do not touch the existing Netlify V2.4 production link/release.
+- Vercel hosts the API-backed React implementation; StrategicPlan API V1 is the application backend.
+- Browser application data access must go through StrategicPlan API rather than direct Supabase Data API/RPC calls.
+- Supabase remains the PostgreSQL database host. Protected writes use approved server-side routines and restricted database permissions.
+- Admin and Super Admin operations are included in the API migration.
+- Super Admin must dynamically configure Userbased, Google or Microsoft Admin login settings without code changes/redeployment after provider configuration is supplied.
+- Indicator and Initiative CSV uploads are API-backed and must return the UI from Processing state after success or failure.
+- Current Vercel/API performance gap versus direct Supabase is accepted for this freeze. Do not optimize the frozen checkpoint; benchmark and optimize on a subsequent branch.
+- Preserve product name Strategic Plan Dashboard / StrategicPlan. Legacy District 360 identifiers are historical only.
+
+See `TECHNICAL_ARCHITECTURE.md` for the frozen Vercel architecture and security boundaries.
