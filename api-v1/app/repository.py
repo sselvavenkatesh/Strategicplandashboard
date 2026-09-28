@@ -10,6 +10,12 @@ def fetch_all(sql: str, params=()):
         cur.execute(sql, params)
         return cur.fetchall()
 
+def dashboard_bootstrap():
+    with connection() as conn, conn.cursor() as cur:
+        cur.execute('select * from public."District_Profile" limit 1'); p=cur.fetchone()
+        cur.execute('select * from public."Goal_master" where "Role"=%s order by "Goal ID"', ("All",)); g=cur.fetchall()
+        return p,g
+
 def profile():
     return fetch_one('select * from public."District_Profile" limit 1')
 
