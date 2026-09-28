@@ -26,6 +26,19 @@ app.add_middleware(
 def health():
     return {"status": "ok", "apiVersion": settings.api_version}
 
+@app.get("/api/v1/bootstrap")
+def get_bootstrap():
+    p, goals = repo.dashboard_bootstrap()
+    if not p: raise HTTPException(404, "District profile not found")
+    profile={
+      "districtId":p["District ID"],"districtName":p["School District Name"],
+      "planName":p.get("Strategic Plan Name") or "","duration":p.get("Strategic Plan Duration") or "",
+      "subText":p.get("Sub Text") or "","totalGoals":int(p.get("Total Goals") or 0),
+      "mission":p.get("Mission Statement") or "","vision":p.get("Vision Statement") or "",
+      "logo":p.get("District Logo"),"planImage":p.get("Strategic Plan Image")
+    }
+    return {"profile":profile,"goals":[{"id":r["Goal ID"],"name":r.get("Goal Name") or r["Goal ID"],"description":r.get("Goal Description") or "","totalIndicators":int(r.get("Total Indicators") or 0),"totalInitiatives":int(r.get("Total Initiatives") or 0)} for r in goals]}
+
 @app.get("/api/v1/profile")
 def get_profile():
     row = repo.profile()
