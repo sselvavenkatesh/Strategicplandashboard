@@ -1,6 +1,6 @@
 # StrategicPlan API V1
 
-Open-source, provider-neutral REST API for the District 360 Strategic Plan Dashboard.
+Open-source, provider-neutral REST API for the StrategicPlan Dashboard.
 
 ## Design goals
 
@@ -22,13 +22,20 @@ Interactive OpenAPI documentation is available at /docs when the service runs.
 
 ## Local run
 
-Create a Python 3.11+ virtual environment, install the project with the test
+Create a Python 3.12+ virtual environment, install the project with the test
 extra, copy .env.example to .env, and set DATABASE_URL to a read-only database
 role. Never commit a real password.
 
 Run:
 
     uvicorn app.main:app --reload
+
+## Vercel database connection
+
+For the Vercel deployment, use the Supabase Shared Transaction Pooler on port
+6543 with the dedicated read-only PostgreSQL role. Psycopg prepared statements
+are explicitly disabled in app/db.py for transaction-pooler compatibility.
+Always use SSL and copy the exact pooler host from the Supabase Connect dialog.
 
 ## Validation
 
