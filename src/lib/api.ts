@@ -1,4 +1,4 @@
-const API_BASE = (import.meta.env.VITE_STRATEGICPLAN_API_URL || 'https://strategicplan-apiv1.vercel.app').replace(/\/$/, '')
+const API_BASE = ''
 
 export async function apiGet<T>(path:string):Promise<T>{
   const response=await fetch(API_BASE+path,{headers:{Accept:'application/json'}})
