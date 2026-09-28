@@ -104,21 +104,21 @@ def _validation_checks():
     try:
         g=get_goals(); add("Goals count", "/api/v1/goals", 4, len(g))
     except Exception as e: checks.append({"name":"Goals","endpoint":"/api/v1/goals","expected":4,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
-    expected_kpis={"1":("G1","2025-26","39.53%"),"2":("G1","2025-26","34.42%"),"3":("G1","2025-26","673"),"4":("G2","2025-26","97.45%"),"5":("G2","2024-25","84.4%"),"7":("G3","2025-26","23.32%"),"6":("G4","2024-25","$19,248,186")}
+    expected_kpis={"ID1":("G1","2025-26","39.53%"),"ID2":("G1","2025-26","34.42%"),"ID3":("G1","2025-26","673"),"ID4":("G2","2025-26","97.45%"),"ID5":("G2","2024-25","84.4%"),"ID7":("G3","2025-26","23.32%"),"ID6":("G4","2024-25","$19,248,186")}
     for iid,(gid,year,value) in expected_kpis.items():
         ep=f"/api/v1/goals/{gid}/indicators"
         try:
             rows=get_indicators(gid); row=next((x for x in rows if x["id"]==iid),None)
             add(f"KPI {iid} year",ep,year,row["year"] if row else None); add(f"KPI {iid} value",ep,value,row["value"] if row else None)
         except Exception as e: checks.append({"name":f"KPI {iid}","endpoint":ep,"expected":value,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
-    histories={"1":("2022-23","43.00%"),"2":("2022-23","33.00%"),"3":("2025-26","673"),"4":("2025-26","97.45%"),"5":("2024-25","84.4%"),"6":("2024-25","$19,248,186"),"7":("2025-26","23.32%")}
+    histories={"ID1":("2022-23","43.00%"),"ID2":("2022-23","33.00%"),"ID3":("2025-26","673"),"ID4":("2025-26","97.45%"),"ID5":("2024-25","84.4%"),"ID6":("2024-25","$19,248,186"),"ID7":("2025-26","23.32%")}
     for iid,(year,value) in histories.items():
         ep=f"/api/v1/indicators/{iid}/history"
         try:
             rows=get_indicator_history(iid); row=next((r for r in rows if r.get("school_year")==year),None)
             add(f"History {iid} {year}",ep,value,row.get("value_3_display") if row else None)
         except Exception as e: checks.append({"name":f"History {iid}","endpoint":ep,"expected":value,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
-    for iid,expected_asian,statewide in [("1","53.63%","39.83%"),("2","50.70%","35.93%")]:
+    for iid,expected_asian,statewide in [("ID1","53.63%","39.83%"),("ID2","50.70%","35.93%")]:
         ep=f"/api/v1/indicators/{iid}/student-groups?school_year=2025-26"
         try:
             rows=get_student_groups(iid,"2025-26"); asian=next((r for r in rows if r.get("student_group")=="Asian"),None)
