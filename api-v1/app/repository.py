@@ -120,3 +120,24 @@ def save_oauth_secrets(token: str, google_secret: str | None, microsoft_secret: 
 def oauth_secret(provider: str):
     column='"Google Client Secret"' if provider=="google" else '"Microsoft Client Secret"'
     return fetch_one(f'''select c.{column} as secret from public."District_Auth_Config" c join public."District_Profile" p on p."District ID"=c."District ID" limit 1''')
+
+
+def create_admin_oauth_state(provider: str, return_to: str):
+    row=fetch_one("select public.create_admin_oauth_state(%s,%s) as state",(provider,return_to))
+    return str(row["state"])
+
+def consume_admin_oauth_state(state: str, provider: str):
+    row=fetch_one("select public.consume_admin_oauth_state(%s::uuid,%s) as return_to",(state,provider))
+    return row.get("return_to") if row else None
+
+def create_admin_session(user_id):
+    row=fetch_one("select public.create_admin_session(%s) as token",(str(user_id),))
+    return str(row["token"])
+
+def validate_admin_session(token: str):
+    rows=fetch_all("select * from public.validate_admin_session(%s::uuid)",(token,))
+    return rows[0] if rows else None
+
+def revoke_admin_session(token: str):
+    with connection() as conn, conn.cursor() as cur:
+        cur.execute("select public.revoke_admin_session(%s::uuid)",(token,))
