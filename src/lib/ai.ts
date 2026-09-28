@@ -1,15 +1,17 @@
-import {supabase} from './supabase';
+import {apiGet,apiPost} from './api';
 
 export type AiAnswer={answer:string;sources:string[];outOfScope?:boolean};
 
 export async function isAiEnabled(){
-  const{data,error}=await supabase.rpc('is_feature_enabled',{p_version:'V2.3',p_feature:'AI Assistant'});
-  if(error){console.error(error);return false}
-  return data===true;
+  try{
+    const data=await apiGet<{enabled:boolean}>('/api/v1/features/V2.3/AI%20Assistant');
+    return data.enabled===true;
+  }catch(error){
+    console.error(error);
+    return false;
+  }
 }
 
 export async function askDistrictAi(question:string,sessionId:string):Promise<AiAnswer>{
-  const{data,error}=await supabase.functions.invoke('district-ai',{body:{question,sessionId}});
-  if(error)throw new Error(error.message||'AI service is unavailable.');
-  return data as AiAnswer;
+  return apiPost<AiAnswer>('/api/v1/ai/ask',{question,sessionId});
 }
