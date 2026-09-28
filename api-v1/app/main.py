@@ -7,7 +7,7 @@ settings = get_settings()
 app = FastAPI(
     title=settings.api_title,
     version=settings.api_version,
-    description="Provider-neutral REST facade over the District 360 PostgreSQL reporting contract.",
+    description="Provider-neutral REST facade over the StrategicPlan PostgreSQL reporting contract.",
     license_info={"name": "MIT", "identifier": "MIT"},
 )
 app.add_middleware(
