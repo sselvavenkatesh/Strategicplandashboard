@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from .config import get_settings
 from . import repository as repo
 
@@ -91,3 +92,71 @@ def get_subinitiatives(goal_id: str, initiative_id: str, school: str | None = Qu
 @app.get("/api/v1/features/{version}/{feature}")
 def get_feature(version: str, feature: str):
     return {"version":version,"feature":feature,"enabled":repo.feature_enabled(version,feature)}
+
+def _validation_checks():
+    checks = []
+    def add(name, endpoint, expected, actual):
+        checks.append({"name": name, "endpoint": endpoint, "expected": expected, "actual": actual, "status": "PASS" if actual == expected else "FAIL"})
+    try:
+        p=get_profile(); add("Profile district", "/api/v1/profile", "Riverside School District", p["districtName"])
+        add("Profile total goals", "/api/v1/profile", 4, p["totalGoals"])
+    except Exception as e: checks.append({"name":"Profile","endpoint":"/api/v1/profile","expected":"Riverside profile","actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    try:
+        g=get_goals(); add("Goals count", "/api/v1/goals", 4, len(g))
+    except Exception as e: checks.append({"name":"Goals","endpoint":"/api/v1/goals","expected":4,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    expected_kpis={"1":("G1","2025-26","39.53%"),"2":("G1","2025-26","34.42%"),"3":("G1","2025-26","673"),"4":("G2","2025-26","97.45%"),"5":("G2","2024-25","84.4%"),"7":("G3","2025-26","23.32%"),"6":("G4","2024-25","$19,248,186")}
+    for iid,(gid,year,value) in expected_kpis.items():
+        ep=f"/api/v1/goals/{gid}/indicators"
+        try:
+            rows=get_indicators(gid); row=next((x for x in rows if x["id"]==iid),None)
+            add(f"KPI {iid} year",ep,year,row["year"] if row else None); add(f"KPI {iid} value",ep,value,row["value"] if row else None)
+        except Exception as e: checks.append({"name":f"KPI {iid}","endpoint":ep,"expected":value,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    histories={"1":("2022-23","43.00%"),"2":("2022-23","33.00%"),"3":("2025-26","673"),"4":("2025-26","97.45%"),"5":("2024-25","84.4%"),"6":("2024-25","$19,248,186"),"7":("2025-26","23.32%")}
+    for iid,(year,value) in histories.items():
+        ep=f"/api/v1/indicators/{iid}/history"
+        try:
+            rows=get_indicator_history(iid); row=next((r for r in rows if r.get("school_year")==year),None)
+            add(f"History {iid} {year}",ep,value,row.get("value_3_display") if row else None)
+        except Exception as e: checks.append({"name":f"History {iid}","endpoint":ep,"expected":value,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    for iid,expected_asian,statewide in [("1","53.63%","39.83%"),("2","50.70%","35.93%")]:
+        ep=f"/api/v1/indicators/{iid}/student-groups?school_year=2025-26"
+        try:
+            rows=get_student_groups(iid,"2025-26"); asian=next((r for r in rows if r.get("student_group")=="Asian"),None)
+            add(f"Student groups {iid} Asian",ep,expected_asian,asian.get("value_3_display") if asian else None)
+            add(f"Student groups {iid} statewide",ep,statewide,asian.get("statewide_value_3_display") if asian else None)
+        except Exception as e: checks.append({"name":f"Student groups {iid}","endpoint":ep,"expected":expected_asian,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    goal_progress={"G1":(48,26),"G2":(36,23),"G3":(12,7),"G4":(36,27)}
+    for gid,(total,done) in goal_progress.items():
+        ep=f"/api/v1/goals/{gid}/initiative-progress"
+        try:
+            rows=get_goal_progress(gid); row=rows[0] if rows else {}
+            add(f"{gid} action items",ep,total,row.get("total_action_items")); add(f"{gid} done",ep,done,row.get("done_count"))
+        except Exception as e: checks.append({"name":f"{gid} progress","endpoint":ep,"expected":total,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    initiatives={"G1":{"IN1":75.0,"IN2":58.3,"IN3":50.0,"IN5":33.3},"G2":{"IN4":66.7,"IN6":41.7,"IN7":83.3},"G3":{"IN8":58.3},"G4":{"IN10":100.0,"IN11":50.0,"IN9":75.0}}
+    for gid,expected in initiatives.items():
+        ep=f"/api/v1/goals/{gid}/initiatives"
+        try:
+            rows=get_initiatives(gid); byid={r["initiative_id"]:r for r in rows}
+            for iid,pct in expected.items(): add(f"{gid} {iid} completion",ep,pct,float(byid.get(iid,{}).get("completion_percent")) if byid.get(iid,{}).get("completion_percent") is not None else None)
+        except Exception as e: checks.append({"name":f"{gid} initiatives","endpoint":ep,"expected":"initiative progress","actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    try:
+        ep="/api/v1/goals/G1/initiatives/IN1/subinitiatives"; rows=get_subinitiatives("G1","IN1")
+        row=next((r for r in rows if r.get("sub_initiative_name")=="Culturally Responsive Teaching"),None)
+        add("Subinitiative sample total",ep,4,row.get("total_action_items") if row else None); add("Subinitiative sample done",ep,4,row.get("done_count") if row else None)
+    except Exception as e: checks.append({"name":"Subinitiatives","endpoint":ep,"expected":"4 done of 4","actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    try:
+        ep="/api/v1/features/V2.3/AI%20Assistant"; actual=get_feature("V2.3","AI Assistant")
+        add("AI feature flag",ep,True,actual["enabled"])
+    except Exception as e: checks.append({"name":"AI feature flag","endpoint":ep,"expected":True,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    return checks
+
+@app.get("/api/v1/validation")
+def validation_json():
+    checks=_validation_checks()
+    return {"apiVersion":settings.api_version,"summary":{"total":len(checks),"passed":sum(c["status"]=="PASS" for c in checks),"failed":sum(c["status"]=="FAIL" for c in checks)},"checks":checks}
+
+@app.get("/validation", response_class=HTMLResponse)
+def validation_page():
+    report=validation_json(); rows="".join(f"<tr><td>{c['status']}</td><td>{c['name']}</td><td><code>{c['endpoint']}</code></td><td>{c['expected']}</td><td>{c['actual']}</td></tr>" for c in report["checks"])
+    s=report["summary"]
+    return f"""<!doctype html><html><head><meta charset='utf-8'><title>StrategicPlan API V1 Validation</title><style>body{{font-family:Arial,sans-serif;margin:32px;color:#222}}table{{border-collapse:collapse;width:100%}}th,td{{border:1px solid #ddd;padding:8px;text-align:left}}th{{background:#f3f3f3}}code{{font-size:12px}}.summary{{font-size:20px;margin:18px 0}}</style></head><body><h1>StrategicPlan API V1 Validation</h1><div class='summary'>Total: {s['total']} &nbsp; Passed: {s['passed']} &nbsp; Failed: {s['failed']}</div><p>Read-only parity checks against the approved Supabase baseline.</p><table><thead><tr><th>Status</th><th>Check</th><th>API endpoint</th><th>Expected</th><th>Actual</th></tr></thead><tbody>{rows}</tbody></table></body></html>"""
