@@ -72,3 +72,12 @@ Release separation is explicit: **V2.2 remains the frozen non-AI release; V2.3 i
 ## V2.4 — Responsive Branding Maintenance Release
 
 V2.4 is a focused UI maintenance release based on V2.3. It preserves existing dashboard and AI functionality while correcting two branding issues: the Powered By K12Matrix header treatment remains visible and responsive on mobile, and the canonical K12Matrix dark/light SVG assets include additional spacing between “K12” and “Matrix” to prevent glyph overlap on some laptop/browser rendering combinations.
+
+
+## V2.4 API freeze — 28 Sep 2026
+
+The accepted Vercel/API implementation is frozen separately from the existing Netlify V2.4 production release. Netlify V2.4 remains unchanged.
+
+The API implementation uses React/Vite on Vercel with same-origin `/api/v1` proxying to the StrategicPlan API V1, which accesses Supabase PostgreSQL through a restricted database role and protected server-side functions. Dashboard, Admin and Super Admin application data access has been migrated away from direct browser Supabase calls on this branch. Dynamic Google/Microsoft Admin SSO configuration and Indicator/Initiative CSV bulk upload are included.
+
+Known accepted limitation: perceived performance is slower than the direct-Supabase Netlify implementation. Optimization is deferred to a new post-freeze branch and must be measurement-led. See `docs/TECHNICAL_ARCHITECTURE.md` for the frozen architecture.
