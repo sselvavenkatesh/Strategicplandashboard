@@ -128,6 +128,17 @@ class AdminLogin(BaseModel):
 class SsoAdminValidation(BaseModel):
     email: str
 
+class AccessLog(BaseModel):
+    sessionId: str
+    userId: str | None = None
+    userName: str | None = None
+    userEmail: str | None = None
+    userType: str = "Public"
+    region: str | None = None
+    country: str | None = None
+    pagePath: str | None = None
+    userAgent: str | None = None
+
 class SuperAdminConfiguration(BaseModel):
     token: str
     profile: dict
@@ -161,6 +172,15 @@ def admin_sso_validate(body: SsoAdminValidation):
     if not row: raise HTTPException(403,"SSO account is not authorized for Admin access")
     return {"name":row.get("user_name") or row.get("user_email"),"email":row.get("user_email")}
 
+@app.post("/api/v1/access-log", status_code=204)
+def access_log(body: AccessLog):
+    try:
+        repo.log_dashboard_access(body.sessionId,body.userId,body.userName,body.userEmail,body.userType,body.region,body.country,body.pagePath,body.userAgent)
+    except Exception:
+        # Access telemetry must never make the dashboard unavailable.
+        return None
+    return None
+
 @app.post("/api/v1/superadmin/login")
 def superadmin_login(body: AdminLogin):
     row=repo.validate_superadmin_login(body.email.strip(),body.password)
@@ -171,8 +191,9 @@ def superadmin_login(body: AdminLogin):
 
 @app.get("/api/v1/superadmin/configuration")
 def superadmin_configuration(token: str = Query(...)):
-    # Token validation is delegated to the existing secured Super Admin RPCs for writes.
-    # Read access will require a server-side session validation function before frontend migration.
+    try: session=repo.validate_superadmin_session(token)
+    except Exception: session=None
+    if not session: raise HTTPException(401,"Invalid or expired Super Admin session")
     p=repo.superadmin_profile() or {}
     return {
       "profile":p,
