@@ -17,7 +17,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -120,6 +120,94 @@ def get_initiatives_full(goal_id: str):
         total=len(rr)
         result.append({"id":iid,"name":m.get("Initiative Name") or iid,"shortName":m.get("Initiative_Short_name") or m.get("Initiative Name") or iid,"description":m.get("Initiative Name") or "","done":done,"inProgress":progress,"notStarted":not_started,"completion":100*done/total if total else 0,"start":starts[0] if starts else None,"end":ends[-1] if ends else None,"totalActionItems":total,"subInitiatives":subs})
     return result
+
+class AdminLogin(BaseModel):
+    email: str
+    password: str
+
+class SsoAdminValidation(BaseModel):
+    email: str
+
+class SuperAdminConfiguration(BaseModel):
+    token: str
+    profile: dict
+    goals: list[dict]
+
+class SuperAdminLogo(BaseModel):
+    token: str
+    logo: str
+
+class SuperAdminBulkData(BaseModel):
+    token: str
+    rows: list[dict]
+
+@app.get("/api/v1/admin/signin-config")
+def get_admin_signin_config():
+    row=repo.admin_signin_config() or {}
+    return {"signinMethod": row.get("Admin Signin Method") or "Userbased"}
+
+@app.post("/api/v1/auth/admin/login")
+def admin_login(body: AdminLogin):
+    try:
+        row=repo.validate_admin_login(body.email.strip(),body.password)
+    except Exception as e:
+        raise HTTPException(500, f"Admin authentication unavailable: {type(e).__name__}")
+    if not row: raise HTTPException(401,"Invalid credentials")
+    return {"name":row.get("user_name") or row.get("user_email"),"email":row.get("user_email")}
+
+@app.post("/api/v1/auth/admin/sso/validate")
+def admin_sso_validate(body: SsoAdminValidation):
+    row=repo.validate_sso_admin(body.email.strip())
+    if not row: raise HTTPException(403,"SSO account is not authorized for Admin access")
+    return {"name":row.get("user_name") or row.get("user_email"),"email":row.get("user_email")}
+
+@app.post("/api/v1/superadmin/login")
+def superadmin_login(body: AdminLogin):
+    row=repo.validate_superadmin_login(body.email.strip(),body.password)
+    if not row: raise HTTPException(401,"Invalid credentials")
+    token=row.get("session_token")
+    if not token: raise HTTPException(500,"Super Admin session token was not returned")
+    return {"token":token,"email":row.get("user_email") or body.email.strip(),"name":row.get("user_name") or row.get("user_email") or body.email.strip()}
+
+@app.get("/api/v1/superadmin/configuration")
+def superadmin_configuration(token: str = Query(...)):
+    # Token validation is delegated to the existing secured Super Admin RPCs for writes.
+    # Read access will require a server-side session validation function before frontend migration.
+    p=repo.superadmin_profile() or {}
+    return {
+      "profile":p,
+      "goals":repo.superadmin_goals(),
+      "indicators":repo.superadmin_indicator_data(),
+      "initiatives":repo.superadmin_initiative_data(),
+      "indicatorCount":repo.superadmin_indicator_count(),
+      "initiativeCount":repo.superadmin_initiative_count(),
+    }
+
+@app.put("/api/v1/superadmin/configuration")
+def put_superadmin_configuration(body: SuperAdminConfiguration):
+    try: return {"result":repo.save_superadmin_configuration(body.token,body.profile,body.goals)}
+    except Exception as e: raise HTTPException(400,str(e))
+
+@app.delete("/api/v1/superadmin/goals/{goal_id}")
+def delete_superadmin_goal(goal_id: str, token: str = Query(...)):
+    try: return {"result":repo.delete_superadmin_goal(token,goal_id)}
+    except Exception as e: raise HTTPException(400,str(e))
+
+@app.put("/api/v1/superadmin/logo")
+def put_superadmin_logo(body: SuperAdminLogo):
+    if len(body.logo)>1_500_000: raise HTTPException(413,"Logo payload is too large")
+    try: return {"result":repo.update_superadmin_logo(body.token,body.logo)}
+    except Exception as e: raise HTTPException(400,str(e))
+
+@app.post("/api/v1/superadmin/indicators/bulk")
+def bulk_indicators(body: SuperAdminBulkData):
+    try: return {"result":repo.superadmin_bulk_upsert_data(body.token,"indicator",body.rows)}
+    except Exception as e: raise HTTPException(400,str(e))
+
+@app.post("/api/v1/superadmin/initiatives/bulk")
+def bulk_initiatives(body: SuperAdminBulkData):
+    try: return {"result":repo.superadmin_bulk_upsert_data(body.token,"initiative",body.rows)}
+    except Exception as e: raise HTTPException(400,str(e))
 
 class AiQuestion(BaseModel):
     question: str
