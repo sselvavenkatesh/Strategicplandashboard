@@ -10,7 +10,9 @@ class Settings(BaseSettings):
 
     @property
     def allowed_origins(self) -> list[str]:
-        origins = [x.strip() for x in self.cors_origins.split(",") if x.strip()]\n        required = ["http://localhost:5173", "https://k12matrix-strategicplan.vercel.app"]\n        return list(dict.fromkeys(origins + required))
+        origins=[x.strip() for x in self.cors_origins.split(",") if x.strip()]
+        required=["http://localhost:5173","https://k12matrix-strategicplan.vercel.app"]
+        return list(dict.fromkeys(origins+required))
 
 @lru_cache
 def get_settings() -> Settings:
