@@ -180,7 +180,8 @@ def admin_login(body: AdminLogin):
     except Exception as e:
         raise HTTPException(500, f"Admin authentication unavailable: {type(e).__name__}")
     if not row: raise HTTPException(401,"Invalid credentials")
-    return {"name":row.get("user_name") or row.get("user_email"),"email":row.get("user_email")}
+    token=repo.create_admin_session(row.get("user_id"))
+    return {"token":token,"name":row.get("user_name") or row.get("user_email"),"email":row.get("user_email")}
 
 def _safe_return_to(value: str | None):
     fallback=os.getenv("FRONTEND_URL","https://k12matrix-strategicplan.vercel.app")
