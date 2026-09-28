@@ -118,8 +118,8 @@ def save_oauth_secrets(token: str, google_secret: str | None, microsoft_secret: 
         cur.execute("select public.save_district_oauth_secrets(%s::uuid,%s,%s)", (token,google_secret,microsoft_secret))
 
 def oauth_secret(provider: str):
-    column='"Google Client Secret"' if provider=="google" else '"Microsoft Client Secret"'
-    return fetch_one(f'''select c.{column} as secret from public."District_Auth_Config" c join public."District_Profile" p on p."District ID"=c."District ID" limit 1''')
+    row=fetch_one("select public.get_server_oauth_secret(%s) as secret",(provider,))
+    return row.get("secret") if row else None
 
 
 def create_admin_oauth_state(provider: str, return_to: str):
