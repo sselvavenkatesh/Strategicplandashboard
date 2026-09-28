@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
+import json, os, urllib.request
 from .config import get_settings
 from . import repository as repo
 
@@ -15,7 +17,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
     allow_credentials=False,
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
@@ -93,6 +95,48 @@ def get_subinitiatives(goal_id: str, initiative_id: str, school: str | None = No
 def get_feature(version: str, feature: str):
     return {"version":version,"feature":feature,"enabled":repo.feature_enabled(version,feature)}
 
+def _date_key(v):
+    if not v: return (9999,99)
+    months={"Jan":1,"Feb":2,"Mar":3,"Apr":4,"May":5,"Jun":6,"Jul":7,"Aug":8,"Sep":9,"Oct":10,"Nov":11,"Dec":12}
+    s=str(v).strip()
+    try: return (int(s[4:]),months.get(s[:3],99))
+    except: return (9999,99)
+
+@app.get("/api/v1/goals/{goal_id}/initiatives-full")
+def get_initiatives_full(goal_id: str):
+    masters={r["Initiative ID"]:r for r in repo.initiative_master(goal_id)}
+    rows=repo.initiative_data(goal_id)
+    result=[]
+    for iid,m in masters.items():
+        rr=[r for r in rows if r["Initiative ID"]==iid]
+        done=sum(r.get("Status")=="Done" for r in rr); progress=sum(r.get("Status")=="In Progress" for r in rr); not_started=sum(r.get("Status")=="Not Yet Started" for r in rr)
+        starts=sorted([r.get("Start Date") for r in rr if r.get("Start Date")],key=_date_key); ends=sorted([r.get("End Date") for r in rr if r.get("End Date")],key=_date_key)
+        names=list(dict.fromkeys(r.get("Sub Initiative Name") for r in rr if r.get("Sub Initiative Name")))
+        subs=[]
+        for name in names:
+            sr=[r for r in rr if r.get("Sub Initiative Name")==name]; sd=sum(r.get("Status")=="Done" for r in sr); sp=sum(r.get("Status")=="In Progress" for r in sr); sn=sum(r.get("Status")=="Not Yet Started" for r in sr); total=sd+sp+sn or 1
+            ss=sorted([r.get("Start Date") for r in sr if r.get("Start Date")],key=_date_key); se=sorted([r.get("End Date") for r in sr if r.get("End Date")],key=_date_key)
+            subs.append({"name":name,"done":100*sd/total,"inProgress":100*sp/total,"notStarted":100*sn/total,"start":ss[0] if ss else None,"end":se[-1] if se else None,"totalActionItems":len(sr),"completion":100*sd/total})
+        total=len(rr)
+        result.append({"id":iid,"name":m.get("Initiative Name") or iid,"shortName":m.get("Initiative_Short_name") or m.get("Initiative Name") or iid,"description":m.get("Initiative Name") or "","done":done,"inProgress":progress,"notStarted":not_started,"completion":100*done/total if total else 0,"start":starts[0] if starts else None,"end":ends[-1] if ends else None,"totalActionItems":total,"subInitiatives":subs})
+    return result
+
+class AiQuestion(BaseModel):
+    question: str
+    sessionId: str = "api-v1"
+
+def _ask_ai(question, session_id):
+    base=os.getenv("VITE_SUPABASE_URL") or os.getenv("SUPABASE_URL")
+    key=os.getenv("VITE_SUPABASE_ANON_KEY") or os.getenv("SUPABASE_ANON_KEY")
+    if not base or not key: raise RuntimeError("AI proxy environment not configured")
+    req=urllib.request.Request(base.rstrip("/")+"/functions/v1/district-ai",data=json.dumps({"question":question,"sessionId":session_id}).encode(),headers={"Content-Type":"application/json","apikey":key,"Authorization":"Bearer "+key},method="POST")
+    with urllib.request.urlopen(req,timeout=45) as resp: return json.loads(resp.read().decode())
+
+@app.post("/api/v1/ai/ask")
+def ask_ai(body: AiQuestion):
+    try: return _ask_ai(body.question,body.sessionId)
+    except Exception as e: raise HTTPException(502, f"AI service unavailable: {type(e).__name__}")
+
 def _validation_checks():
     checks = []
     def add(name, endpoint, expected, actual):
@@ -148,6 +192,19 @@ def _validation_checks():
         ep="/api/v1/features/V2.3/AI%20Assistant"; actual=get_feature("V2.3","AI Assistant")
         add("AI feature flag",ep,True,actual["enabled"])
     except Exception as e: checks.append({"name":"AI feature flag","endpoint":ep,"expected":True,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    for gid,iid,expected in [("G1","IN1",{"done":9,"inProgress":2,"notStarted":1,"completion":75.0,"start":"Sep-2023","end":"Jun-2027","subInitiatives":3}),("G4","IN10",{"done":12,"inProgress":0,"notStarted":0,"completion":100.0,"start":"Jan-2023","end":"Jun-2027","subInitiatives":3})]:
+        ep=f"/api/v1/goals/{gid}/initiatives-full"
+        try:
+            row=next((x for x in get_initiatives_full(gid) if x["id"]==iid),None)
+            actual={"done":row["done"],"inProgress":row["inProgress"],"notStarted":row["notStarted"],"completion":row["completion"],"start":row["start"],"end":row["end"],"subInitiatives":len(row["subInitiatives"])} if row else None
+            add(f"Full initiative {iid}",ep,expected,actual)
+        except Exception as e: checks.append({"name":f"Full initiative {iid}","endpoint":ep,"expected":expected,"actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
+    for label,question,expected_value in [("AI question ELA","What is the district M-Step ELA assessment value for 2025-26?","39.53%"),("AI question graduation","What is the district graduation rate for 2024-25?","84.4%")]:
+        ep="/api/v1/ai/ask"
+        try:
+            out=_ask_ai(question,"api-v1-validation"); answer=str(out.get("answer") or "")
+            add(label,ep,f"answer contains {expected_value}",f"answer contains {expected_value}" if expected_value in answer else answer[:240])
+        except Exception as e: checks.append({"name":label,"endpoint":ep,"expected":f"answer contains {expected_value}","actual":f"ERROR: {type(e).__name__}: {e}","status":"FAIL"})
     return checks
 
 @app.get("/api/v1/validation")
