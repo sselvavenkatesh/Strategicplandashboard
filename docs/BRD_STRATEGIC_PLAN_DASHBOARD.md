@@ -524,3 +524,8 @@ V2.3 is approved as the AI-enabled successor to V2.2. V2.2 remains the frozen no
 V2.3 adds K12 AI Assistant under database feature control. The assistant is read-only, district-data scoped, parent/general-public friendly, backed by the protected Supabase Edge Function and Ollama Cloud during this release, and provides Popular Questions, free-text questions, Copy/Download, processing feedback and audit logging. Responses are intentionally lightweight text; AI chart generation is excluded.
 
 The release also retains the approved V2.3 reporting-data maintenance refinements documented in the requirements. All V2.2 public, Admin and Super Admin behavior remains the inherited baseline unless an explicit V2.3 requirement supersedes it.
+
+
+## V2.4 maintenance release
+
+V2.4 is a responsive-branding maintenance release. The global header must retain Powered By K12Matrix branding on mobile while fitting district identity and header controls within constrained widths. The K12Matrix logo must maintain visible separation between the K12 and Matrix word groups across supported browsers, laptop displays, and both light/dark themes. No business-data, KPI, initiative, indicator, authentication, or AI business rule is changed by this release.
