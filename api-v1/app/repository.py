@@ -99,3 +99,12 @@ def update_superadmin_logo(token: str, logo: str):
 def superadmin_bulk_upsert_data(token: str, dataset: str, rows):
     row=fetch_one("select public.superadmin_bulk_upsert_data(%s,%s,%s::jsonb) as result", (token, dataset, __import__("json").dumps(rows)))
     return row["result"] if row else None
+
+
+def validate_superadmin_session(token: str):
+    rows=fetch_all("select * from public.validate_superadmin_session(%s::uuid)", (token,))
+    return rows[0] if rows else None
+
+def log_dashboard_access(session_id: str, user_id, user_name, user_email, user_type, region, country, page_path, user_agent):
+    with connection() as conn, conn.cursor() as cur:
+        cur.execute("select public.log_dashboard_access(%s::uuid,%s,%s,%s,%s,%s,%s,%s,%s)", (session_id,user_id,user_name,user_email,user_type,region,country,page_path,user_agent))
