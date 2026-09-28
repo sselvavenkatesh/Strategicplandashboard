@@ -1,4 +1,4 @@
-const API_BASE = ''
+const API_BASE = 'https://strategicplan-apiv1.vercel.app'
 
 async function apiRequest<T>(path:string,init?:RequestInit):Promise<T>{
   const response=await fetch(API_BASE+path,{...init,headers:{Accept:'application/json',...(init?.body?{'Content-Type':'application/json'}:{}),...(init?.headers||{})}})
