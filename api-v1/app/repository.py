@@ -43,3 +43,7 @@ def goal_initiative_progress(goal_id: str | None = None, school: str | None = No
 def feature_enabled(version: str, feature: str):
     row = fetch_one("select public.is_feature_enabled(%s,%s) as enabled", (version, feature))
     return bool(row and row["enabled"])
+
+
+def initiative_data(goal_id: str):
+    return fetch_all('select * from public."Initiative_Data" where "Goal ID"=%s and "Role"=%s order by "Initiative ID", "Sub Initiative Name", "Action Item"', (goal_id, "All"))
