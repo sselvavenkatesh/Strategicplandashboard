@@ -601,3 +601,14 @@ Detailed architecture is maintained in docs/TECHNICAL_ARCHITECTURE.md.
 ## V2.4 release checkpoint — 27 Sep 2026
 
 V2.4 branches from V2.3 and is intentionally limited to responsive branding fixes. Mobile CSS no longer hides the header Powered By K12Matrix treatment; instead the district name and branding scale progressively at <=650px and <=430px. The canonical React assets public/k12matrix-logo.svg and public/k12matrix-logo-light.svg were widened and the Matrix text origin moved right to prevent K12/Matrix glyph overlap. Preserve these fixes in future releases. Existing V2.3 dashboard/AI behavior is otherwise unchanged.
+
+
+## V2.4 API freeze update — 28 Sep 2026
+
+The product owner accepted and froze the Vercel API approach. Do not modify the existing Netlify V2.4 production path when working from this checkpoint.
+
+Current API architecture: React/Vite frontend on Vercel -> same-origin `/api/v1` rewrite -> StrategicPlan API V1 on Vercel -> Supabase PostgreSQL transaction pooler. Browser-side direct Supabase data access was removed from the API-integration branch. Admin and Super Admin operations are API-mediated. Dynamic Google/Microsoft SSO settings are managed by Super Admin. Indicator and Initiative CSV bulk uploads are API-backed.
+
+Performance is a known accepted gap. Database-side KPI generation is fast; future optimization must instrument end-to-end API timing before changing architecture. Do not optimize the frozen branch. Create a new branch from the API freeze.
+
+Canonical current architecture is `docs/TECHNICAL_ARCHITECTURE.md`.
