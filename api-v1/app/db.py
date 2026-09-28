@@ -1,23 +1,18 @@
 from contextlib import contextmanager
+import psycopg
 from psycopg.rows import dict_row
-from psycopg_pool import ConnectionPool
 from .config import get_settings
-
-_pool: ConnectionPool | None = None
-
-def get_pool() -> ConnectionPool:
-    global _pool
-    if _pool is None:
-        _pool = ConnectionPool(
-            conninfo=get_settings().database_url,
-            min_size=1,
-            max_size=5,
-            kwargs={"row_factory": dict_row},
-            open=True,
-        )
-    return _pool
 
 @contextmanager
 def connection():
-    with get_pool().connection() as conn:
+    """Open one short-lived PostgreSQL connection for the request data operation.
+
+    This lifecycle is safe for both traditional ASGI servers and serverless/Fluid
+    runtimes because no process-level pool is left open when an instance suspends.
+    """
+    with psycopg.connect(
+        get_settings().database_url,
+        row_factory=dict_row,
+        connect_timeout=10,
+    ) as conn:
         yield conn
