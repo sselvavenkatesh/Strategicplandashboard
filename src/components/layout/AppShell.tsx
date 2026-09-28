@@ -3,7 +3,7 @@ import {FormEvent,useEffect,useState} from 'react';
 import {Link,Outlet,useLocation,useNavigate} from 'react-router-dom';
 import {getGoals,getProfile} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
-import {supabase} from '../../lib/supabase';
+import {apiGet,apiPost,apiUrl} from '../../lib/api';
 import {useTheme} from '../../app/ThemeProvider';
 import {isAiEnabled} from '../../lib/ai';
 
@@ -18,6 +18,7 @@ export function AppShell(){
   const[authMessage,setAuthMessage]=useState('');
   const[authBusy,setAuthBusy]=useState(false);
   const[signinMethod,setSigninMethod]=useState<'Userbased'|'Google'|'Microsoft'>('Userbased');
+  const[ssoConfigured,setSsoConfigured]=useState(true);
   const[admin,setAdmin]=useState<AdminProfile|null>(null);
   const p=useDashboard(getProfile),g=useDashboard(getGoals);
   const nav=useNavigate();
@@ -28,13 +29,18 @@ export function AppShell(){
   useEffect(()=>{isAiEnabled().then(setAiEnabled).catch(()=>setAiEnabled(false))},[]);
 
   useEffect(()=>{
-    const key='strategic_access_session';
-    let sessionId=sessionStorage.getItem(key);
-    if(!sessionId){sessionId=crypto.randomUUID();sessionStorage.setItem(key,sessionId)}
-    const saved=sessionStorage.getItem('district360_admin');
-    let userName:string|undefined,userEmail:string|undefined;
-    if(saved){try{const x=JSON.parse(saved);userName=x?.name;userEmail=x?.email}catch{}}
-    supabase.functions.invoke('log-dashboard-access',{body:{sessionId,userName,userEmail,userType:saved?'Admin':'Public',pagePath:location.pathname}}).catch(()=>{});
+    const key='strategic_access_session';let sessionId=sessionStorage.getItem(key);if(!sessionId){sessionId=crypto.randomUUID();sessionStorage.setItem(key,sessionId)}
+    const saved=sessionStorage.getItem('district360_admin');let userName:string|undefined,userEmail:string|undefined;if(saved){try{const x=JSON.parse(saved);userName=x?.name;userEmail=x?.email}catch{}}
+    apiPost('/api/v1/access-log',{sessionId,userName,userEmail,userType:saved?'Admin':'Public',pagePath:location.pathname}).catch(()=>{});
+  },[]);
+
+  useEffect(()=>{apiGet<any>('/api/v1/admin/signin-config').then(x=>{const method=(x.signinMethod||'Userbased') as 'Userbased'|'Google'|'Microsoft';setSigninMethod(method);setSsoConfigured(method==='Google'?!!x.google?.configured:method==='Microsoft'?!!x.microsoft?.configured:true)}).catch(()=>{})},[]);
+
+  useEffect(()=>{
+    const q=new URLSearchParams(window.location.search);const token=q.get('adminSession');const authError=q.get('authError');
+    if(token){const profile={name:q.get('name')||q.get('email')||'Admin',email:q.get('email')||''};sessionStorage.setItem('district360_admin',JSON.stringify(profile));sessionStorage.setItem('strategic_admin_token',token);setAdmin(profile);window.history.replaceState({},'',window.location.pathname)}
+    else if(authError){setAuthMessage(authError==='not_authorized'?'This SSO account is not authorized for Admin access.':'SSO sign in failed. Please contact your administrator.');setSignInOpen(true);window.history.replaceState({},'',window.location.pathname)}
+    else{const saved=sessionStorage.getItem('district360_admin');const sessionToken=sessionStorage.getItem('strategic_admin_token');if(saved&&sessionToken){apiGet<any>('/api/v1/auth/admin/session?token='+encodeURIComponent(sessionToken)).then(x=>setAdmin({name:x.name,email:x.email})).catch(()=>{sessionStorage.removeItem('district360_admin');sessionStorage.removeItem('strategic_admin_token');setAdmin(null)})}}
   },[]);
 
   useEffect(()=>{
@@ -43,38 +49,12 @@ export function AppShell(){
     return()=>window.clearTimeout(timer);
   },[location.pathname]);
 
-  useEffect(()=>{(async()=>{const{data}=await supabase.from('District_Profile').select('"Admin Signin Method"').limit(1).maybeSingle();if(data?.['Admin Signin Method'])setSigninMethod(data['Admin Signin Method'])})()},[]);
+  async function submitSignIn(e:FormEvent){e.preventDefault();setAuthBusy(true);setAuthMessage('');try{const row=await apiPost<any>('/api/v1/auth/admin/login',{email:email.trim(),password});const profile={name:row.name||row.email,email:row.email};sessionStorage.setItem('district360_admin',JSON.stringify(profile));sessionStorage.setItem('strategic_admin_token',row.token);setAdmin(profile);setPassword('');setSignInOpen(false);nav('/')}catch{sessionStorage.removeItem('district360_admin');sessionStorage.removeItem('strategic_admin_token');setAdmin(null);setAuthMessage('Sign in failed. Please check your email and password.')}finally{setAuthBusy(false)}}
 
-  useEffect(()=>{
-    const saved=sessionStorage.getItem('district360_admin');
-    if(saved){try{setAdmin(JSON.parse(saved))}catch{sessionStorage.removeItem('district360_admin')}}
-    (async()=>{const{data:{session}}=await supabase.auth.getSession();const ssoEmail=session?.user?.email;if(!saved&&ssoEmail){const{data}=await supabase.rpc('validate_sso_admin',{p_email:ssoEmail});const row=Array.isArray(data)?data[0]:null;if(row){const profile={name:row.user_name||row.user_email,email:row.user_email};sessionStorage.setItem('district360_admin',JSON.stringify(profile));setAdmin(profile)}else{await supabase.auth.signOut();setAuthMessage('This SSO account is not authorized for Admin access.')}}})();
-  },[]);
+  function submitSso(provider:'google'|'microsoft'){setAuthMessage('');if(!ssoConfigured){setAuthMessage(provider==='google'?'Google SSO is not fully configured by the district.':'Microsoft SSO is not fully configured by the district.');return}window.location.assign(apiUrl('/api/v1/auth/admin/oauth/'+provider+'/start?return_to='+encodeURIComponent(window.location.origin+window.location.pathname)))}
 
-  async function submitSignIn(e:FormEvent){
-    e.preventDefault();setAuthBusy(true);setAuthMessage('');
-    const {data,error}=await supabase.rpc('validate_admin_login',{p_email:email.trim(),p_password:password});
-    const row=Array.isArray(data)?data[0]:null;
-    if(error||!row){
-      sessionStorage.removeItem('district360_admin');setAdmin(null);
-      setAuthMessage('Sign in failed. Please check your email and password.');
-      setAuthBusy(false);
-      setTimeout(()=>{setSignInOpen(false);setAuthMessage('');nav('/')},1400);
-      return;
-    }
-    const profile={name:row.user_name||row.user_email,email:row.user_email};
-    sessionStorage.setItem('district360_admin',JSON.stringify(profile));
-    setAdmin(profile);setPassword('');setSignInOpen(false);setAuthBusy(false);nav('/');
-  }
+  function signOut(){const token=sessionStorage.getItem('strategic_admin_token');sessionStorage.removeItem('district360_admin');sessionStorage.removeItem('strategic_admin_token');setAdmin(null);if(token)apiPost('/api/v1/auth/admin/logout?token='+encodeURIComponent(token)).catch(()=>{});nav('/')}
 
-  async function submitSso(provider:'google'|'azure'){
-    setAuthBusy(true);setAuthMessage('');
-    const options=provider==='azure'?{redirectTo:window.location.origin,scopes:'email openid profile',queryParams:{prompt:'select_account'}}:{redirectTo:window.location.origin,queryParams:{prompt:'select_account'}};
-    const{error}=await supabase.auth.signInWithOAuth({provider,options});
-    if(error){setAuthMessage('SSO sign in could not be started. Please contact your administrator.');setAuthBusy(false)}
-  }
-
-  function signOut(){sessionStorage.removeItem('district360_admin');setAdmin(null);supabase.auth.signOut();nav('/')}
 
   return <div className="app-shell">
     {pageLoading&&<div className="pageLoader" role="status" aria-live="polite" aria-label="Loading page"><img className="k12LoaderLogo" src="/k12matrix-logo.svg" alt="K12Matrix"/><div className="k12LoaderPulse"/><small>Loading strategic plan…</small></div>}
@@ -105,7 +85,7 @@ export function AppShell(){
           <button className="signInSubmit" type="submit" disabled={authBusy}>{authBusy?'Signing in…':'Sign In'}</button>
         </>:<>
           {authMessage&&<div className="signInError" role="alert">{authMessage}</div>}
-          <button className="signInSubmit ssoSignIn" type="button" disabled={authBusy} onClick={()=>submitSso(signinMethod==='Google'?'google':'azure')}>Sign in with {signinMethod}</button>
+          <button className="signInSubmit ssoSignIn" type="button" disabled={authBusy} onClick={()=>submitSso(signinMethod==='Google'?'google':'microsoft')}>Sign in with {signinMethod}</button>
         </>}
       </form>
     </div>}
