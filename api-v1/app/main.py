@@ -125,6 +125,15 @@ class AiQuestion(BaseModel):
     question: str
     sessionId: str = "api-v1"
 
+@app.get("/api/v1/diagnostics/ai-config")
+def ai_config_diagnostics():
+    return {
+        "supabaseUrlConfigured": bool(os.getenv("SUPABASE_URL")),
+        "supabaseAnonKeyConfigured": bool(os.getenv("SUPABASE_ANON_KEY")),
+        "viteSupabaseUrlConfigured": bool(os.getenv("VITE_SUPABASE_URL")),
+        "viteSupabaseAnonKeyConfigured": bool(os.getenv("VITE_SUPABASE_ANON_KEY")),
+    }
+
 def _ask_ai(question, session_id):
     base=os.getenv("VITE_SUPABASE_URL") or os.getenv("SUPABASE_URL")
     key=os.getenv("VITE_SUPABASE_ANON_KEY") or os.getenv("SUPABASE_ANON_KEY")
