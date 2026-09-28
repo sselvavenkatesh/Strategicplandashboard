@@ -62,8 +62,9 @@ def get_indicators(goal_id: str, school: str | None = None):
             "variance":float(r["ly_variance_numeric"]) if r.get("ly_variance_numeric") is not None else None,
             "year":r.get("school_year") or "—",
             "nature":"Negative" if m.get("KPI Nature")=="Negative" else "Positive",
-            "isPercent":str(m.get("Indicator Type") or "").lower()=="percent" or "%" in str(r.get("value_3_display") or ""),
-            "type":str(m.get("Indicator Type") or ""),
+            "isPercent":str(m.get("Indicator Type") or "").lower()=="percent" and "$" not in str(r.get("value_3_display") or ""),
+            "isCurrency":str(m.get("Indicator Type") or "").lower()=="currency" or "$" in str(r.get("value_3_display") or ""),
+            "type":"Currency" if "$" in str(r.get("value_3_display") or "") else str(m.get("Indicator Type") or ""),
         })
     return result
 
