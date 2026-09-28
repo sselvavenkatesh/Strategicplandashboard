@@ -47,3 +47,55 @@ def feature_enabled(version: str, feature: str):
 
 def initiative_data(goal_id: str):
     return fetch_all('select * from public."Initiative_Data" where "Goal ID"=%s and "Role"=%s order by "Initiative ID", "Sub Initiative Name", "Action Item"', (goal_id, "All"))
+
+
+def admin_signin_config():
+    return fetch_one('select "Admin Signin Method" from public."District_Profile" limit 1')
+
+def validate_admin_login(email: str, password: str):
+    rows = fetch_all("select * from public.validate_admin_login(%s,%s)", (email, password))
+    return rows[0] if rows else None
+
+def validate_sso_admin(email: str):
+    rows = fetch_all("select * from public.validate_sso_admin(%s)", (email,))
+    return rows[0] if rows else None
+
+def validate_superadmin_login(email: str, password: str):
+    rows = fetch_all("select * from public.validate_superadmin_login(%s,%s)", (email, password))
+    return rows[0] if rows else None
+
+def superadmin_profile():
+    return fetch_one('select * from public."District_Profile" limit 1')
+
+def superadmin_goals():
+    return fetch_all('select * from public."Goal_master" order by "Goal ID"')
+
+def superadmin_indicator_data():
+    return fetch_all('select * from public."Indicator_Data"')
+
+def superadmin_initiative_data():
+    return fetch_all('select * from public."Initiative_Data"')
+
+def superadmin_indicator_count():
+    row=fetch_one('select count(*) as count from public."Indicator_master" where "Role"=%s', ("All",))
+    return int(row["count"] if row else 0)
+
+def superadmin_initiative_count():
+    row=fetch_one('select count(*) as count from public."Initiative_master" where "Role"=%s', ("All",))
+    return int(row["count"] if row else 0)
+
+def save_superadmin_configuration(token: str, profile, goals):
+    row=fetch_one("select public.save_superadmin_configuration(%s,%s::jsonb,%s::jsonb) as result", (token, __import__("json").dumps(profile), __import__("json").dumps(goals)))
+    return row["result"] if row else None
+
+def delete_superadmin_goal(token: str, goal_id: str):
+    row=fetch_one("select public.delete_superadmin_goal(%s,%s) as result", (token, goal_id))
+    return row["result"] if row else None
+
+def update_superadmin_logo(token: str, logo: str):
+    row=fetch_one("select public.update_superadmin_logo(%s,%s) as result", (token, logo))
+    return row["result"] if row else None
+
+def superadmin_bulk_upsert_data(token: str, dataset: str, rows):
+    row=fetch_one("select public.superadmin_bulk_upsert_data(%s,%s,%s::jsonb) as result", (token, dataset, __import__("json").dumps(rows)))
+    return row["result"] if row else None
