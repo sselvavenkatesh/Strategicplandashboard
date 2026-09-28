@@ -529,3 +529,12 @@ The release also retains the approved V2.3 reporting-data maintenance refinement
 ## V2.4 maintenance release
 
 V2.4 is a responsive-branding maintenance release. The global header must retain Powered By K12Matrix branding on mobile while fitting district identity and header controls within constrained widths. The K12Matrix logo must maintain visible separation between the K12 and Matrix word groups across supported browsers, laptop displays, and both light/dark themes. No business-data, KPI, initiative, indicator, authentication, or AI business rule is changed by this release.
+
+
+## V2.4 API delivery status — 28 Sep 2026
+
+The Vercel/API implementation has been accepted as the frozen API baseline. The existing Netlify V2.4 production experience remains unchanged and is not part of this migration freeze.
+
+Business behavior remains data-driven and functionally equivalent while the technical access path changes from direct browser-to-Supabase calls to browser-to-StrategicPlan-API-to-PostgreSQL. Admin and Super Admin functions, including configuration and controlled Indicator/Initiative CSV uploads, use the API boundary. District Admin login type and Google/Microsoft SSO provider configuration are managed dynamically from Super Admin.
+
+Known accepted non-functional issue: the API path currently has higher perceived latency than the direct Supabase path. Performance optimization is deferred and must preserve the accepted functional behavior.
