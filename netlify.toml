@@ -20,3 +20,9 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Isolated demonstration targets are enabled only for this preview branch.
+[context."preview/indicator-achievement-20261019".environment]
+  VITE_ACHIEVEMENT_PREVIEW = "true"
+[context.deploy-preview.environment]
+  VITE_ACHIEVEMENT_PREVIEW = "true"
