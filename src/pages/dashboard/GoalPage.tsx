@@ -2,6 +2,8 @@ import {useEffect,useState} from 'react';
 import {useNavigate,useParams} from 'react-router-dom';
 import {getGoals,getIndicators,getInitiatives,getIndicatorHistory,getStudentGroups,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
+import {AchievementProgress} from '../../components/AchievementProgress';
+import {getAchievementSummary} from '../../lib/achievement';
 
 type HistoryMap=Record<string,any[]>;
 type AvgMap=Record<string,string>;
@@ -108,6 +110,8 @@ function formatStatewide(raw:string|undefined){
 
 export function GoalPage(){
   const{goalId:id}=useParams(),nav=useNavigate(),goals=useDashboard(getGoals);
+  const achievement=useDashboard(getAchievementSummary);
+  const goalAchievement=achievement.data?.goals.find(g=>g.goalId===id);
   const[goal,setGoal]=useState<Goal|null>(null),[initiatives,setInitiatives]=useState<Initiative[]>([]),[indicators,setIndicators]=useState<Indicator[]>([]);
   const[histories,setHistories]=useState<HistoryMap>({}),[stateAvgs,setStateAvgs]=useState<AvgMap>({});
   const[initiative,setInitiative]=useState<Initiative|null>(null),[indicator,setIndicator]=useState<Indicator|null>(null),[history,setHistory]=useState<any[]>([]),[groups,setGroups]=useState<any[]>([]),[selectedYear,setSelectedYear]=useState(''),[indicatorLoading,setIndicatorLoading]=useState(false),[error,setError]=useState('');
@@ -159,8 +163,8 @@ export function GoalPage(){
     </nav>
 
     <header className="goalHero">
-      <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
-      <div className="goalHeroActions"><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}>Key Resources</button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
+      <div className="goalHeroCopy"><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
+      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}>Key Resources</button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
     </header>
 
     <div className="goalSectionTitle">
@@ -205,8 +209,11 @@ export function GoalPage(){
         const rows=(histories[k.id]||[]).filter((r:any)=>r.value_3_numeric!=null).slice(-4);
         const mx=Math.max(1,...rows.map((r:any)=>Number(r.value_3_numeric)||0));
         const favorable=k.variance==null?null:(k.nature==='Negative'?k.variance<=0:k.variance>=0);
+        const target=goalAchievement?.indicators.find(x=>x.id===k.id&&x.year===k.year);
+        const targetStatus=achievement.loading?'Loading target':achievement.error?'Target unavailable':target?.achieved===true?'Target achieved':target?.achieved===false?'Target not achieved':target?.reason||'Target unavailable';
+        const targetHelp=`${targetStatus}. Actual: ${target?.actual??k.value}. Target 1: ${target?.target??'Unavailable'}. Reporting year: ${k.year}.${target?.nature==='Negative'?' Lower is better.':''}`;
         return <article className="indicatorCard goalIndicatorCard" key={k.id} onClick={()=>setIndicator(k)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')setIndicator(k)}}>
-          <div className="indicatorIntro"><h4>{k.shortName}</h4><p title={k.name}>{k.name}</p></div>
+          <div className="indicatorIntro"><div className="indicatorTitleWithTarget"><h4>{k.shortName}</h4><span className="indicatorTargetBadge" role="img" aria-label={targetHelp} title={targetHelp}><i className={'indicatorTargetDot '+(target?.achieved===true?'met':target?.achieved===false?'unmet':'unknown')} aria-hidden="true"/><span>Target <b>{achievement.loading?'…':achievement.error?'—':target?.target??'—'}</b></span></span></div><p title={k.name}>{k.name}</p></div>
           <div className="indicatorValueRow">
             <div className="indicatorValueWrap">
               <span className="indicatorValue">{formatIndicatorValue(k)}</span>

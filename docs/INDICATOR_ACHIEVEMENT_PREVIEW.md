@@ -55,3 +55,7 @@ Final desktop checks: 1363px viewport, no horizontal overflow, all full goal tit
 ## Micro progress presentation
 
 The approved follow-up replaces all five speedometers with blue micro progress bars. The 90px heading reservation and side-by-side gauge column are removed. Goal titles and descriptions again use the full card width. Bars use one blue fill and a muted remainder, distinct from the multicolor initiative stacks. Calculation, demonstration targets and details dialog are unchanged.
+
+## Individual Goal page
+
+Each Goal header reuses its achievement micro progress bar before Key Resources. Indicator tile headings show the same-year Target 1 and a green (achieved) or red (not achieved) status dot. No indicator achievement bar is added. Missing target/data or API failure uses a neutral dot and an unavailable label, never a false red/green result. Percentage KPIs retain %, SAT uses a numeric score and Fund Balance uses currency. Hover and accessible labels provide actual, target, reporting year and status. Existing tile click/keyboard detail dialogs, historical charts, statewide averages and initiative displays retain their handlers. This reuses the existing achievement RPC with no database changes.
