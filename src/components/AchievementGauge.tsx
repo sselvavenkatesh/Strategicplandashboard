@@ -6,7 +6,7 @@ import '../styles/achievement.css';
 type Props={label:string;score:AchievementScore|null;indicators:AchievementIndicator[];loading?:boolean;error?:string};
 
 export function AchievementGauge({label,score,indicators,loading=false,error=''}:Props){
-  const [open,setOpen]=useState(false),id=useId(),button=useRef<HTMLButtonElement>(null),close=useRef<HTMLButtonElement>(null);
+  const [open,setOpen]=useState(false),id=useId(),close=useRef<HTMLButtonElement>(null);
   useEffect(()=>{
     if(!open)return;
     const previous=document.activeElement as HTMLElement|null;
@@ -27,7 +27,7 @@ export function AchievementGauge({label,score,indicators,loading=false,error=''}
   const tooltip=`${label}: ${value}. ${caption}.${score?.excluded?` ${score.excluded} indicators excluded.`:''}\n${details}`;
   const color=available?(percent===100?'var(--green)':percent>=50?'var(--yellow)':'#f07878'):'var(--muted)';
   return <>
-    <button ref={button} type="button" className="achievementGauge" aria-label={`${label}: ${value}, ${caption}. View target details`}
+    <button type="button" className="achievementGauge" aria-label={`${label}: ${value}, ${caption}. View target details`}
       title={tooltip} aria-haspopup="dialog" aria-expanded={open} disabled={loading||!!error}
       onClick={e=>{e.stopPropagation();setOpen(true)}} onKeyDown={e=>e.stopPropagation()}>
       <span className="achievementGaugeLabel">{label==='Overall Achievement'?'Overall Achievement':'Achievement'}</span>

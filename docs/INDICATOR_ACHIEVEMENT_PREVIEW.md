@@ -41,3 +41,11 @@ Goal results: G1 2/3 (66.7%), G2 1/2 (50%), G3 1/1 (100%), G4 0/1 (0%). Overall 
 ## Release path
 
 Review this preview first. Before a future release, approve actual district targets separately, populate the matching Indicator_Data Target 1 records, build without the demonstration flag, recheck missing coverage, and deploy only after explicit release approval. No API V1 frontend migration is required for this feature.
+
+### Hosted QA findings
+
+The Vercel frontend preview deployed successfully on the isolated branch. Direct /summary loading, live public RPC data, all five gauge scores, overall details dialog (seven rows), Escape dismissal with focus restoration, and dark/light themes were checked in the browser. The first visual pass found long-heading clipping caused by inherited fixed-height styles; the scoped title selector and shared heading space were corrected before handoff.
+
+Supabase security advisors reported no finding for the new preview table or RPC. Existing normalized-view/security-definer and authentication-function findings remain outside this feature's scope; the production view and authorization functions were not altered. The new function itself is SECURITY INVOKER and does not add privileged execution.
+
+The separate API V1 project also attempts to build this frontend branch automatically and fails because this branch does not contain its api-v1 root. That failed preview does not replace its production deployment and is not needed for the gauge feature. The frontend preview uses the existing Supabase connection.

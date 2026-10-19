@@ -19,7 +19,7 @@ insert into public."Indicator_Target_Preview" values
   ('ID3','2025-26','650'),
   ('ID4','2025-26','95%'),
   ('ID5','2024-25','90%'),
-  ('ID6','2024-25','$20000000'),
+  ('ID6','2024-25','$20,000,000'),
   ('ID7','2025-26','25%');
 
 create function public.fn_indicator_achievement_summary(p_preview boolean default false)
