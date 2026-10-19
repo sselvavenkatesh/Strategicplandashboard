@@ -59,3 +59,7 @@ The approved follow-up replaces all five speedometers with blue micro progress b
 ## Individual Goal page
 
 Each Goal header reuses its achievement micro progress bar before Key Resources. Indicator tile headings show the same-year Target 1 and a green (achieved) or red (not achieved) status dot. No indicator achievement bar is added. Missing target/data or API failure uses a neutral dot and an unavailable label, never a false red/green result. Percentage KPIs retain %, SAT uses a numeric score and Fund Balance uses currency. Hover and accessible labels provide actual, target, reporting year and status. Existing tile click/keyboard detail dialogs, historical charts, statewide averages and initiative displays retain their handlers. This reuses the existing achievement RPC with no database changes.
+
+## Indicator popup target scorecard
+
+The popup removes its static green title dot. Its scorecard displays Actual and Target with the same value typography and a separate red/green achievement dot with status text. Target lookup follows the selected reporting year through existing read-only tables/view access; historical years do not inherit the latest target. Missing or invalid target/actual data uses neutral status and an unavailable label. Initiative title dots are unchanged. No database changes are required.

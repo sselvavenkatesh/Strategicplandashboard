@@ -3,7 +3,7 @@ import {useNavigate,useParams} from 'react-router-dom';
 import {getGoals,getIndicators,getInitiatives,getIndicatorHistory,getStudentGroups,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 import {AchievementProgress} from '../../components/AchievementProgress';
-import {getAchievementSummary} from '../../lib/achievement';
+import {getAchievementSummary,getIndicatorTarget,numericTarget} from '../../lib/achievement';
 
 type HistoryMap=Record<string,any[]>;
 type AvgMap=Record<string,string>;
@@ -115,6 +115,17 @@ export function GoalPage(){
   const[goal,setGoal]=useState<Goal|null>(null),[initiatives,setInitiatives]=useState<Initiative[]>([]),[indicators,setIndicators]=useState<Indicator[]>([]);
   const[histories,setHistories]=useState<HistoryMap>({}),[stateAvgs,setStateAvgs]=useState<AvgMap>({});
   const[initiative,setInitiative]=useState<Initiative|null>(null),[indicator,setIndicator]=useState<Indicator|null>(null),[history,setHistory]=useState<any[]>([]),[groups,setGroups]=useState<any[]>([]),[selectedYear,setSelectedYear]=useState(''),[indicatorLoading,setIndicatorLoading]=useState(false),[error,setError]=useState('');
+
+  const popupYear=selectedYear||indicator?.year||'';
+  const popupTarget=useDashboard(async()=>({id:indicator?.id,year:popupYear,value:await getIndicatorTarget(indicator?.id,popupYear)}),[indicator?.id,popupYear]);
+  const popupTargetReady=popupTarget.data?.id===indicator?.id&&popupTarget.data?.year===popupYear;
+  const popupTargetLoading=(popupTarget.loading||!popupTargetReady)&&!popupTarget.error;
+  const popupTargetValue=popupTargetReady?popupTarget.data?.value??null:null;
+  const popupObservation=history.find((r:any)=>r.school_year===popupYear);
+  const popupActualNumeric=popupYear===indicator?.year?indicator?.numeric:popupObservation?.value_3_numeric!=null?Number(popupObservation.value_3_numeric):null;
+  const popupTargetNumeric=numericTarget(popupTargetValue);
+  const popupAchieved=popupTargetLoading||popupTarget.error||popupTargetNumeric==null||popupActualNumeric==null||!Number.isFinite(popupActualNumeric)?null:indicator?.nature==='Negative'?popupActualNumeric<=popupTargetNumeric:popupActualNumeric>=popupTargetNumeric;
+  const popupStatus=popupTargetLoading?'Loading target':popupTarget.error?'Target unavailable':popupAchieved==null?'Target unavailable':popupAchieved?'Achieved':'Not achieved';
 
   useEffect(()=>{
     if(!id||!goals.data)return;
@@ -273,10 +284,10 @@ export function GoalPage(){
           <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
-        <div className="indicatorModalHead"><span className="statusDot"/><h3>{indicator.shortName} - {indicator.name}</h3></div>
-        <section className="currentKpi">
-          <div><small>CY: {selectedYear||indicator.year}</small><span>{indicator.shortName}{indicator.isPercent?' Proficient %':''}</span></div>
-          <b>{(()=>{
+        <div className="indicatorModalHead"><h3>{indicator.shortName} - {indicator.name}</h3></div>
+        <section className="currentKpi currentKpiWithTarget">
+          <div className="popupKpiContext"><small>CY: {popupYear}</small><span>{indicator.shortName}{indicator.isPercent?' Proficient %':''}</span></div>
+          <div className="popupKpiMetric"><small>Actual</small><b>{(()=>{
             const r=history.find((x:any)=>x.school_year===selectedYear);
             if(!r)return formatIndicatorValue(indicator);
             if(r.value_3_display!=null)return String(r.value_3_display);
@@ -285,7 +296,12 @@ export function GoalPage(){
             if(indicator.isPercent)return n.toFixed(1)+'%';
             if(indicator.shortName.toLowerCase().includes('fund balance')||indicator.name.toLowerCase().includes('fund balance'))return '$'+(n/1000000).toFixed(2)+'M';
             return n.toFixed(1);
-          })()}</b>
+          })()}</b></div>
+          <div className="popupKpiMetric"><small>Target</small><b>{popupTargetLoading?'…':popupTarget.error?'—':popupTargetValue??'—'}</b></div>
+          <div className="popupAchievementStatus" title={`${popupStatus}. Target 1 for ${popupYear}.${indicator.nature==='Negative'?' Lower is better.':''}`}>
+            <i className={'indicatorTargetDot '+(popupAchieved==null?'unknown':popupAchieved?'met':'unmet')} aria-hidden="true"/>
+            <span role="status">{popupStatus}</span>
+          </div>
         </section>
         <section className="indicatorChartPanel">
           <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>

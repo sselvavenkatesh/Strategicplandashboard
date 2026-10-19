@@ -42,3 +42,12 @@
 .goalPage .indicatorTargetDot.met{background:#32d18a}
 .goalPage .indicatorTargetDot.unmet{background:#f07878}
 @media(max-width:700px){.goalPage .goalHero{flex-wrap:wrap;gap:12px}.goalPage .goalHeroCopy{flex-basis:100%}.goalPage .goalHeroActions{width:100%}.goalPage .goalHeroActions>.achievementProgress{width:150px;flex:1;max-width:180px;margin-right:auto}.goalPage .indicatorTargetBadge{font-size:9px}}
+
+/* Indicator popup actual/target scorecard. Both values share currentKpi's font. */
+.indicatorModal .currentKpi.currentKpiWithTarget{width:auto;max-width:none;display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(90px,1fr) minmax(130px,1fr) minmax(100px,.7fr);gap:20px;align-items:center}
+.indicatorModal .currentKpiWithTarget .popupKpiMetric{min-width:0;gap:4px}
+.indicatorModal .currentKpiWithTarget .popupKpiMetric>b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.indicatorModal .currentKpiWithTarget .popupAchievementStatus{display:flex;flex-direction:row;align-items:center;gap:8px}
+.indicatorModal .currentKpiWithTarget .indicatorTargetDot{width:11px;height:11px;flex-basis:11px}
+.indicatorModal .currentKpiWithTarget .popupAchievementStatus>span{font-size:11px;font-weight:600;color:var(--muted)}
+@media(max-width:700px){.indicatorModal .currentKpi.currentKpiWithTarget{grid-template-columns:1fr 1fr;gap:12px}.indicatorModal .currentKpiWithTarget .popupKpiContext,.indicatorModal .currentKpiWithTarget .popupAchievementStatus{grid-column:1/-1}.indicatorModal .currentKpiWithTarget .popupKpiMetric>b{font-size:20px}}
