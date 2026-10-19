@@ -4,7 +4,7 @@ Branch: `preview/indicator-achievement-20261019`, based on `react-dashboard` at 
 
 ## Behavior
 
-The Summary page adds four compact semicircular goal gauges and one overall gauge. Hover gives target details; click/tap opens an accessible details dialog. No chart library added. The existing indicator tiles, initiative bars and navigation are preserved. Gauge loading/API failure does not prevent the existing summary from rendering.
+The Summary page adds a compact blue micro progress strip below each goal description and one beside the page heading. Full-width goal titles and the original description spacing are restored; no gauge heading reservation remains. Each strip shows Achievement, its percentage, a thin 4px bar and the achieved/eligible count. Hover gives target details; click/tap opens the accessible details dialog. Existing indicator tiles, initiative bars and navigation are preserved. Achievement loading/API failure does not prevent the existing summary from rendering.
 
 The security-invoker RPC `fn_indicator_achievement_summary(p_preview boolean default false)` returns overall totals and all visible goals in one request. Indicator_master and Goal_master with Role=All determine the included entities. The latest district observation must have Role=All, Category=All, Student Group=All Students and School=NULL. Each actual is paired with Target 1 for that same year. No older target fallback. Positive nature uses actual >= target; negative uses actual <= target. A valid zero is included. Missing/invalid actuals, targets or KPI direction are excluded and disclosed. With no eligible indicators, percent is NULL and the UI shows N/A.
 
@@ -52,6 +52,6 @@ The separate API V1 project also attempts to build this frontend branch automati
 
 Final desktop checks: 1363px viewport, no horizontal overflow, all full goal titles visible, five expected scores, seven target details, keyboard close/focus restoration and both themes. Final heading reservation is 90px to align descriptions and chart rows across the four cards. Mobile responsive styles are implemented but a mobile-sized browser session was unavailable; mobile visual QA remains unverified.
 
-## Compact gauge refinement
+## Micro progress presentation
 
-The gauge uses a shorter pointer at the inner rim, a slimmer arc and a smaller footprint (78px goal control, 72px dial). The percentage has its own clear centre area; pointer geometry stays outside the text at 0%, 50% and 100%. No centre stem passes through the value. Zero percent draws no colored progress dot. Existing achievement calculations, target data, dialog, and production deployment are unchanged.
+The approved follow-up replaces all five speedometers with blue micro progress bars. The 90px heading reservation and side-by-side gauge column are removed. Goal titles and descriptions again use the full card width. Bars use one blue fill and a muted remainder, distinct from the multicolor initiative stacks. Calculation, demonstration targets and details dialog are unchanged.

@@ -5,7 +5,7 @@ import '../styles/achievement.css';
 
 type Props={label:string;score:AchievementScore|null;indicators:AchievementIndicator[];loading?:boolean;error?:string};
 
-export function AchievementGauge({label,score,indicators,loading=false,error=''}:Props){
+export function AchievementProgress({label,score,indicators,loading=false,error=''}:Props){
   const [open,setOpen]=useState(false),id=useId(),close=useRef<HTMLButtonElement>(null);
   useEffect(()=>{
     if(!open)return;
@@ -25,20 +25,13 @@ export function AchievementGauge({label,score,indicators,loading=false,error=''}
   const caption=loading?'Loading…':error?'Unavailable':score?.eligible?`${score.achieved} of ${score.eligible} achieved`:'No targets available';
   const details=indicators.map(k=>`${k.name} (${k.year||'No year'}): Actual ${k.actual??'N/A'}; Target ${k.target??'N/A'}; ${k.achieved==null?k.reason:k.achieved?'Achieved':'Not achieved'}${k.nature==='Negative'?' (lower is better)':''}`).join('\n');
   const tooltip=`${label}: ${value}. ${caption}.${score?.excluded?` ${score.excluded} indicators excluded.`:''}\n${details}`;
-  const color=available?(percent===100?'var(--green)':percent>=50?'var(--yellow)':'#f07878'):'var(--muted)';
   return <>
-    <button type="button" className="achievementGauge" aria-label={`${label}: ${value}, ${caption}. View target details`}
+    <button type="button" className="achievementProgress" aria-label={`${label}: ${value}, ${caption}. View target details`}
       title={tooltip} aria-haspopup="dialog" aria-expanded={open} disabled={loading||!!error}
       onClick={e=>{e.stopPropagation();setOpen(true)}} onKeyDown={e=>e.stopPropagation()}>
-      <span className="achievementGaugeLabel">{label==='Overall Achievement'?'Overall Achievement':'Achievement'}</span>
-      <svg viewBox="0 0 100 64" aria-hidden="true">
-        <path d="M 12 43 A 38 38 0 0 1 88 43" className="achievementTrack"/>
-        {available&&percent>0&&<path d="M 12 43 A 38 38 0 0 1 88 43" pathLength="100" stroke={color} strokeDasharray={`${percent} 100`} className="achievementArc"/>}
-        {/* A short rim pointer keeps the entire centre clear, including 0% and 100%. */}
-        {available&&<g transform={`rotate(${percent*1.8-90} 50 43)`}><path d="M 47.8 16 L 50 8 L 52.2 16 Z" fill={color} className="achievementPointer"/></g>}
-        <text x="50" y="47" textAnchor="middle">{value}</text>
-      </svg>
-      <span className="achievementCaption">{caption}</span>
+      <span className="achievementProgressTop"><span>{label==='Overall Achievement'?'Overall Achievement':'Achievement'}</span><strong>{value}</strong></span>
+      <span className="achievementProgressTrack" aria-hidden="true"><span style={{width:(available?percent:0)+'%'}}/></span>
+      <span className="achievementProgressCaption">{caption}</span>
     </button>
     {open&&createPortal(<div className="achievementBackdrop" onClick={e=>{e.stopPropagation();setOpen(false)}} onKeyDown={e=>e.stopPropagation()}>
       <section className="achievementDialog" role="dialog" aria-modal="true" aria-labelledby={id} onClick={e=>e.stopPropagation()}>
