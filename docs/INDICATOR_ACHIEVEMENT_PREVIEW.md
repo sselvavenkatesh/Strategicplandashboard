@@ -49,3 +49,5 @@ The Vercel frontend preview deployed successfully on the isolated branch. Direct
 Supabase security advisors reported no finding for the new preview table or RPC. Existing normalized-view/security-definer and authentication-function findings remain outside this feature's scope; the production view and authorization functions were not altered. The new function itself is SECURITY INVOKER and does not add privileged execution.
 
 The separate API V1 project also attempts to build this frontend branch automatically and fails because this branch does not contain its api-v1 root. That failed preview does not replace its production deployment and is not needed for the gauge feature. The frontend preview uses the existing Supabase connection.
+
+Final desktop checks: 1363px viewport, no horizontal overflow, all full goal titles visible, five expected scores, seven target details, keyboard close/focus restoration and both themes. Final heading reservation is 90px to align descriptions and chart rows across the four cards. Mobile responsive styles are implemented but a mobile-sized browser session was unavailable; mobile visual QA remains unverified.
