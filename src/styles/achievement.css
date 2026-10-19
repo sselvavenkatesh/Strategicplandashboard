@@ -6,15 +6,17 @@
 .summaryPage .achievementGoalHeading>div{min-width:0;flex:1}
 .summaryPage .achievementGoalHeading small{font-size:10px;color:var(--muted)}
 .summaryPage .summaryGoal .achievementGoalHeading h2{height:auto;min-height:36px;margin:3px 0;font-size:17px;line-height:1.18;overflow:visible;overflow-wrap:normal}
-.achievementGauge{width:88px;flex:0 0 88px;display:flex;flex-direction:column;align-items:center;padding:0;border:0;background:transparent;color:var(--text);cursor:pointer;line-height:1.2;border-radius:5px}
+.achievementGauge{width:78px;flex:0 0 78px;display:flex;flex-direction:column;align-items:center;padding:0;border:0;background:transparent;color:var(--text);cursor:pointer;line-height:1.2;border-radius:5px}
 .achievementGauge:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 .achievementGauge:disabled{cursor:default}
 .achievementGaugeLabel{font-size:8px;white-space:nowrap;color:var(--muted);letter-spacing:0!important}
-.achievementGauge svg{width:80px;height:48px;display:block;overflow:visible;margin-top:2px}
-.achievementTrack,.achievementArc{fill:none;stroke-width:7;stroke-linecap:round}
-.achievementTrack{stroke:var(--gray)}
-.achievementGauge text{font-size:19px;font-weight:750;fill:var(--text)}
-.achievementCaption{font-size:8px!important;letter-spacing:0!important;color:var(--muted);white-space:nowrap;margin-top:2px}
+.achievementGauge svg{width:72px;height:46px;display:block;overflow:visible;margin-top:3px}
+.achievementTrack,.achievementArc{fill:none;stroke-width:5.5;stroke-linecap:round}
+.achievementTrack{stroke:var(--gray);opacity:.65}
+.achievementPointer{stroke:var(--panel);stroke-width:1;stroke-linejoin:round}
+.achievementGauge text{font-size:18px;font-weight:750;fill:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+.achievementCaption{font-size:8px!important;letter-spacing:0!important;color:var(--muted);white-space:nowrap;margin-top:-6px}
+.summaryHeading .achievementGauge{width:96px;flex-basis:96px}
 .achievementBackdrop{position:fixed;inset:0;z-index:1500;background:#02070dcc;display:grid;place-items:center;padding:16px}
 .achievementDialog{position:relative;width:min(660px,100%);max-height:85vh;overflow:auto;padding:24px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 70px #0006}
 .achievementDialog h2{font-size:21px;margin:0 30px 8px 0}
@@ -30,5 +32,5 @@
 .achievementDialog tbody small{display:block;font-size:9px;font-weight:400;color:var(--muted);margin-top:4px}
 .achievementDialog .achieved{color:var(--green)}
 .achievementDialog .achievementExplanation{font-size:10px;margin-bottom:0}
-@media(min-width:851px) and (max-width:1150px){.summaryPage .achievementGoalHeading{gap:5px}.summaryPage .summaryGoal .achievementGoalHeading h2{font-size:15px}.achievementGoalHeading .achievementGauge{width:76px;flex-basis:76px}.achievementGoalHeading .achievementGauge svg{width:70px}}
-@media(max-width:650px){.summaryHeading .achievementHeadingRight{gap:8px}.achievementHeadingRight>span{display:none}.summaryHeading .achievementGauge{width:106px;flex-basis:106px}.summaryPage .summaryGoal .achievementGoalHeading h2{font-size:17px}.achievementDialog{padding:18px}.achievementDialog table{font-size:10px}}
+@media(min-width:851px) and (max-width:1150px){.summaryPage .achievementGoalHeading{gap:5px}.summaryPage .summaryGoal .achievementGoalHeading h2{font-size:15px}.achievementGoalHeading .achievementGauge{width:72px;flex-basis:72px}.achievementGoalHeading .achievementGauge svg{width:68px}}
+@media(max-width:650px){.summaryHeading .achievementHeadingRight{gap:8px}.achievementHeadingRight>span{display:none}.summaryHeading .achievementGauge{width:96px;flex-basis:96px}.summaryPage .summaryGoal .achievementGoalHeading h2{font-size:17px}.achievementDialog{padding:18px}.achievementDialog table{font-size:10px}}

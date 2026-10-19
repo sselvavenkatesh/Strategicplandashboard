@@ -31,11 +31,12 @@ export function AchievementGauge({label,score,indicators,loading=false,error=''}
       title={tooltip} aria-haspopup="dialog" aria-expanded={open} disabled={loading||!!error}
       onClick={e=>{e.stopPropagation();setOpen(true)}} onKeyDown={e=>e.stopPropagation()}>
       <span className="achievementGaugeLabel">{label==='Overall Achievement'?'Overall Achievement':'Achievement'}</span>
-      <svg viewBox="0 0 100 60" aria-hidden="true">
-        <path d="M 9 49 A 41 41 0 0 1 91 49" className="achievementTrack"/>
-        {available&&<path d="M 9 49 A 41 41 0 0 1 91 49" pathLength="100" stroke={color} strokeDasharray={`${percent} 100`} className="achievementArc"/>}
-        {available&&<g transform={`rotate(${percent*1.8-90} 50 49)`}><path d="M 48 43 L 50 14 L 52 43 Z" fill={color}/></g>}
-        <text x="50" y="55" textAnchor="middle">{value}</text>
+      <svg viewBox="0 0 100 64" aria-hidden="true">
+        <path d="M 12 43 A 38 38 0 0 1 88 43" className="achievementTrack"/>
+        {available&&percent>0&&<path d="M 12 43 A 38 38 0 0 1 88 43" pathLength="100" stroke={color} strokeDasharray={`${percent} 100`} className="achievementArc"/>}
+        {/* A short rim pointer keeps the entire centre clear, including 0% and 100%. */}
+        {available&&<g transform={`rotate(${percent*1.8-90} 50 43)`}><path d="M 47.8 16 L 50 8 L 52.2 16 Z" fill={color} className="achievementPointer"/></g>}
+        <text x="50" y="47" textAnchor="middle">{value}</text>
       </svg>
       <span className="achievementCaption">{caption}</span>
     </button>

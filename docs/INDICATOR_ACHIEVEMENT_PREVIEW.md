@@ -51,3 +51,7 @@ Supabase security advisors reported no finding for the new preview table or RPC.
 The separate API V1 project also attempts to build this frontend branch automatically and fails because this branch does not contain its api-v1 root. That failed preview does not replace its production deployment and is not needed for the gauge feature. The frontend preview uses the existing Supabase connection.
 
 Final desktop checks: 1363px viewport, no horizontal overflow, all full goal titles visible, five expected scores, seven target details, keyboard close/focus restoration and both themes. Final heading reservation is 90px to align descriptions and chart rows across the four cards. Mobile responsive styles are implemented but a mobile-sized browser session was unavailable; mobile visual QA remains unverified.
+
+## Compact gauge refinement
+
+The gauge uses a shorter pointer at the inner rim, a slimmer arc and a smaller footprint (78px goal control, 72px dial). The percentage has its own clear centre area; pointer geometry stays outside the text at 0%, 50% and 100%. No centre stem passes through the value. Zero percent draws no colored progress dot. Existing achievement calculations, target data, dialog, and production deployment are unchanged.
