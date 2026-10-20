@@ -22,7 +22,7 @@ export function AchievementProgress({label,score,indicators,loading=false,error=
   const percent=score?.percent??null;
   const available=!loading&&!error&&percent!=null;
   const value=loading?'…':available?`${Math.round(percent)}%`:'N/A';
-  const caption=loading?'Loading…':error?'Unavailable':score?.eligible?`${score.achieved} of ${score.eligible} achieved`:'No targets available';
+  const caption=loading?'Loading…':error?'Unavailable':score?.eligible?`${score.achieved} of ${score.eligible} ${score.eligible===1?'indicator':'indicators'} achieved`:'No targets available';
   const details=indicators.map(k=>`${k.name} (${k.year||'No year'}): Actual ${k.actual??'N/A'}; Target ${k.target??'N/A'}; ${k.achieved==null?k.reason:k.achieved?'Achieved':'Not achieved'}${k.nature==='Negative'?' (lower is better)':''}`).join('\n');
   const tooltip=`${label}: ${value}. ${caption}.${score?.excluded?` ${score.excluded} indicators excluded.`:''}\n${details}`;
   return <>
