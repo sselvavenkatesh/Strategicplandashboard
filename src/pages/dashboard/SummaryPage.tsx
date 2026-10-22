@@ -2,6 +2,8 @@ import {useEffect,useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {getGoals,getIndicators,getInitiatives,getProfile,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
+import {AchievementProgress} from '../../components/AchievementProgress';
+import {getAchievementSummary} from '../../lib/achievement';
 
 type Bundle={goal:Goal;indicators:Indicator[];initiatives:Initiative[]};
 const goalImages=[
@@ -18,18 +20,21 @@ function summaryIndicatorValue(k:Indicator){
 }
 
 export function SummaryPage(){
+ const achievement=useDashboard(getAchievementSummary);
  const nav=useNavigate(),goals=useDashboard(getGoals),profile=useDashboard(getProfile),[bundles,setBundles]=useState<Bundle[]>([]),[err,setErr]=useState('');
  useEffect(()=>{if(!goals.data)return;Promise.all(goals.data.map(async goal=>({goal,indicators:await getIndicators(goal.id),initiatives:await getInitiatives(goal.id)}))).then(setBundles).catch(e=>setErr(e.message))},[goals.data]);
  if(goals.loading||profile.loading||(!bundles.length&&!err))return <main className="page state">Loading strategic plan summary…</main>;
  if(goals.error||profile.error||err)return <main className="page state error">{goals.error||profile.error||err}</main>;
  return <main className="page summaryPage">
-  <div className="summaryHeading"><div><small>{profile.data?.planName||'Strategic Plan'}{profile.data?.duration?` · ${profile.data.duration}`:''}</small><h1>Goal Summary</h1></div><span>{bundles.length} Goals</span></div>
+  <div className="summaryHeading"><div><small>{profile.data?.planName||'Strategic Plan'}{profile.data?.duration?` · ${profile.data.duration}`:''}</small><h1>Goal Summary</h1></div><div className="achievementHeadingRight"><AchievementProgress label="Overall Achievement" score={achievement.data?.overall??null} indicators={achievement.data?.goals.flatMap(g=>g.indicators)??[]} loading={achievement.loading} error={achievement.error}/><span>{bundles.length} Goals</span></div></div>
   <section className="summaryGrid">{bundles.map(({goal,indicators,initiatives},idx)=>{
+   const goalAchievement=achievement.data?.goals.find(g=>g.goalId===goal.id);
    const all=initiatives.reduce((a,x)=>({d:a.d+x.done,p:a.p+x.inProgress,n:a.n+x.notStarted}),{d:0,p:0,n:0}),total=all.d+all.p+all.n;
    const pct=(n:number)=>total?Math.round(100*n/total):0;
    return <article className="summaryGoal" key={goal.id} onClick={()=>nav('/goals/'+goal.id)} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')nav('/goals/'+goal.id)}}>
     <div className="goalImage" style={{backgroundImage:`url(${goalImages[idx%goalImages.length]})`}} role="img" aria-label={goal.name}/>
     <div className="summaryBody"><small>Goal {idx+1}</small><h2>{goal.name}</h2><p className="clamp3" title={goal.description}>{goal.description}</p>
+     <AchievementProgress label={`Goal ${idx+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/>
      <div className="sectionLabel"><b>Key Initiatives</b><span>View All →</span></div>
      {total?<><div className="stack" aria-label={`Initiative progress: ${pct(all.d)}% Done, ${pct(all.p)}% In Progress, ${pct(all.n)}% Not Yet Started`}>
        <i className="done" title={`Done: ${pct(all.d)}% (${all.d} actions)`} style={{width:pct(all.d)+'%'}}>{pct(all.d)>11?<span>{pct(all.d)}%</span>:null}</i>

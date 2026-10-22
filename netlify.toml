@@ -8,6 +8,9 @@
 [context.production]
   branch = "react-dashboard"
 
+[context.production.environment]
+  VITE_ACHIEVEMENT_PREVIEW = "false"
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -15,8 +18,24 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
 
 
+# Stable HTML proxy destination: avoid directory-index canonical redirects.
+[[redirects]]
+  from = "/strategic-plan-demo"
+  to = "/strategic-plan-demo.html"
+  status = 200
+
+# Prefixed demo routes must load the matching build on refresh.
+[[redirects]]
+  from = "/strategic-plan/demo/*"
+  to = "/strategic-plan/demo/index.html"
+  status = 200
+
 # SPA fallback: allow direct URLs such as /superadmin to load the React application.
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Isolated demonstration targets are enabled only for this preview branch.
+[context."preview/indicator-achievement-20261019".environment]
+  VITE_ACHIEVEMENT_PREVIEW = "true"

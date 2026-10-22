@@ -1,0 +1,52 @@
+/* Scoped addition: existing page and chart styles remain untouched. */
+.summaryHeading .achievementHeadingRight{display:flex;align-items:center;gap:22px;flex:none}
+.achievementHeadingRight>span{font-size:12px;color:var(--muted);white-space:nowrap}
+.summaryPage .summaryGoal .summaryBody>h2{height:auto;min-height:42px;line-height:1.2;overflow:visible}
+.achievementProgress{width:100%;display:flex;flex-direction:column;gap:4px;padding:0;margin:8px 0 10px;border:0;background:transparent;color:var(--text);text-align:left;cursor:pointer;line-height:1.2;border-radius:4px}
+.achievementProgress:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
+.achievementProgress:disabled{cursor:default}
+.achievementProgressTop{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:10px;letter-spacing:0!important}
+.achievementProgressTop strong{color:var(--text);font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
+.achievementProgressTrack{display:block;width:100%;height:4px;border-radius:999px;background:var(--gray);overflow:hidden}
+.achievementProgressTrack>span{display:block;height:100%;background:var(--blue);border-radius:inherit}
+.achievementProgressCaption{font-size:8px!important;letter-spacing:0!important;color:var(--muted)}
+.achievementProgress:hover .achievementProgressTop>span{color:var(--blue)}
+.summaryHeading .achievementProgress{width:168px;flex:0 0 168px;margin:0 0 3px}
+.achievementBackdrop{position:fixed;inset:0;z-index:1500;background:#02070dcc;display:grid;place-items:center;padding:16px}
+.achievementDialog{position:relative;width:min(660px,100%);max-height:85vh;overflow:auto;padding:24px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 70px #0006}
+.achievementDialog h2{font-size:21px;margin:0 30px 8px 0}
+.achievementDialog p{font-size:12px;color:var(--muted);line-height:1.5}
+.achievementDialog p strong{font-size:19px;color:var(--text)}
+.achievementClose{position:absolute;right:12px;top:10px;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:var(--panel2);color:var(--text);font-size:22px;cursor:pointer}
+.achievementTableWrap{overflow-x:auto;margin-top:18px}
+.achievementDialog table{border-collapse:collapse;width:100%;font-size:11px;text-align:left}
+.achievementDialog th,.achievementDialog td{padding:10px 7px;border-bottom:1px solid var(--line)}
+.achievementDialog td{white-space:nowrap}
+.achievementDialog thead{color:var(--muted)}
+.achievementDialog tbody th{font-weight:600;min-width:140px}
+.achievementDialog tbody small{display:block;font-size:9px;font-weight:400;color:var(--muted);margin-top:4px}
+.achievementDialog .achieved{color:var(--green)}
+.achievementDialog .achievementExplanation{font-size:10px;margin-bottom:0}
+@media(max-width:650px){.summaryHeading .achievementHeadingRight{gap:8px}.achievementHeadingRight>span{display:none}.summaryHeading .achievementProgress{width:132px;flex-basis:132px}.summaryHeading .achievementProgressTop{font-size:9px}.achievementDialog{padding:18px}.achievementDialog table{font-size:10px}}
+
+/* Goal-page additions: retain existing chart/card and modal styles. */
+.goalPage .goalHero{gap:24px}
+.goalPage .goalHeroCopy{flex:1;min-width:0}
+.goalPage .goalHeroActions>.achievementProgress{width:168px;flex:0 0 168px;margin:0 12px 0 0}
+.goalPage .goalIndicatorCard .indicatorTitleWithTarget{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px}
+.goalPage .goalIndicatorCard .indicatorIntro .indicatorTitleWithTarget h4{flex:1;min-width:0;margin:0}
+.goalPage .indicatorTargetBadge{display:inline-flex;align-items:center;gap:5px;flex:none;font-size:9px;color:var(--muted);white-space:nowrap;line-height:1.2;cursor:help}
+.goalPage .indicatorTargetBadge b{color:var(--text);font-weight:650}
+.goalPage .indicatorTargetDot{display:inline-block;width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:var(--gray)}
+.goalPage .indicatorTargetDot.met{background:#32d18a}
+.goalPage .indicatorTargetDot.unmet{background:#f07878}
+@media(max-width:700px){.goalPage .goalHero{flex-wrap:wrap;gap:12px}.goalPage .goalHeroCopy{flex-basis:100%}.goalPage .goalHeroActions{width:100%}.goalPage .goalHeroActions>.achievementProgress{width:150px;flex:1;max-width:180px;margin-right:auto}.goalPage .indicatorTargetBadge{font-size:9px}}
+
+/* Indicator popup actual/target scorecard. Both values share currentKpi's font. */
+.indicatorModal .currentKpi.currentKpiWithTarget{width:auto;max-width:none;display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(90px,1fr) minmax(130px,1fr) minmax(100px,.7fr);gap:20px;align-items:center}
+.indicatorModal .currentKpiWithTarget .popupKpiMetric{min-width:0;gap:4px}
+.indicatorModal .currentKpiWithTarget .popupKpiMetric>b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.indicatorModal .currentKpiWithTarget .popupAchievementStatus{display:flex;flex-direction:row;align-items:center;gap:8px}
+.indicatorModal .currentKpiWithTarget .indicatorTargetDot{width:11px;height:11px;flex-basis:11px}
+.indicatorModal .currentKpiWithTarget .popupAchievementStatus>span{font-size:11px;font-weight:600;color:var(--muted)}
+@media(max-width:700px){.indicatorModal .currentKpi.currentKpiWithTarget{grid-template-columns:1fr 1fr;gap:12px}.indicatorModal .currentKpiWithTarget .popupKpiContext,.indicatorModal .currentKpiWithTarget .popupAchievementStatus{grid-column:1/-1}.indicatorModal .currentKpiWithTarget .popupKpiMetric>b{font-size:20px}}
