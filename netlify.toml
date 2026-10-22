@@ -8,8 +8,9 @@
 [context.production]
   branch = "react-dashboard"
 
+# Public demo uses the same isolated targets and AI service as the approved preview.
 [context.production.environment]
-  VITE_ACHIEVEMENT_PREVIEW = "false"
+  VITE_ACHIEVEMENT_PREVIEW = "true"
 
 [[headers]]
   for = "/*"
