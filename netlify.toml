@@ -8,6 +8,9 @@
 [context.production]
   branch = "react-dashboard"
 
+[context.production.environment]
+  VITE_ACHIEVEMENT_PREVIEW = "false"
+
 [[headers]]
   for = "/*"
   [headers.values]
