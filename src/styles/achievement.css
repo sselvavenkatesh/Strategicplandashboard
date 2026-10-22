@@ -2,7 +2,6 @@
 .summaryHeading .achievementHeadingRight{display:flex;align-items:center;gap:22px;flex:none}
 .achievementHeadingRight>span{font-size:12px;color:var(--muted);white-space:nowrap}
 .summaryPage .summaryGoal .summaryBody>h2{height:auto;min-height:42px;line-height:1.2;overflow:visible}
-.summaryAchievementPreview{font-size:9px;color:var(--muted);margin:0 0 9px}
 .achievementProgress{width:100%;display:flex;flex-direction:column;gap:4px;padding:0;margin:8px 0 10px;border:0;background:transparent;color:var(--text);text-align:left;cursor:pointer;line-height:1.2;border-radius:4px}
 .achievementProgress:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
 .achievementProgress:disabled{cursor:default}

@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {getGoals,getIndicators,getInitiatives,getProfile,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 import {AchievementProgress} from '../../components/AchievementProgress';
-import {getAchievementSummary,previewTargets} from '../../lib/achievement';
+import {getAchievementSummary} from '../../lib/achievement';
 
 type Bundle={goal:Goal;indicators:Indicator[];initiatives:Initiative[]};
 const goalImages=[
@@ -27,7 +27,6 @@ export function SummaryPage(){
  if(goals.error||profile.error||err)return <main className="page state error">{goals.error||profile.error||err}</main>;
  return <main className="page summaryPage">
   <div className="summaryHeading"><div><small>{profile.data?.planName||'Strategic Plan'}{profile.data?.duration?` · ${profile.data.duration}`:''}</small><h1>Goal Summary</h1></div><div className="achievementHeadingRight"><AchievementProgress label="Overall Achievement" score={achievement.data?.overall??null} indicators={achievement.data?.goals.flatMap(g=>g.indicators)??[]} loading={achievement.loading} error={achievement.error}/><span>{bundles.length} Goals</span></div></div>
-  {previewTargets&&<p className="summaryAchievementPreview">Preview targets · Live district actuals</p>}
   <section className="summaryGrid">{bundles.map(({goal,indicators,initiatives},idx)=>{
    const goalAchievement=achievement.data?.goals.find(g=>g.goalId===goal.id);
    const all=initiatives.reduce((a,x)=>({d:a.d+x.done,p:a.p+x.inProgress,n:a.n+x.notStarted}),{d:0,p:0,n:0}),total=all.d+all.p+all.n;
