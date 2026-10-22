@@ -39,3 +39,7 @@
 # Isolated demonstration targets are enabled only for this preview branch.
 [context."preview/indicator-achievement-20261019".environment]
   VITE_ACHIEVEMENT_PREVIEW = "true"
+
+# Restore the reviewed demonstration data and services for Netlify PR #14 only.
+[context."preview/release-check-20261022".environment]
+  VITE_ACHIEVEMENT_PREVIEW = "true"

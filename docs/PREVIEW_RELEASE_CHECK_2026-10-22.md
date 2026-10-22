@@ -1,9 +1,11 @@
-# Strategic Plan release preview — 22 October 2026
+# Strategic Plan Netlify review — 22 October 2026
 
-Preview PR #14 checks release 2e5e317 with unchanged application code, dependencies and build configuration.
+PR #14 uses release 2e5e317 application source. Netlify GitHub access has been restored and the preview builds successfully.
 
-The product owner has now granted the Netlify GitHub App access to Strategicplandashboard. This documentation update sends a fresh preview-branch event to test that connection. It does not update react-dashboard or authorize production publication.
+The new review branch initially omitted the branch-specific VITE_ACHIEVEMENT_PREVIEW setting. It therefore read empty production targets instead of the existing Indicator_Target_Preview data. Read-only database checks confirm preview totals: 7 eligible, 4 achieved, 57.1%; production totals: 7 excluded, no eligible targets.
 
-Verify the Netlify deployment commit, root and /strategic-plan/demo routes, asset loading, Summary and Goal navigation, indicator popups, AI answer labels, both themes and mobile layout. Report authentication and browser-verification limitations explicitly. Production target and AI behavior are documented in PRODUCTION_RELEASE_2026-10-22.md.
+netlify.toml now enables the existing preview mode for preview/release-check-20261022 only, matching the earlier indicator-achievement preview. This mode also uses the existing district-ai-preview endpoint, as implemented in src/lib/ai.ts. Production still explicitly uses VITE_ACHIEVEMENT_PREVIEW=false; no database data or functions are changed.
 
-Production remains on hold pending successful Netlify preview verification and product-owner review. Do not merge this PR.
+This PR is for demonstration review and must not be merged or published to production without resolving how demonstration targets should be treated for the eventual public demo. A production build with the existing production targets will show N/A.
+
+Netlify preview requires team sign-in. Build, routing and API checks are distinct from browser visual verification; do not claim visual verification without completing it.
