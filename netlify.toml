@@ -15,6 +15,12 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
 
 
+# Stable HTML proxy destination: avoid directory-index canonical redirects.
+[[redirects]]
+  from = "/strategic-plan-demo"
+  to = "/strategic-plan-demo.html"
+  status = 200
+
 # Prefixed demo routes must load the matching build on refresh.
 [[redirects]]
   from = "/strategic-plan/demo/*"

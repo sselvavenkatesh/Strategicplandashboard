@@ -1,7 +1,20 @@
 {
   "rewrites": [
-    {"source": "/strategic-plan/demo", "destination": "/strategic-plan/demo/index.html"},
-    {"source": "/strategic-plan/demo/(.*)", "destination": "/strategic-plan/demo/index.html"},
-    {"source": "/(.*)", "destination": "/index.html"}
+    {
+      "source": "/strategic-plan-demo",
+      "destination": "/strategic-plan-demo.html"
+    },
+    {
+      "source": "/strategic-plan/demo",
+      "destination": "/strategic-plan/demo/index.html"
+    },
+    {
+      "source": "/strategic-plan/demo/(.*)",
+      "destination": "/strategic-plan/demo/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
