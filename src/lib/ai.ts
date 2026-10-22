@@ -22,7 +22,8 @@ export async function isAiEnabled(){
 export async function askDistrictAi(question:string,sessionId:string):Promise<AiAnswer>{
   // Load labels alongside the AI request; this does not add a request per turn.
   const labels=getIndicatorLabels();
-  const{data,error}=await supabase.functions.invoke('district-ai',{body:{question,sessionId}});
+  const functionName=import.meta.env.VITE_ACHIEVEMENT_PREVIEW==='true'?'district-ai-preview':'district-ai';
+  const{data,error}=await supabase.functions.invoke(functionName,{body:{question,sessionId}});
   if(error)throw new Error(error.message||'AI service is unavailable.');
   const result=data as AiAnswer;
   return {...result,answer:formatIndicatorReferences(result.answer,await labels)};
