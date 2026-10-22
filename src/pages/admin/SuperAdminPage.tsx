@@ -45,7 +45,7 @@ export function SuperAdminPage(){
  }
  function logout(){sessionStorage.removeItem('strategic_superadmin');sessionStorage.removeItem('strategic_superadmin_token');setAuthenticated(false)}
  if(!authenticated)return <main className="superAdminLogin"><form className="superAdminLoginCard" onSubmit={login}>
-  <img src="/k12matrix-logo.svg" alt="K12Matrix"/><small className="superAdminAccessLabel">SUPER ADMIN ACCESS</small><h1>Sign In</h1><p>Manage district strategic plan configuration and reporting data.</p>
+  <img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/><small className="superAdminAccessLabel">SUPER ADMIN ACCESS</small><h1>Sign In</h1><p>Manage district strategic plan configuration and reporting data.</p>
   <label>Email</label><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter SuperAdmin email"/>
   <label>Password</label><input type="password" required value={password} onChange={e=>setPassword(e.target.value)}/>
   {error&&<div className="superAdminError">{error}</div>}<button disabled={busy}>{busy?'Signing in…':'Sign In'}</button>
@@ -75,7 +75,7 @@ export function SuperAdminPage(){
  const pagedInitiatives=initiatives.slice((initiativePage-1)*initiativePageSize,initiativePage*initiativePageSize);
  const data=section==='indicators'?pagedIndicators:pagedInitiatives;
  return <div className="superAdmin">{toast&&<div className={`adminToast ${toast.type}`}>{toast.text}</div>}{pendingDeleteGoals.length>0&&<div className="adminModalBackdrop"><div className="adminConfirmModal" role="dialog" aria-modal="true" aria-labelledby="delete-goal-title"><h3 id="delete-goal-title">Delete Goal?</h3><p>You are about to permanently delete <b>{pendingDeleteGoals[0]?.['Goal Name']}</b>. This action cannot be undone.</p><div className="modalActions"><button type="button" className="modalCancel" onClick={cancelGoalDeletion}>Cancel</button><button type="button" className="modalDelete" onClick={confirmGoalDeletion} disabled={busy}>{busy?'Deleting…':'Delete Goal'}</button></div></div></div>}
-  <aside className="superAdminSide"><div className="superAdminBrand"><img src="/k12matrix-logo.svg" alt="K12Matrix"/><div><b>Strategic Plan</b><span>Super Admin</span></div></div>
+  <aside className="superAdminSide"><div className="superAdminBrand"><img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/><div><b>Strategic Plan</b><span>Super Admin</span></div></div>
    <nav>{menu.map(x=>{const Icon=x.icon;return <button key={x.id} className={section===x.id?'active':''} onClick={()=>setSection(x.id)}><Icon size={17}/><span>{x.label}</span></button>})}</nav>
    <button className="superAdminLogout" onClick={logout}><LogOut size={16}/> Sign Out</button>
   </aside>

@@ -1,3 +1,7 @@
 {
-  "rewrites": [{"source": "/(.*)", "destination": "/index.html"}]
+  "rewrites": [
+    {"source": "/strategic-plan/demo", "destination": "/strategic-plan/demo/index.html"},
+    {"source": "/strategic-plan/demo/(.*)", "destination": "/strategic-plan/demo/index.html"},
+    {"source": "/(.*)", "destination": "/index.html"}
+  ]
 }

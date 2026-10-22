@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --base=/strategic-plan/demo/ --outDir=dist/strategic-plan/demo",
     "lint": "eslint .",
     "preview": "vite preview"
   },
