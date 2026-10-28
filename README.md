@@ -72,3 +72,7 @@ Release separation is explicit: **V2.2 remains the frozen non-AI release; V2.3 i
 ## V2.4 — Responsive Branding Maintenance Release
 
 V2.4 is a focused UI maintenance release based on V2.3. It preserves existing dashboard and AI functionality while correcting two branding issues: the Powered By K12Matrix header treatment remains visible and responsive on mobile, and the canonical K12Matrix dark/light SVG assets include additional spacing between “K12” and “Matrix” to prevent glyph overlap on some laptop/browser rendering combinations.
+
+## V2.5 — Admin and stakeholder UI preview
+
+V2.5 development is isolated on `v2.5-ui`. The first review introduces stakeholder assignments and assigned Admin workspaces using existing district data with browser-tab-only edits. Production remains unchanged. See [V2.5 UI review](docs/V2.5_UI_REVIEW.md) for routes, access rules, validation and the subsequent FastAPI implementation scope.

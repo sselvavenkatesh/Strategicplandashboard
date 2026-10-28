@@ -44,3 +44,8 @@
 # Restore the reviewed demonstration data and services for Netlify PR #14 only.
 [context."preview/release-check-20261022".environment]
   VITE_ACHIEVEMENT_PREVIEW = "true"
+
+# V2.5 UI review only. The production branch and its configuration are unchanged.
+[context."v2.5-ui".environment]
+  VITE_V25_UI_PREVIEW = "true"
+  VITE_ACHIEVEMENT_PREVIEW = "true"
