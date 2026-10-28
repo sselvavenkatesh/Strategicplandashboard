@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Link, useLocation, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, ChevronRight, ClipboardList, Eye, FlaskConical, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Users} from 'lucide-react';
+import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, ChevronRight, ClipboardList, Eye, FlaskConical, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Trash2, Users} from 'lucide-react';
 import {useTheme} from '../../../app/ThemeProvider';
 import {accessibleRows, emptyAssignments, idColumn, loadDataset, stakeholders, text} from './model';
 import type {Assignments, DataRow, Dataset, Kind} from './model';
@@ -9,12 +9,15 @@ import {DataEditor} from './DataEditor';
 import {MasterEditor} from './MasterEditor';
 import {MasterTable} from './MasterTable';
 import {DataUpload} from './DataUpload';
+import {DistrictLogoControl, GoalCountControl} from './DistrictControls';
+import {DeleteGoalDialog} from './DeleteGoalDialog';
+import {goalDependencies, increaseGoalCount, validateGoalNames} from './goalConfiguration';
 import './v25.css';
 
 type Section = 'home' | 'plan' | 'indicators' | 'initiatives';
 const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}] as const;
 const draftKey = 'strategic-v25-ui-draft-v1';
-type Draft = {assignments: Assignments; indicatorEdits: Record<string, DataRow>; initiativeEdits: Record<string, DataRow>; profile?: DataRow; goals?: DataRow[]; indicatorMasters?: DataRow[]; initiativeMasters?: DataRow[]};
+type Draft = {assignments: Assignments; indicatorEdits: Record<string, DataRow>; initiativeEdits: Record<string, DataRow>; profile?: DataRow; goals?: DataRow[]; indicatorMasters?: DataRow[]; initiativeMasters?: DataRow[]; nextGoalNumber?: number};
 function newDraft(): Draft {return {assignments: emptyAssignments(), indicatorEdits: {}, initiativeEdits: {}}}
 function readDraft(): Draft {
   try {const saved = JSON.parse(sessionStorage.getItem(draftKey) || 'null'); return saved?.assignments?.goals && saved?.assignments?.indicators && saved?.assignments?.initiatives ? {...newDraft(), ...saved} : newDraft()} catch {return newDraft()}
@@ -32,6 +35,8 @@ export default function V25AdminPage() {
   const [retry, setRetry] = useState(0);
   const [draft, setDraft] = useState<Draft>(readDraft);
   const [notice, setNotice] = useState('');
+  const [configurationError, setConfigurationError] = useState('');
+  const [pendingDeleteGoal, setPendingDeleteGoal] = useState<DataRow | null>(null);
   const [masterEditing, setMasterEditing] = useState<{kind: 'indicators' | 'initiatives'; row: DataRow; isNew: boolean} | null>(null);
   const requestedTab = params.get('tab');
   const planTab = requestedTab === 'goals' ? 'goals' : 'district';
@@ -69,6 +74,35 @@ export default function V25AdminPage() {
   function assign(kind: Kind, id: string, value: string[]) {setDraft(previous => ({...previous, assignments: {...previous.assignments, [kind]: {...previous.assignments[kind], [id]: value}}}))}
   function updateProfile(field: string, value: string) {setDraft(previous => ({...previous, profile: {...(previous.profile ?? dataset?.profile), [field]: value}}))}
   function updateGoal(index: number, field: string, value: string) {setDraft(previous => ({...previous, goals: (previous.goals ?? dataset?.goals ?? []).map((row, i) => i === index ? {...row, [field]: value} : row)}))}
+  function changeGoalCount(count: number) {
+    if (!superAdmin) return;
+    try {
+      const result = increaseGoalCount(goals, count, draft.nextGoalNumber);
+      setDraft(previous => ({...previous, ...result, profile: {...(previous.profile ?? dataset?.profile), 'Total Goals': result.goals.length}}));
+      setConfigurationError('');
+      if (count > goals.length) {setParams({section: 'plan', tab: 'goals'}); setNotice(`${count - goals.length} goal(s) added locally.`)}
+    } catch (reason) {setConfigurationError(reason instanceof Error ? reason.message : 'Check the goal count.')}
+  }
+  function saveConfiguration() {
+    try {validateGoalNames(goals); setConfigurationError(''); setNotice('Saved locally.')}
+    catch (reason) {setConfigurationError(reason instanceof Error ? reason.message : 'Check the goals.')}
+  }
+  function deleteGoal() {
+    if (!superAdmin || !pendingDeleteGoal || goals.length <= 1) return;
+    const id = text(pendingDeleteGoal, 'Goal ID');
+    if (getGoalDependencies(id).total) return;
+    const remaining = goals.filter(goal => goal['Goal ID'] !== id);
+    const ownership = {...assignments.goals}; delete ownership[id];
+    setDraft(previous => ({...previous, goals: remaining, profile: {...(previous.profile ?? dataset?.profile), 'Total Goals': remaining.length}, assignments: {...previous.assignments, goals: ownership}}));
+    setPendingDeleteGoal(null); setConfigurationError(''); setNotice('Goal deleted locally.');
+  }
+  function getGoalDependencies(id: string) {
+    const indicatorData = [...(dataset?.indicatorData ?? []), ...Object.values(draft.indicatorEdits)];
+    const initiativeData = [...(dataset?.initiativeData ?? []), ...Object.values(draft.initiativeEdits)];
+    // Edits retain the source key; avoid counting the same reporting row twice.
+    const distinct = (rows: DataRow[]) => [...new Map(rows.map(row => [text(row, '__previewKey'), row])).values()];
+    return goalDependencies(id, allIndicators, allInitiatives, distinct(indicatorData), distinct(initiativeData));
+  }
   function exampleAssignments() {
     setDraft(previous => ({...previous, assignments: {goals: {G1: ['6', '7'], G2: ['8'], G3: ['9'], G4: ['10']}, indicators: {ID1: ['6']}, initiatives: {IN1: ['6']}}}));
     setNotice('Example assignments loaded in this tab. John has explicit access; Sarah inherits Goal 1 access.');
@@ -119,15 +153,16 @@ export default function V25AdminPage() {
 
       </>}
       {section === 'plan' && <>
+        {configurationError && <p className="v25-inline-error" role="alert">{configurationError}</p>}
         <div className="v25-section-tabs" role="group" aria-label="Strategic Plan sections"><button aria-pressed={planTab === 'district'} onClick={() => selectTab('district')}>District & Strategic Plan</button><button aria-pressed={planTab === 'goals'} onClick={() => selectTab('goals')}>{superAdmin ? 'Goal Master' : 'Assigned Goals'} <span>{visibleGoals.length}</span></button></div>
         {planTab === 'district' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>District & Strategic Plan</h2></div>{!superAdmin && <span className="v25-badge"><Eye size={14}/> View only</span>}</div>
-          <div className="v25-form-grid">{['School District Name', 'Strategic Plan Name', 'Strategic Plan Duration', 'Admin Signin Method', 'Mission Statement', 'Vision Statement'].map(field => <label key={field} className="">{field}{field.endsWith('Statement') ? <textarea readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/> : field === 'Admin Signin Method' && superAdmin ? <select value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}>{['Userbased', 'Google', 'Microsoft'].map(method => <option key={method}>{method}</option>)}</select> : <input readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/>}</label>)}</div>
-          {superAdmin && <div className="v25-panel-footer"><button className="v25-button primary v25-save" onClick={() => setNotice('Saved locally.')}><Check size={14}/> Save</button></div>}
+          <div className="v25-form-grid">{['School District Name', 'Strategic Plan Name', 'District Logo', 'Strategic Plan Duration', 'Total Goals', 'Admin Signin Method', 'Mission Statement', 'Vision Statement'].map(field => field === 'District Logo' ? <DistrictLogoControl key={field} logo={text(profile, field)} readOnly={!superAdmin} onChange={logo => updateProfile(field, logo)}/> : field === 'Total Goals' ? superAdmin ? <GoalCountControl key={field} count={goals.length} onChange={changeGoalCount} onError={setConfigurationError}/> : <label key={field}>Number of Goals<input readOnly value={goals.length}/></label> : <label key={field} className="">{field}{field.endsWith('Statement') ? <textarea readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/> : field === 'Admin Signin Method' && superAdmin ? <select value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}>{['Userbased', 'Google', 'Microsoft'].map(method => <option key={method}>{method}</option>)}</select> : <input readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/>}</label>)}</div>
+          {superAdmin && <div className="v25-panel-footer"><button className="v25-button primary v25-save" onClick={saveConfiguration}><Check size={14}/> Save</button></div>}
         </section>}
-        {planTab === 'goals' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{superAdmin ? 'Goal Master' : 'Assigned Goals'} <span className="v25-count">{visibleGoals.length}</span></h2></div>{superAdmin ? <span className="v25-badge"><Users size={14}/> Multiple stakeholders</span> : <span className="v25-badge"><Eye size={14}/> View only</span>}</div>
-          <div className="v25-goal-grid">{visibleGoals.map(goal => {const index = goals.indexOf(goal); const id = text(goal, 'Goal ID'); return <article className="v25-goal-card" key={id}><div className="v25-goal-card-head"><span className="v25-goal-number">{id}</span><span>{allIndicators.filter(row => row['Goal ID'] === id).length} indicators · {allInitiatives.filter(row => row['Goal ID'] === id).length} initiatives</span></div>{superAdmin ? <><label>Goal Name<input value={text(goal, 'Goal Name')} onChange={event => updateGoal(index, 'Goal Name', event.target.value)}/></label><label>Goal Description<textarea value={text(goal, 'Goal Description')} onChange={event => updateGoal(index, 'Goal Description', event.target.value)}/></label><div className="v25-stakeholder-field"><span>Stakeholder</span><StakeholderSelect label={`Stakeholder for ${text(goal, 'Goal Name')}`} value={assignments.goals[id] ?? []} onChange={value => assign('goals', id, value)}/></div></> : <><h3>{text(goal, 'Goal Name')}</h3><p>{text(goal, 'Goal Description')}</p><span className="v25-badge"><Check size={13}/> Assigned to you</span></>}</article>})}</div>
+        {planTab === 'goals' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{superAdmin ? 'Goal Master' : 'Assigned Goals'} <span className="v25-count">{visibleGoals.length}</span></h2></div>{superAdmin ? <GoalCountControl count={goals.length} onChange={changeGoalCount} onError={setConfigurationError}/> : <span className="v25-badge"><Eye size={14}/> View only</span>}</div>
+          <div className="v25-goal-grid">{visibleGoals.map(goal => {const index = goals.indexOf(goal); const id = text(goal, 'Goal ID'); return <article className="v25-goal-card" key={id}><div className="v25-goal-card-head"><span className="v25-goal-number">{id}</span><span>{allIndicators.filter(row => row['Goal ID'] === id).length} indicators · {allInitiatives.filter(row => row['Goal ID'] === id).length} initiatives</span>{superAdmin && <button type="button" className="v25-delete-goal" aria-label={`Delete ${text(goal, 'Goal Name') || id}`} onClick={() => setPendingDeleteGoal(goal)}><Trash2 size={12}/> Delete</button>}</div>{superAdmin ? <><label>Goal Name<input value={text(goal, 'Goal Name')} onChange={event => updateGoal(index, 'Goal Name', event.target.value)}/></label><label>Goal Description<textarea value={text(goal, 'Goal Description')} onChange={event => updateGoal(index, 'Goal Description', event.target.value)}/></label><div className="v25-stakeholder-field"><span>Stakeholder</span><StakeholderSelect label={`Stakeholder for ${text(goal, 'Goal Name')}`} value={assignments.goals[id] ?? []} onChange={value => assign('goals', id, value)}/></div></> : <><h3>{text(goal, 'Goal Name')}</h3><p>{text(goal, 'Goal Description')}</p><span className="v25-badge"><Check size={13}/> Assigned to you</span></>}</article>})}</div>
           {!visibleGoals.length && <Empty title="No goals assigned yet"/>}
-          {superAdmin && <div className="v25-panel-footer"><button className="v25-button primary v25-save" onClick={() => setNotice('Saved locally.')}><Check size={15}/> Save</button></div>}
+          {superAdmin && <div className="v25-panel-footer"><button className="v25-button primary v25-save" onClick={saveConfiguration}><Check size={15}/> Save</button></div>}
         </section>}
       </>}
       {(section === 'indicators' || section === 'initiatives') && <>
@@ -142,6 +177,7 @@ export default function V25AdminPage() {
       </div>
     </main></div>
     {masterEditing && superAdmin && <MasterEditor kind={masterEditing.kind} row={masterEditing.row} isNew={masterEditing.isNew} goals={goals} records={masterEditing.kind === 'indicators' ? allIndicators : allInitiatives} onClose={() => setMasterEditing(null)} onSave={saveMaster}/>}
+    {pendingDeleteGoal && superAdmin && <DeleteGoalDialog goal={pendingDeleteGoal} dependencies={getGoalDependencies(text(pendingDeleteGoal, 'Goal ID'))} lastGoal={goals.length <= 1} onClose={() => setPendingDeleteGoal(null)} onDelete={deleteGoal}/>}
     {notice && <div className="v25-toast" role="status"><Check size={18}/><span>{notice}</span><button className="v25-icon" aria-label="Dismiss notification" onClick={() => setNotice('')}>×</button></div>}
   </div>;
 }
