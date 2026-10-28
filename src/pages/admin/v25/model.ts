@@ -1,4 +1,5 @@
 import {supabase} from '../../../lib/supabase';
+import {apiGet, fastApiV25Enabled} from '../../../lib/api';
 
 export type DataRow = Record<string, string | number | null>;
 export type Kind = 'goals' | 'indicators' | 'initiatives';
@@ -53,6 +54,7 @@ function withPreviewKeys(rows: DataRow[]): DataRow[] {
 }
 
 export async function loadDataset(): Promise<Dataset> {
+  if(fastApiV25Enabled){const data=await apiGet<Dataset>('/api/v1/preview/dataset');return {...data,indicatorData:withPreviewKeys(data.indicatorData),initiativeData:withPreviewKeys(data.initiativeData)}}
   const [profiles, goals, indicators, initiatives, indicatorData, initiativeData, targets] = await Promise.all([
     readRows('District_Profile', '"School District Name","Strategic Plan Name","Strategic Plan Duration","Mission Statement","Vision Statement","District Logo","Admin Signin Method"', false),
     readRows('Goal_master', '"Goal ID","Goal Name","Goal Description","Total Indicators","Total Initiatives"'),

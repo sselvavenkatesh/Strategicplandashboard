@@ -3,7 +3,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
 // Load the pure access rules without initializing a network client.
-const source = readFileSync(new URL('../src/pages/admin/v25/model.ts', import.meta.url), 'utf8').replace("import {supabase} from '../../../lib/supabase';", 'const supabase = null;');
+const source = readFileSync(new URL('../src/pages/admin/v25/model.ts', import.meta.url), 'utf8').replace("import {supabase} from '../../../lib/supabase';", 'const supabase = null;').replace("import {apiGet, fastApiV25Enabled} from '../../../lib/api';", 'const fastApiV25Enabled = false; const apiGet = null;');
 const {outputText} = ts.transpileModule(source, {compilerOptions: {module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022}});
 const {accessibleRows, emptyAssignments} = await import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`);
 const rows = [

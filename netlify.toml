@@ -21,6 +21,19 @@
 
 # Stable HTML proxy destination: avoid directory-index canonical redirects.
 [[redirects]]
+  from = "/strategic-plan/demo/api/v1/*"
+  to = "https://k12matrix-strategicplan.vercel.app/api/v1/:splat"
+  status = 200
+  force = true
+
+# Existing public FastAPI service; preview routes never publish an API credential.
+[[redirects]]
+  from = "/api/v1/*"
+  to = "https://k12matrix-strategicplan.vercel.app/api/v1/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/strategic-plan-demo"
   to = "/strategic-plan-demo.html"
   status = 200
@@ -47,5 +60,7 @@
 
 # V2.5 UI review only. The production branch and its configuration are unchanged.
 [context."v2.5-ui".environment]
+  VITE_FASTAPI_ENABLED = "true"
+  VITE_FASTAPI_V25 = "false"
   VITE_V25_UI_PREVIEW = "true"
   VITE_ACHIEVEMENT_PREVIEW = "true"
