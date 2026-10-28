@@ -27,14 +27,14 @@
   ],
   "functions": {
     "api/index.py": {
-      "includeFiles": "../api-v1/app/**"
+      "includeFiles": "app/**"
     }
   },
   "regions": [
     "hnd1"
   ],
   "framework": "vite",
-  "buildCommand": "cd .. && VITE_FASTAPI_ENABLED=true VITE_FASTAPI_REPORTING=true VITE_ACHIEVEMENT_PREVIEW=true VITE_V25_UI_PREVIEW=true VITE_FASTAPI_V25=false npm run build && cp -R dist preview/dist",
+  "buildCommand": "cd .. && VITE_FASTAPI_ENABLED=true VITE_FASTAPI_REPORTING=true VITE_ACHIEVEMENT_PREVIEW=true VITE_V25_UI_PREVIEW=true VITE_FASTAPI_V25=false npm run build && cp -R dist preview/dist && cp -R api-v1/app preview/app",
   "installCommand": "cd .. && npm ci",
   "outputDirectory": "dist"
 }
