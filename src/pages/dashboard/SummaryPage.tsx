@@ -22,7 +22,7 @@ function summaryIndicatorValue(k:Indicator){
 export function SummaryPage(){
  const achievement=useDashboard(getAchievementSummary);
  const nav=useNavigate(),goals=useDashboard(getGoals),profile=useDashboard(getProfile),[bundles,setBundles]=useState<Bundle[]>([]),[err,setErr]=useState('');
- useEffect(()=>{if(!goals.data)return;Promise.all(goals.data.map(async goal=>({goal,indicators:await getIndicators(goal.id),initiatives:await getInitiatives(goal.id)}))).then(setBundles).catch(e=>setErr(e.message))},[goals.data]);
+ useEffect(()=>{if(!goals.data)return;Promise.all(goals.data.map(async goal=>{const [indicators,initiatives]=await Promise.all([getIndicators(goal.id),getInitiatives(goal.id)]);return {goal,indicators,initiatives}})).then(setBundles).catch(e=>setErr(e.message))},[goals.data]);
  if(goals.loading||profile.loading||(!bundles.length&&!err))return <main className="page state">Loading strategic plan summary…</main>;
  if(goals.error||profile.error||err)return <main className="page state error">{goals.error||profile.error||err}</main>;
  return <main className="page summaryPage">

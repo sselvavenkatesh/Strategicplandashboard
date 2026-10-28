@@ -4,7 +4,7 @@ import { ThemeProvider } from './app/ThemeProvider'
 import { AppShell } from './components/layout/AppShell'
 import { AdminHomePage } from './pages/admin/AdminHomePage'
 import { SuperAdminPage } from './pages/admin/SuperAdminPage'
-import { GoalPage } from './pages/dashboard/GoalPage'
+const GoalPage = lazy(() => import('./pages/dashboard/GoalPage').then(module => ({default: module.GoalPage})))
 import { SummaryPage } from './pages/dashboard/SummaryPage'
 import { WelcomePage } from './pages/dashboard/WelcomePage'
 import { AiAssistantPage } from './pages/dashboard/AiAssistantPage'
