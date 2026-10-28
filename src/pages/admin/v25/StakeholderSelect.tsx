@@ -3,8 +3,8 @@ import {Check, ChevronDown, Search, Users} from 'lucide-react';
 import {createPortal} from 'react-dom';
 import {stakeholders} from './model';
 
-type Props = {label: string; value: string[]; onChange: (value: string[]) => void};
-export function StakeholderSelect({label, value, onChange}: Props) {
+type Props = {disabled?: boolean; label: string; value: string[]; onChange: (value: string[]) => void};
+export function StakeholderSelect({label, value, onChange, disabled = false}: Props) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [position, setPosition] = useState({top: 0, left: 0, width: 265});
@@ -23,7 +23,7 @@ export function StakeholderSelect({label, value, onChange}: Props) {
   }, [open]);
   const names = stakeholders.filter(user => value.includes(user.id)).map(user => user.name);
   return <div className="v25-multiselect" ref={ref} onKeyDown={event => {if (event.key === 'Escape') {setOpen(false); ref.current?.querySelector('button')?.focus()}}}>
-    <button type="button" className={`v25-select-trigger ${value.length ? 'has-value' : ''}`} aria-label={label} aria-expanded={open} aria-controls={id} onClick={event => {const rect = event.currentTarget.getBoundingClientRect(); const width = Math.min(265, window.innerWidth - 16); setPosition({width, left: Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8)), top: window.innerHeight - rect.bottom >= 300 ? rect.bottom + 4 : Math.max(8, rect.top - 300)}); setOpen(!open); setSearch('')}}>
+    <button type="button" disabled={disabled} className={`v25-select-trigger ${value.length ? 'has-value' : ''}`} aria-label={label} aria-expanded={open} aria-controls={id} onClick={event => {const rect = event.currentTarget.getBoundingClientRect(); const width = Math.min(265, window.innerWidth - 16); setPosition({width, left: Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8)), top: window.innerHeight - rect.bottom >= 300 ? rect.bottom + 4 : Math.max(8, rect.top - 300)}); setOpen(!open); setSearch('')}}>
       <Users size={15}/><span>{names.length ? names.join(', ') : 'None'}</span><ChevronDown size={15}/>
     </button>
     {open && createPortal(<div ref={menuRef} style={position} className="v25-select-menu v25-select-floating" id={id} role="group" aria-label={label}>
