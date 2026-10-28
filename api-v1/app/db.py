@@ -1,7 +1,10 @@
 from contextlib import contextmanager
+import logging
 import psycopg
 from psycopg.rows import dict_row
 from .config import get_settings
+
+_role_logged = False
 
 @contextmanager
 def connection():
@@ -22,4 +25,8 @@ def connection():
         connect_timeout=10,
         prepare_threshold=None,
     ) as conn:
+        global _role_logged
+        if not _role_logged:
+            logging.getLogger(__name__).warning("Reporting connection role: %s", conn.info.user)
+            _role_logged = True
         yield conn

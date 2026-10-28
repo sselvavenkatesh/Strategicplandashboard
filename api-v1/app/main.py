@@ -1,3 +1,4 @@
+from time import perf_counter
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,10 +26,13 @@ app.add_middleware(
 
 @app.middleware("http")
 async def preview_write_guard(request: Request, call_next):
+    started = perf_counter()
     path = request.url.path
     if not settings.data_writes_enabled and request.method in {"POST", "PUT", "PATCH", "DELETE"} and path.startswith("/api/v1/superadmin/") and path != "/api/v1/superadmin/login":
         return JSONResponse(status_code=503, content={"detail": "Data writes remain disabled until V2.5 authenticated storage is integrated."})
-    return await call_next(request)
+    response = await call_next(request)
+    response.headers["Server-Timing"] = f"app;dur={(perf_counter() - started) * 1000:.1f}"
+    return response
 
 @app.get("/api/v1/achievement")
 def get_achievement(preview: bool = False):
