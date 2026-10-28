@@ -1,17 +1,19 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Link, useLocation, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, ChevronRight, ClipboardList, Eye, FlaskConical, Goal, Home, Moon, Pencil, RotateCcw, Search, Settings2, ShieldCheck, Sun, Users} from 'lucide-react';
+import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, ChevronRight, ClipboardList, Eye, FlaskConical, Goal, Home, Moon, Pencil, Plus, RotateCcw, Search, Settings2, ShieldCheck, Sun, Users} from 'lucide-react';
 import {useTheme} from '../../../app/ThemeProvider';
 import {accessibleRows, emptyAssignments, idColumn, loadDataset, stakeholders, text} from './model';
 import type {Assignments, DataRow, Dataset, Kind} from './model';
 import {StakeholderSelect} from './StakeholderSelect';
 import {DataEditor} from './DataEditor';
+import {MasterEditor} from './MasterEditor';
+import {DataUpload} from './DataUpload';
 import './v25.css';
 
 type Section = 'home' | 'plan' | 'indicators' | 'initiatives';
 const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}] as const;
 const draftKey = 'strategic-v25-ui-draft-v1';
-type Draft = {assignments: Assignments; indicatorEdits: Record<string, DataRow>; initiativeEdits: Record<string, DataRow>; profile?: DataRow; goals?: DataRow[]};
+type Draft = {assignments: Assignments; indicatorEdits: Record<string, DataRow>; initiativeEdits: Record<string, DataRow>; profile?: DataRow; goals?: DataRow[]; indicatorMasters?: DataRow[]; initiativeMasters?: DataRow[]};
 function newDraft(): Draft {return {assignments: emptyAssignments(), indicatorEdits: {}, initiativeEdits: {}}}
 function readDraft(): Draft {
   try {const saved = JSON.parse(sessionStorage.getItem(draftKey) || 'null'); return saved?.assignments?.goals && saved?.assignments?.indicators && saved?.assignments?.initiatives ? {...newDraft(), ...saved} : newDraft()} catch {return newDraft()}
@@ -32,6 +34,7 @@ export default function V25AdminPage() {
   const [masterSearch, setMasterSearch] = useState('');
   const [goalFilter, setGoalFilter] = useState('');
   const [masterPage, setMasterPage] = useState(1);
+  const [masterEditing, setMasterEditing] = useState<{kind: 'indicators' | 'initiatives'; row: DataRow; isNew: boolean} | null>(null);
   const requestedTab = params.get('tab');
   const planTab = requestedTab === 'goals' ? 'goals' : 'district';
   const resourceTab = requestedTab === 'data' ? 'data' : 'master';
@@ -49,14 +52,20 @@ export default function V25AdminPage() {
   const profile = draft.profile ?? dataset?.profile ?? {};
   const goals = draft.goals ?? dataset?.goals ?? [];
   const visibleGoals = goals.filter(row => superAdmin || (assignments.goals[text(row, 'Goal ID')] ?? []).includes(user));
-  const indicators = useMemo(() => dataset ? superAdmin ? dataset.indicators : accessibleRows(dataset.indicators, 'indicators', user, assignments) : [], [dataset, superAdmin, user, assignments]);
-  const initiatives = useMemo(() => dataset ? superAdmin ? dataset.initiatives : accessibleRows(dataset.initiatives, 'initiatives', user, assignments) : [], [dataset, superAdmin, user, assignments]);
+  const allIndicators = useMemo(() => draft.indicatorMasters ?? dataset?.indicators ?? [], [draft.indicatorMasters, dataset]);
+  const allInitiatives = useMemo(() => draft.initiativeMasters ?? dataset?.initiatives ?? [], [draft.initiativeMasters, dataset]);
+  const indicators = useMemo(() => superAdmin ? allIndicators : accessibleRows(allIndicators, 'indicators', user, assignments), [allIndicators, superAdmin, user, assignments]);
+  const initiatives = useMemo(() => superAdmin ? allInitiatives : accessibleRows(allInitiatives, 'initiatives', user, assignments), [allInitiatives, superAdmin, user, assignments]);
   const kind = section === 'initiatives' ? 'initiatives' : 'indicators';
   const master = kind === 'indicators' ? indicators : initiatives;
-  const sourceData = kind === 'indicators' ? dataset?.indicatorData ?? [] : dataset?.initiativeData ?? [];
+  const baseData = kind === 'indicators' ? dataset?.indicatorData ?? [] : dataset?.initiativeData ?? [];
   const edits = kind === 'indicators' ? draft.indicatorEdits : draft.initiativeEdits;
+  const baseKeys = new Set(baseData.map(row => text(row, '__previewKey')));
+  const sourceData = [...baseData, ...Object.values(edits).filter(row => !baseKeys.has(text(row, '__previewKey')))];
+  const nameColumn = kind === 'indicators' ? 'Indicator Name' : 'Initiative Name';
+  const mastersById = new Map(master.map(row => [text(row, idColumn(kind)), row]));
   const allowedIds = new Set(master.map(row => text(row, idColumn(kind))));
-  const indexedData = sourceData.map((row, index) => ({row: edits[text(row, '__previewKey')] ?? row, index})).filter(({row}) => allowedIds.has(text(row, idColumn(kind))));
+  const indexedData = sourceData.map((original, index) => {const row = edits[text(original, '__previewKey')] ?? original; const definition = mastersById.get(text(row, idColumn(kind))); return {row: {...row, [nameColumn]: definition?.[nameColumn] ?? row[nameColumn]}, index}}).filter(({row}) => allowedIds.has(text(row, idColumn(kind))));
   const filteredMaster = master.filter(row => (!goalFilter || row['Goal ID'] === goalFilter) && Object.values(row).join(' ').toLowerCase().includes(masterSearch.toLowerCase()));
   const goalName = (id: string) => goals.find(goal => goal['Goal ID'] === id)?.['Goal Name'] ?? id;
   const navigateSection = (next: Section) => {setParams(next === 'home' ? {} : {section: next}); setMasterSearch(''); setGoalFilter(''); setMasterPage(1)};
@@ -67,6 +76,29 @@ export default function V25AdminPage() {
   function exampleAssignments() {
     setDraft(previous => ({...previous, assignments: {goals: {G1: ['6', '7'], G2: ['8'], G3: ['9'], G4: ['10']}, indicators: {ID1: ['6']}, initiatives: {IN1: ['6']}}}));
     setNotice('Example assignments loaded in this tab. John has explicit access; Sarah inherits Goal 1 access.');
+  }
+  function addMaster() {
+    const prefix = kind === 'indicators' ? 'ID' : 'IN';
+    const records = kind === 'indicators' ? allIndicators : allInitiatives;
+    const next = 1 + Math.max(0, ...records.map(row => Number(text(row, idColumn(kind)).replace(new RegExp(`^${prefix}`), '')) || 0));
+    const row: DataRow = {[idColumn(kind)]: `${prefix}${next}`, [nameColumn]: '', 'Goal ID': goalFilter || text(goals[0] ?? {}, 'Goal ID')};
+    if (kind === 'indicators') {row['Indicator Type'] = 'Percent'; row['KPI Nature'] = 'Positive'} else row['Total Sub Initiatives'] = 0;
+    setMasterEditing({kind, row, isNew: true});
+  }
+  function saveMaster(row: DataRow) {
+    if (!masterEditing || !superAdmin) return;
+    const editedKind = masterEditing.kind;
+    const key = editedKind === 'indicators' ? 'indicatorMasters' : 'initiativeMasters';
+    const originalRecords = editedKind === 'indicators' ? allIndicators : allInitiatives;
+    const records = masterEditing.isNew ? [...originalRecords, row] : originalRecords.map(record => record[idColumn(editedKind)] === row[idColumn(editedKind)] ? row : record);
+    setDraft(previous => ({...previous, [key]: records}));
+    setMasterSearch(''); setGoalFilter(''); setMasterPage(masterEditing.isNew ? Math.ceil(records.length / 5) : currentMasterPage);
+    setMasterEditing(null); setNotice('Saved locally.');
+  }
+  function uploadData(rows: DataRow[]) {
+    const key = kind === 'indicators' ? 'indicatorEdits' : 'initiativeEdits';
+    setDraft(previous => ({...previous, [key]: {...previous[key], ...Object.fromEntries(rows.map(row => [text(row, '__previewKey'), row]))}}));
+    setNotice(`${rows.length} records uploaded locally.`);
   }
   function accessMode(resource: 'indicators' | 'initiatives') {return Object.values(assignments[resource]).some(users => users.includes(user)) ? 'Explicit assignment' : 'Inherited from assigned goals'}
   const masterPages = Math.max(1, Math.ceil(filteredMaster.length / 5));
@@ -101,19 +133,19 @@ export default function V25AdminPage() {
           {superAdmin && <div className="v25-panel-footer"><button className="v25-button primary v25-save" onClick={() => setNotice('Saved locally.')}><Check size={14}/> Save</button></div>}
         </section>}
         {planTab === 'goals' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{superAdmin ? 'Goal Master' : 'Assigned Goals'} <span className="v25-count">{visibleGoals.length}</span></h2></div>{superAdmin ? <span className="v25-badge"><Users size={14}/> Multiple stakeholders</span> : <span className="v25-badge"><Eye size={14}/> View only</span>}</div>
-          <div className="v25-goal-grid">{visibleGoals.map(goal => {const index = goals.indexOf(goal); const id = text(goal, 'Goal ID'); return <article className="v25-goal-card" key={id}><div className="v25-goal-card-head"><span className="v25-goal-number">{id}</span><span>{dataset.indicators.filter(row => row['Goal ID'] === id).length} indicators · {dataset.initiatives.filter(row => row['Goal ID'] === id).length} initiatives</span></div>{superAdmin ? <><label>Goal Name<input value={text(goal, 'Goal Name')} onChange={event => updateGoal(index, 'Goal Name', event.target.value)}/></label><label>Goal Description<textarea value={text(goal, 'Goal Description')} onChange={event => updateGoal(index, 'Goal Description', event.target.value)}/></label><div className="v25-stakeholder-field"><span>Stakeholder</span><StakeholderSelect label={`Stakeholder for ${text(goal, 'Goal Name')}`} value={assignments.goals[id] ?? []} onChange={value => assign('goals', id, value)}/></div></> : <><h3>{text(goal, 'Goal Name')}</h3><p>{text(goal, 'Goal Description')}</p><span className="v25-badge"><Check size={13}/> Assigned to you</span></>}</article>})}</div>
+          <div className="v25-goal-grid">{visibleGoals.map(goal => {const index = goals.indexOf(goal); const id = text(goal, 'Goal ID'); return <article className="v25-goal-card" key={id}><div className="v25-goal-card-head"><span className="v25-goal-number">{id}</span><span>{allIndicators.filter(row => row['Goal ID'] === id).length} indicators · {allInitiatives.filter(row => row['Goal ID'] === id).length} initiatives</span></div>{superAdmin ? <><label>Goal Name<input value={text(goal, 'Goal Name')} onChange={event => updateGoal(index, 'Goal Name', event.target.value)}/></label><label>Goal Description<textarea value={text(goal, 'Goal Description')} onChange={event => updateGoal(index, 'Goal Description', event.target.value)}/></label><div className="v25-stakeholder-field"><span>Stakeholder</span><StakeholderSelect label={`Stakeholder for ${text(goal, 'Goal Name')}`} value={assignments.goals[id] ?? []} onChange={value => assign('goals', id, value)}/></div></> : <><h3>{text(goal, 'Goal Name')}</h3><p>{text(goal, 'Goal Description')}</p><span className="v25-badge"><Check size={13}/> Assigned to you</span></>}</article>})}</div>
           {!visibleGoals.length && <Empty title="No goals assigned yet"/>}
           {superAdmin && <div className="v25-panel-footer"><button className="v25-button primary v25-save" onClick={() => setNotice('Saved locally.')}><Check size={15}/> Save</button></div>}
         </section>}
       </>}
       {(section === 'indicators' || section === 'initiatives') && <>
         <div className="v25-section-tabs" role="group" aria-label="Configuration sections"><button aria-pressed={resourceTab === 'master'} onClick={() => selectTab('master')}>{superAdmin ? kind === 'indicators' ? 'Indicator Master' : 'Initiative Master' : kind === 'indicators' ? 'Assigned Indicators' : 'Assigned Initiatives'} <span>{master.length}</span></button><button aria-pressed={resourceTab === 'data'} onClick={() => selectTab('data')}>{kind === 'indicators' ? 'Indicator Data' : 'Initiative Data'} <span>{indexedData.length}</span></button></div>
-        {resourceTab === 'master' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{superAdmin ? kind === 'indicators' ? 'Indicator Master' : 'Initiative Master' : kind === 'indicators' ? 'Assigned Indicators' : 'Assigned Initiatives'} <span className="v25-count">{master.length}</span></h2></div><span className="v25-badge">{superAdmin ? 'Master configuration' : accessMode(kind)}</span></div>
+        {resourceTab === 'master' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{superAdmin ? kind === 'indicators' ? 'Indicator Master' : 'Initiative Master' : kind === 'indicators' ? 'Assigned Indicators' : 'Assigned Initiatives'} <span className="v25-count">{master.length}</span></h2></div>{superAdmin ? <button className="v25-button primary" disabled={!goals.length} onClick={addMaster}><Plus size={14}/> {kind === 'indicators' ? 'Add Indicator' : 'Add Initiative'}</button> : <span className="v25-badge">{accessMode(kind)}</span>}</div>
           <div className="v25-table-tools"><label className="v25-search"><Search size={16}/><input aria-label="Search master" placeholder={`Search ${kind}…`} value={masterSearch} onChange={event => {setMasterSearch(event.target.value); setMasterPage(1)}}/></label><select aria-label="Filter by goal" value={goalFilter} onChange={event => {setGoalFilter(event.target.value); setMasterPage(1)}}><option value="">All goals</option>{goals.map(goal => <option key={text(goal, 'Goal ID')} value={text(goal, 'Goal ID')}>{text(goal, 'Goal Name')}</option>)}</select></div>
-          {master.length ? <div className="v25-table-scroll v25-master-scroll"><table className="v25-table v25-master-table"><thead><tr><th>{kind === 'indicators' ? 'Indicator' : 'Initiative'}</th><th>Goal</th><th>{kind === 'indicators' ? 'Type / Direction' : 'Sub-initiatives'}</th><th>{superAdmin ? 'Stakeholder' : 'Access'}</th></tr></thead><tbody>{pagedMaster.map(row => {const id = text(row, idColumn(kind)); return <tr key={id}><td><b>{text(row, kind === 'indicators' ? 'Indicator Name' : 'Initiative Name')}</b><small>{id}</small></td><td>{goalName(text(row, 'Goal ID'))}</td><td>{kind === 'indicators' ? <><span>{text(row, 'Indicator Type') || '—'}</span><small>{text(row, 'KPI Nature')}</small></> : text(row, 'Total Sub Initiatives')}</td><td>{superAdmin ? <StakeholderSelect label={`Stakeholder for ${text(row, kind === 'indicators' ? 'Indicator Name' : 'Initiative Name')}`} value={assignments[kind][id] ?? []} onChange={value => assign(kind, id, value)}/> : <span className="v25-badge editable"><Pencil size={12}/> Can edit</span>}</td></tr>})}</tbody></table>{!filteredMaster.length && <Empty title="No matching items"/>}</div> : <Empty title={`No ${kind} assigned yet`}/>}
+          {master.length ? <div className="v25-table-scroll v25-master-scroll"><table className={`v25-table v25-master-table ${superAdmin ? 'is-superadmin' : ''}`}><thead><tr><th>{kind === 'indicators' ? 'Indicator' : 'Initiative'}</th><th>Goal</th><th>{kind === 'indicators' ? 'Type / Direction' : 'Sub-initiatives'}</th><th>{superAdmin ? 'Stakeholder' : 'Access'}</th>{superAdmin && <th>Action</th>}</tr></thead><tbody>{pagedMaster.map(row => {const id = text(row, idColumn(kind)); return <tr key={id}><td><b>{text(row, kind === 'indicators' ? 'Indicator Name' : 'Initiative Name')}</b><small>{id}</small></td><td>{goalName(text(row, 'Goal ID'))}</td><td>{kind === 'indicators' ? <><span>{text(row, 'Indicator Type') || '—'}</span><small>{text(row, 'KPI Nature')}</small></> : text(row, 'Total Sub Initiatives')}</td><td>{superAdmin ? <StakeholderSelect label={`Stakeholder for ${text(row, kind === 'indicators' ? 'Indicator Name' : 'Initiative Name')}`} value={assignments[kind][id] ?? []} onChange={value => assign(kind, id, value)}/> : <span className="v25-badge editable"><Pencil size={12}/> Can edit</span>}</td>{superAdmin && <td><button className="v25-edit" aria-label={`Edit ${text(row, nameColumn)}`} onClick={() => setMasterEditing({kind, row: {...row}, isNew: false})}><Pencil size={13}/> Edit</button></td>}</tr>})}</tbody></table>{!filteredMaster.length && <Empty title="No matching items"/>}</div> : <Empty title={`No ${kind} assigned yet`}/>}
           <div className="v25-master-footer">{superAdmin && <button className="v25-button primary v25-save" onClick={() => setNotice('Saved locally.')}><Check size={14}/> Save</button>}<div className="v25-pagination"><span>{filteredMaster.length ? (currentMasterPage - 1) * 5 + 1 : 0}–{Math.min(currentMasterPage * 5, filteredMaster.length)} of {filteredMaster.length}</span><div><button disabled={currentMasterPage === 1} onClick={() => setMasterPage(currentMasterPage - 1)}>Previous</button><span>{currentMasterPage} / {masterPages}</span><button disabled={currentMasterPage === masterPages} onClick={() => setMasterPage(currentMasterPage + 1)}>Next</button></div></div></div>
         </section>}
-        {resourceTab === 'data' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{kind === 'indicators' ? 'Indicator' : 'Initiative'} Data <span className="v25-count">{indexedData.length}</span></h2></div></div>
+        {resourceTab === 'data' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{kind === 'indicators' ? 'Indicator' : 'Initiative'} Data <span className="v25-count">{indexedData.length}</span></h2></div><DataUpload key={`${kind}-${user}-${superAdmin}`} kind={kind} masters={master} goals={goals} rows={indexedData.map(item => item.row)} onUpload={uploadData}/></div>
           {indexedData.length ? <DataEditor key={`${kind}-${user}-${superAdmin}`} kind={kind} rows={indexedData.map(item => item.row)} onSave={(index, row) => {const rowKey = text(sourceData[indexedData[index].index], '__previewKey'); setDraft(previous => ({...previous, [kind === 'indicators' ? 'indicatorEdits' : 'initiativeEdits']: {...(kind === 'indicators' ? previous.indicatorEdits : previous.initiativeEdits), [rowKey]: row}})); setNotice('Saved locally.')}}/> : <Empty title="No reporting data in your scope"/>}
         </section>}
       </>}
@@ -121,6 +153,7 @@ export default function V25AdminPage() {
       <footer className="v25-footer"><span>Strategic Plan · V2.5</span><span>Powered by <b>K12Matrix</b></span></footer>
       </div>
     </main></div>
+    {masterEditing && superAdmin && <MasterEditor kind={masterEditing.kind} row={masterEditing.row} isNew={masterEditing.isNew} goals={goals} records={masterEditing.kind === 'indicators' ? allIndicators : allInitiatives} onClose={() => setMasterEditing(null)} onSave={saveMaster}/>}
     {notice && <div className="v25-toast" role="status"><Check size={18}/><span>{notice}</span><button className="v25-icon" aria-label="Dismiss notification" onClick={() => setNotice('')}>×</button></div>}
   </div>;
 }
