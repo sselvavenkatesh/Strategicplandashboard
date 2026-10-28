@@ -1,5 +1,5 @@
 import {supabase} from './supabase';
-import {apiGet, fastApiV25Enabled} from './api';
+import {apiGet, fastApiReportingEnabled} from './api';
 
 export type AchievementIndicator = {
   id:string; name:string; year:string|null; actual:string|null; target:string|null;
@@ -14,7 +14,7 @@ export type AchievementSummary = {preview:boolean; overall:AchievementScore; goa
 // Enabled only by the preview build context. Normal builds use production targets.
 export const previewTargets = import.meta.env.VITE_ACHIEVEMENT_PREVIEW === 'true';
 export async function getAchievementSummary():Promise<AchievementSummary> {
-  if(fastApiV25Enabled)return apiGet<AchievementSummary>(`/api/v1/achievement?preview=${previewTargets}`);
+  if(fastApiReportingEnabled)return apiGet<AchievementSummary>(`/api/v1/achievement?preview=${previewTargets}`);
   const {data,error} = await supabase.rpc('fn_indicator_achievement_summary',{p_preview:previewTargets});
   if(error)throw error;
   if(!data || !Array.isArray(data.goals) || !data.overall)throw new Error('Achievement data unavailable');
@@ -24,7 +24,7 @@ export async function getAchievementSummary():Promise<AchievementSummary> {
 // Read the target for the selected popup year, without borrowing a newer target.
 export async function getIndicatorTarget(indicatorId:string|undefined,year:string):Promise<string|null> {
   if(!indicatorId||!year)return null;
-  if(fastApiV25Enabled){const result=await apiGet<{target:string|null}>(`/api/v1/indicators/${encodeURIComponent(indicatorId)}/target?school_year=${encodeURIComponent(year)}&preview=${previewTargets}`);return result.target}
+  if(fastApiReportingEnabled){const result=await apiGet<{target:string|null}>(`/api/v1/indicators/${encodeURIComponent(indicatorId)}/target?school_year=${encodeURIComponent(year)}&preview=${previewTargets}`);return result.target}
   const request=previewTargets
     ? supabase.from('Indicator_Target_Preview').select('target_1').eq('indicator_id',indicatorId).eq('school_year',year)
     : supabase.from('vw_indicator_reporting_normalized').select('target_1').eq('indicator_id',indicatorId).eq('school_year',year).eq('category','All').eq('student_group','All Students').eq('role','All').is('school',null);

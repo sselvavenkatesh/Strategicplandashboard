@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/strategic-plan/demo/api/v1/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/v1/(.*)",
+      "destination": "/api/index"
+    },
+    {
       "source": "/strategic-plan-demo",
       "destination": "/strategic-plan-demo.html"
     },
@@ -16,5 +24,13 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "api-v1/app/**"
+    }
+  },
+  "regions": [
+    "hnd1"
   ]
 }

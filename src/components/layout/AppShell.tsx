@@ -5,6 +5,7 @@ import {getGoals,getProfile} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 import {supabase} from '../../lib/supabase';
 import {useTheme} from '../../app/ThemeProvider';
+import {apiGet,fastApiEnabled} from '../../lib/api';
 import {isAiEnabled} from '../../lib/ai';
 
 type AdminProfile={name:string;email:string};
@@ -43,7 +44,7 @@ export function AppShell(){
     return()=>window.clearTimeout(timer);
   },[location.pathname]);
 
-  useEffect(()=>{(async()=>{const{data}=await supabase.from('District_Profile').select('"Admin Signin Method"').limit(1).maybeSingle();if(data?.['Admin Signin Method'])setSigninMethod(data['Admin Signin Method'])})()},[]);
+  useEffect(()=>{(async()=>{if(fastApiEnabled){try{const config=await apiGet<{signinMethod:'Userbased'|'Google'|'Microsoft'}>('/api/v1/admin/signin-config');setSigninMethod(config.signinMethod)}catch{};return}const{data}=await supabase.from('District_Profile').select('"Admin Signin Method"').limit(1).maybeSingle();if(data?.['Admin Signin Method'])setSigninMethod(data['Admin Signin Method'])})()},[]);
 
   useEffect(()=>{
     const saved=sessionStorage.getItem('district360_admin');
