@@ -76,7 +76,7 @@ def sso_settings(request:Request,response:Response):
         if not repo.validate_superadmin_session(token_from(request)): raise HTTPException(401,'Invalid or expired Super Admin session.')
         config=repo.admin_auth_config() or {}
         base=str(request.base_url).rstrip('/')
-        return {'googleConfigured':bool(config.get('google_configured')),'microsoftConfigured':bool(config.get('microsoft_configured')),'googleCallback':base+'/api/v1/auth/admin/oauth/google/callback','microsoftCallback':base+'/api/v1/auth/admin/oauth/microsoft/callback'}
+        return {'googleConfigured':bool(config.get('google_configured')),'microsoftConfigured':bool(config.get('microsoft_configured')),'googleSecretSaved':bool(repo.oauth_secret('google')),'microsoftSecretSaved':bool(repo.oauth_secret('microsoft')),'googleCallback':base+'/api/v1/auth/admin/oauth/google/callback','microsoftCallback':base+'/api/v1/auth/admin/oauth/microsoft/callback'}
     except psycopg.Error as error: db_error(error)
 
 class SsoSecrets(BaseModel):

@@ -32,7 +32,7 @@ def set_session(response:Response,token:str):
 class Login(BaseModel):
     model_config=ConfigDict(extra='forbid')
     email:str=Field(min_length=1,max_length=254)
-    password:str=Field(min_length=1,max_length=2000)
+    password:str=Field(min_length=1)
 
 @router.post('/login')
 def login(body:Login,request:Request,response:Response):

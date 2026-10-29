@@ -143,6 +143,9 @@
 .v25-user-form,.v25-sso-settings{padding:12px;margin:12px 0;background:var(--v-soft);border:1px solid var(--v-line);border-radius:8px}
 .v25-user-form h3,.v25-sso-settings h3{margin-bottom:12px;font-size:13px}
 .v25-sso-status{display:flex;gap:18px;margin:10px 0;font-size:10px;color:var(--v-muted)}
+.v25-sso-login{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.v25-sso-login .v25-button{min-height:32px;padding:6px 8px;font-size:10px!important;gap:7px}
+.v25-sso-login svg{flex:none}
 .v25-sso-help{font-size:10px;line-height:1.5;color:var(--v-muted);margin-bottom:10px!important}
 .v25-table-tools{flex-wrap:wrap}
 
