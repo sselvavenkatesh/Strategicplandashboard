@@ -1,0 +1,52 @@
+begin;
+do $$
+declare sa bigint; adm bigint; pw text:=gen_random_uuid()::text; tok uuid; s jsonb; r jsonb; g text; ind text; ini text; n bigint; rowdata jsonb; old_hash text; new_hash text;
+begin
+ select coalesce(max(id),0)+1 into sa from public.admin_users;
+ insert into public.admin_users(id,"Email","Name","Role","Password Hash") values(sa,gen_random_uuid()::text||'@example.invalid','Transactional QA Super Admin','SuperAdmin',extensions.crypt(pw,extensions.gen_salt('bf')));
+ adm:=sa+1; insert into public.admin_users(id,"Email","Name","Role") values(adm,gen_random_uuid()::text||'@example.invalid','Transactional QA Admin','Admin');
+ select session_token into tok from public.validate_superadmin_login((select "Email" from public.admin_users where id=sa),pw);
+ if tok is null then raise exception 'Login failed'; end if;
+ s:=public.v25_superadmin_snapshot(tok);
+ select md5(coalesce(string_agg(x,'' order by x),'')) into old_hash from (select 'i'||ctid::text||xmin::text x from public."Indicator_Data" union all select 'n'||ctid::text||xmin::text from public."Initiative_Data")q;
+ -- No-op configuration must not change its revision or existing reporting rows.
+ r:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',s->'goals','owners','{}'::jsonb));
+ if r->>'revision'<>s->>'revision' then raise exception 'No-op configuration changed data'; end if;
+ -- Existing duplicate master names remain valid when saving unchanged definitions.
+ s:=public.v25_superadmin_save(tok,r->>'revision',jsonb_build_object('action','masters','kind','initiatives','records',r->'initiatives','owners','{}'::jsonb));
+ select md5(coalesce(string_agg(x,'' order by x),'')) into new_hash from (select 'i'||ctid::text||xmin::text x from public."Indicator_Data" union all select 'n'||ctid::text||xmin::text from public."Initiative_Data")q;
+ if old_hash<>new_hash then raise exception 'Unchanged masters rewrote reporting data'; end if;
+ select 'G'||(coalesce(max(substring("Goal ID" from 2)::int),0)+1) into g from public."Goal_master" where "Goal ID"~'^G[0-9]+$';
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',(s->'goals')||jsonb_build_array(jsonb_build_object('Goal ID',g,'Goal Name','Transactional QA Goal','Goal Description','Rollback only')),'owners',jsonb_build_object(g,jsonb_build_array(adm::text))));
+ if s->'assignments'->'goals'->g<>jsonb_build_array(adm::text) then raise exception 'Goal assignment was not saved'; end if;
+ select 'ID'||(coalesce(max(substring("Indicator ID" from 3)::int),0)+1) into ind from public."Indicator_master" where "Indicator ID"~'^ID[0-9]+$';
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','indicators','create',true,'records',jsonb_build_array(jsonb_build_object('Indicator ID',ind,'Indicator Name','Transactional QA Indicator','Goal ID',g,'Indicator Type','Number','KPI Nature','Positive')),'owners',jsonb_build_object(ind,jsonb_build_array(adm::text))));
+ rowdata:=jsonb_build_object('Indicator ID',ind,'Goal ID',g,'Indicator Name','Transactional QA Indicator','School Year','2030-31','Category','All','Student Group','All Students','Value 3','7','Target 1','5');
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','indicators','dataRows',jsonb_build_array(rowdata)));
+ select x into rowdata from jsonb_array_elements(s->'indicatorData')x where x->>'Indicator ID'=ind;
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','indicators','dataRows',jsonb_build_array(rowdata||jsonb_build_object('Value 3','8'))));
+ if (select count(*) from public."Indicator_Data" where "Indicator ID"=ind and "Value 3"='8')<>1 then raise exception 'Indicator edit did not persist exactly once'; end if;
+ if (select count(*) from public.fn_indicator_key_values(g,null) where indicator_id=ind)<>1 then raise exception 'Assignments hid a public KPI'; end if;
+ select 'IN'||(coalesce(max(substring("Initiative ID" from 3)::int),0)+1) into ini from public."Initiative_master" where "Initiative ID"~'^IN[0-9]+$';
+ rowdata:=jsonb_build_object('Initiative ID',ini,'Initiative Name','Transactional QA Initiative','Goal ID',g,'Sub Initiative Name','QA Sub','Action Item','QA action','Status','Not Started');
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','initiatives','create',true,'records',jsonb_build_array(jsonb_build_object('Initiative ID',ini,'Initiative Name','Transactional QA Initiative','Goal ID',g)),'dataRows',jsonb_build_array(rowdata)));
+ select x into rowdata from jsonb_array_elements(s->'initiativeData')x where x->>'Initiative ID'=ini;
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','initiatives','dataRows',jsonb_build_array(rowdata||jsonb_build_object('Action Item','Renamed QA action','Status','Done'))));
+ if (select count(*) from public."Initiative_Data" where "Initiative ID"=ini)<>1 or not exists(select 1 from public."Initiative_Data" where "Initiative ID"=ini and "Action Item"='Renamed QA action' and "Status"='Done') then raise exception 'Action edit duplicated or lost data'; end if;
+ begin
+  perform public.v25_superadmin_save(tok,'stale revision',jsonb_build_object('action','reporting','kind','indicators'));
+  raise exception 'Stale revision accepted';
+ exception when serialization_failure then null; end;
+ begin
+  perform public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','delete_goal','goalId',g));
+  raise exception 'Dependent Goal deletion accepted';
+ exception when raise_exception then if sqlerrm='Dependent Goal deletion accepted' then raise; end if; end;
+ begin
+  perform public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',s->'goals','owners',jsonb_build_object(g,jsonb_build_array(sa::text))));
+  raise exception 'SuperAdmin accepted as stakeholder';
+ exception when raise_exception then if sqlerrm='SuperAdmin accepted as stakeholder' then raise; end if; end;
+ perform public.v25_superadmin_logout(tok);
+ begin perform public.v25_superadmin_snapshot(tok);raise exception 'Revoked session accepted';exception when invalid_authorization_specification then null;end;
+end $$;
+rollback;
+select 'PASS: real SQL login, no-op preservation, assignment persistence, master creation, indicator update, nested action rename, public KPI visibility, conflict/deletion/role checks, logout; all fixtures rolled back' as result;

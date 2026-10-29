@@ -7,11 +7,12 @@ import type {SubInitiativeDraft} from './initiativeDetails';
 
 type Props = {
   kind: 'indicators' | 'initiatives'; row: DataRow; isNew: boolean;
-  goals: DataRow[]; records: DataRow[]; onClose: () => void; onSave: (row: DataRow, dataRows: DataRow[]) => void;
+  goals: DataRow[]; records: DataRow[]; onClose: () => void; onSave: (row: DataRow, dataRows: DataRow[]) => void | Promise<void>;
 };
 export function MasterEditor({kind, row, isNew, goals, records, onClose, onSave}: Props) {
   const [draft, setDraft] = useState(row);
   const [error, setError] = useState('');
+  const [saving,setSaving]=useState(false);
   const [groups, setGroups] = useState<SubInitiativeDraft[]>([]);
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -25,17 +26,19 @@ export function MasterEditor({kind, row, isNew, goals, records, onClose, onSave}
     modal?.showModal();
     return () => {modal?.close(); previous?.focus()};
   }, []);
-  function save() {
+  async function save() {
+    if(saving)return;
     const name = text(draft, nameKey).trim();
     if (!name) {setError(`${entity} name is required.`); return}
     if (!goals.some(goal => goal['Goal ID'] === draft['Goal ID'])) {setError('Select a valid goal.'); return}
     if (records.some(record => record[idColumn(kind)] !== draft[idColumn(kind)] && record['Goal ID'] === draft['Goal ID'] && text(record, nameKey).trim().toLowerCase() === name.toLowerCase())) {setError(`This goal already has an ${entity.toLowerCase()} with that name.`); return}
     const master = {...draft, [nameKey]: name};
+    setSaving(true);
     try {
       const dataRows = indicator ? [] : buildInitiativeRows(master, groups);
       if (!indicator) master['Total Sub Initiatives'] = groups.length;
-      onSave(master, dataRows);
-    } catch (reason) {setError(reason instanceof Error ? reason.message : 'Check the sub-initiatives and action items.')}
+      await onSave(master, dataRows);
+    } catch (reason) {setError(reason instanceof Error ? reason.message : 'Check the sub-initiatives and action items.')}finally{setSaving(false)}
 
   }
   return <dialog ref={dialog} className={`v25-dialog v25-master-dialog ${indicator ? '' : 'v25-initiative-dialog'}`} aria-labelledby={titleId} onCancel={onClose}>
@@ -54,7 +57,7 @@ export function MasterEditor({kind, row, isNew, goals, records, onClose, onSave}
         </section>)}
       </div>}
       {error && <p role="alert" className="v25-inline-error">{error}</p>}
-      <div className="v25-dialog-foot"><button type="button" className="v25-button" onClick={onClose}>Cancel</button><button type="submit" className="v25-button primary v25-save">Save</button></div>
+      <div className="v25-dialog-foot"><button type="button" className="v25-button" onClick={onClose}>Cancel</button><button type="submit" disabled={saving} className="v25-button primary v25-save">Save</button></div>
     </form>
   </dialog>;
 }

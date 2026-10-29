@@ -1,10 +1,11 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Link, useLocation, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, ChevronRight, ClipboardList, Eye, FlaskConical, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Trash2, Users} from 'lucide-react';
+import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, ChevronRight, ClipboardList, Eye, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Trash2, Users} from 'lucide-react';
 import {useTheme} from '../../../app/ThemeProvider';
-import {accessibleRows, emptyAssignments, idColumn, loadDataset, stakeholders, text} from './model';
+import {accessibleRows, emptyAssignments, idColumn, loadDataset, text} from './model';
 import type {Assignments, DataRow, Dataset, Kind} from './model';
-import {StakeholderSelect} from './StakeholderSelect';
+import {StakeholderSelect,StakeholderContext} from './StakeholderSelect';
+import {getSuperAdminWorkspace,saveSuperAdminWorkspace,type SuperAdminUser,type Workspace} from './superadminApi';
 import {DataEditor} from './DataEditor';
 import {MasterEditor} from './MasterEditor';
 import {MasterTable} from './MasterTable';
@@ -23,17 +24,19 @@ function readDraft(): Draft {
   try {const saved = JSON.parse(sessionStorage.getItem(draftKey) || 'null'); return saved?.assignments?.goals && saved?.assignments?.indicators && saved?.assignments?.initiatives ? {...newDraft(), ...saved} : newDraft()} catch {return newDraft()}
 }
 
-export default function V25AdminPage() {
+export default function V25AdminPage({authenticatedUser,onSignOut}:{authenticatedUser?:SuperAdminUser;onSignOut?:()=>void}) {
   const location = useLocation();
   const superAdmin = location.pathname.replace(/\/$/, '').endsWith('/superadmin');
   const [params, setParams] = useSearchParams();
   const requested = params.get('section');
   const section: Section = menus.some(item => item.id === requested) ? requested as Section : 'home';
-  const [user, setUser] = useState(() => sessionStorage.getItem('strategic-v25-review-user') || stakeholders[0].id);
+  const live=superAdmin && Boolean(authenticatedUser);
+  const [user] = useState(authenticatedUser?.id ?? '');
+  const [busy,setBusy]=useState(false);
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
-  const [draft, setDraft] = useState<Draft>(readDraft);
+  const [draft, setDraft] = useState<Draft>(()=>live?newDraft():readDraft());
   const [notice, setNotice] = useState('');
   const [configurationError, setConfigurationError] = useState('');
   const [pendingDeleteGoal, setPendingDeleteGoal] = useState<DataRow | null>(null);
@@ -43,14 +46,14 @@ export default function V25AdminPage() {
   const resourceTab = requestedTab === 'data' ? 'data' : 'master';
   const {theme, toggleTheme} = useTheme();
   const assignments = draft.assignments;
-  const currentUser = stakeholders.find(person => person.id === user) ?? stakeholders[0];
+  const stakeholders=dataset?.stakeholders??[];
+  const currentUser=authenticatedUser ?? stakeholders.find(person=>person.id===user) ?? {id:'',name:'Admin',email:''};
   useEffect(() => {
     let current = true;
-    loadDataset().then(data => {if (current) {setDataset(data); setError('')}}).catch(reason => {if (current) setError(reason instanceof Error ? reason.message : 'Unable to load district data.')});
+    (live?getSuperAdminWorkspace():loadDataset()).then(data => {if (current) {setDataset(data); if(live)setDraft({...newDraft(),assignments:(data as Workspace).assignments});setError('')}}).catch(reason => {if (current) setError(reason instanceof Error ? reason.message : 'Unable to load district data.')});
     return () => {current = false};
-  }, [retry]);
-  useEffect(() => {try {sessionStorage.setItem(draftKey, JSON.stringify(draft))} catch {setNotice('Tab storage is unavailable. Your changes will last until you leave this page.')}}, [draft]);
-  useEffect(() => {sessionStorage.setItem('strategic-v25-review-user', user)}, [user]);
+  }, [retry,live]);
+  useEffect(() => {if(live)return;try {sessionStorage.setItem(draftKey, JSON.stringify(draft))} catch {setNotice('Tab storage is unavailable. Your changes will last until you leave this page.')}}, [draft,live]);
   useEffect(() => {if (!notice) return; const timer = window.setTimeout(() => setNotice(''), 5000); return () => clearTimeout(timer)}, [notice]);
   const profile = draft.profile ?? dataset?.profile ?? {};
   const goals = draft.goals ?? dataset?.goals ?? [];
@@ -69,7 +72,13 @@ export default function V25AdminPage() {
   const mastersById = new Map(master.map(row => [text(row, idColumn(kind)), row]));
   const allowedIds = new Set(master.map(row => text(row, idColumn(kind))));
   const indexedData = sourceData.map((original, index) => {const row = edits[text(original, '__previewKey')] ?? original; const definition = mastersById.get(text(row, idColumn(kind))); return {row: {...row, [nameColumn]: definition?.[nameColumn] ?? row[nameColumn], 'Goal ID': definition?.['Goal ID'] ?? row['Goal ID']}, index}}).filter(({row}) => allowedIds.has(text(row, idColumn(kind))));
-  const navigateSection = (next: Section) => setParams(next === 'home' ? {} : {section: next});
+  const navigateSection=(next:Section)=>{
+    if(section==='plan'&&next!=='plan'&&(draft.profile||draft.goals||JSON.stringify(assignments.goals)!==JSON.stringify((dataset as Workspace|null)?.assignments?.goals??{}))){
+      if(!window.confirm('Discard unsaved configuration changes?'))return;
+      setDraft({...newDraft(),assignments:(dataset as Workspace).assignments});
+    }
+    setParams(next==='home'?{}:{section:next});
+  };
   const selectTab = (tab: string) => setParams({section, tab});
   function assign(kind: Kind, id: string, value: string[]) {setDraft(previous => ({...previous, assignments: {...previous.assignments, [kind]: {...previous.assignments[kind], [id]: value}}}))}
   function updateProfile(field: string, value: string) {setDraft(previous => ({...previous, profile: {...(previous.profile ?? dataset?.profile), [field]: value}}))}
@@ -80,21 +89,23 @@ export default function V25AdminPage() {
       const result = increaseGoalCount(goals, count, draft.nextGoalNumber);
       setDraft(previous => ({...previous, ...result, profile: {...(previous.profile ?? dataset?.profile), 'Total Goals': result.goals.length}}));
       setConfigurationError('');
-      if (count > goals.length) {setParams({section: 'plan', tab: 'goals'}); setNotice(`${count - goals.length} goal(s) added locally.`)}
+      if (count > goals.length) {setParams({section: 'plan', tab: 'goals'}); setNotice(`${count - goals.length} goal(s) added. Enter their names and save.`)}
     } catch (reason) {setConfigurationError(reason instanceof Error ? reason.message : 'Check the goal count.')}
   }
-  function saveConfiguration() {
-    try {validateGoalNames(goals); setConfigurationError(''); setNotice('Saved locally.')}
-    catch (reason) {setConfigurationError(reason instanceof Error ? reason.message : 'Check the goals.')}
+  async function persist(change:Record<string,unknown>){
+    if(!live||!dataset?.revision)throw new Error('Sign in with your Super Admin account.');
+    setBusy(true);setConfigurationError('');
+    try{const fresh=await saveSuperAdminWorkspace(dataset.revision,change);setDataset(fresh);setDraft({...newDraft(),assignments:fresh.assignments});setNotice('Saved to database.');}
+    finally{setBusy(false)}
   }
-  function deleteGoal() {
-    if (!superAdmin || !pendingDeleteGoal || goals.length <= 1) return;
-    const id = text(pendingDeleteGoal, 'Goal ID');
-    if (getGoalDependencies(id).total) return;
-    const remaining = goals.filter(goal => goal['Goal ID'] !== id);
-    const ownership = {...assignments.goals}; delete ownership[id];
-    setDraft(previous => ({...previous, goals: remaining, profile: {...(previous.profile ?? dataset?.profile), 'Total Goals': remaining.length}, assignments: {...previous.assignments, goals: ownership}}));
-    setPendingDeleteGoal(null); setConfigurationError(''); setNotice('Goal deleted locally.');
+  async function saveConfiguration(){
+    try{validateGoalNames(goals);await persist({action:'configuration',profile,goals,owners:assignments.goals})}
+    catch(reason){setConfigurationError(reason instanceof Error?reason.message:'Save failed.')}
+  }
+  async function deleteGoal(){
+    if(!pendingDeleteGoal||getGoalDependencies(text(pendingDeleteGoal,'Goal ID')).total||goals.length<=1)return;
+    try{await persist({action:'delete_goal',goalId:text(pendingDeleteGoal,'Goal ID')});setPendingDeleteGoal(null)}
+    catch(reason){setNotice(reason instanceof Error?reason.message:'Deletion failed.')}
   }
   function getGoalDependencies(id: string) {
     const indicatorData = [...(dataset?.indicatorData ?? []), ...Object.values(draft.indicatorEdits)];
@@ -102,10 +113,6 @@ export default function V25AdminPage() {
     // Edits retain the source key; avoid counting the same reporting row twice.
     const distinct = (rows: DataRow[]) => [...new Map(rows.map(row => [text(row, '__previewKey'), row])).values()];
     return goalDependencies(id, allIndicators, allInitiatives, distinct(indicatorData), distinct(initiativeData));
-  }
-  function exampleAssignments() {
-    setDraft(previous => ({...previous, assignments: {goals: {G1: ['6', '7'], G2: ['8'], G3: ['9'], G4: ['10']}, indicators: {ID1: ['6']}, initiatives: {IN1: ['6']}}}));
-    setNotice('Example assignments loaded in this tab. John has explicit access; Sarah inherits Goal 1 access.');
   }
   function addMaster(goalFilter = '') {
     const prefix = kind === 'indicators' ? 'ID' : 'IN';
@@ -115,40 +122,31 @@ export default function V25AdminPage() {
     if (kind === 'indicators') {row['Indicator Type'] = 'Percent'; row['KPI Nature'] = 'Positive'} else row['Total Sub Initiatives'] = 0;
     setMasterEditing({kind, row, isNew: true});
   }
-  function saveMaster(row: DataRow, dataRows: DataRow[]) {
-    if (!masterEditing || !superAdmin) return;
-    const editedKind = masterEditing.kind;
-    const key = editedKind === 'indicators' ? 'indicatorMasters' : 'initiativeMasters';
-    const originalRecords = editedKind === 'indicators' ? allIndicators : allInitiatives;
-    const records = masterEditing.isNew ? [...originalRecords, row] : originalRecords.map(record => record[idColumn(editedKind)] === row[idColumn(editedKind)] ? row : record);
-    setDraft(previous => ({...previous, [key]: records, initiativeEdits: {...previous.initiativeEdits, ...Object.fromEntries(dataRows.map(item => [text(item, '__previewKey'), item]))}}));
-    setMasterEditing(null); setNotice('Saved locally.');
+  async function saveMaster(row:DataRow,dataRows:DataRow[]){
+    if(!masterEditing||!live)return;
+    await persist({action:'masters',kind:masterEditing.kind,records:[row],create:masterEditing.isNew,owners:{[text(row,idColumn(masterEditing.kind))]:[]},dataRows});
+    setMasterEditing(null);
   }
-  function uploadData(rows: DataRow[]) {
-    const key = kind === 'indicators' ? 'indicatorEdits' : 'initiativeEdits';
-    setDraft(previous => ({...previous, [key]: {...previous[key], ...Object.fromEntries(rows.map(row => [text(row, '__previewKey'), row]))}}));
-    setNotice(`${rows.length} records uploaded locally.`);
-  }
+  async function uploadData(rows:DataRow[]){await persist({action:'reporting',kind,dataRows:rows})}
   function accessMode(resource: 'indicators' | 'initiatives') {return Object.values(assignments[resource]).some(users => users.includes(user)) ? 'Explicit assignment' : 'Inherited from assigned goals'}
   const sectionTitle = menus.find(menu => menu.id === section)?.label;
 
-  return <div className="v25-root">
-    <div className="v25-review-bar"><span><FlaskConical size={15}/><b>V2.5 preview</b><span className="v25-local-label">Local edits only</span></span><div><Link className={superAdmin ? 'selected' : ''} to="/superadmin">Super Admin</Link><Link className={!superAdmin ? 'selected' : ''} to="/admin">Admin</Link></div></div>
+  return <StakeholderContext.Provider value={stakeholders}><div className="v25-root">
     <div className="v25-layout"><aside className="v25-sidebar">
       <Link to="/" className="v25-brand"><img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/></Link>
       <div className="v25-workspace"><span className="v25-workspace-icon"><Building2 size={20}/></span><div><b>Strategic Plan</b><span>{superAdmin ? 'Super Admin workspace' : 'Admin workspace'}</span></div></div>
       <div className="v25-nav-caption">WORKSPACE</div><nav aria-label="Administration">{menus.map(menu => {const Icon = menu.icon; return <button type="button" key={menu.id} aria-current={section === menu.id ? 'page' : undefined} className={section === menu.id ? 'active' : ''} onClick={() => navigateSection(menu.id)}><Icon size={18}/><span>{menu.label}</span>{section === menu.id && <ChevronRight size={14}/>}</button>})}</nav>
-      <div className="v25-sidebar-bottom"><Link to="/summary"><ArrowLeft size={16}/> Public dashboard</Link><div className="v25-person"><span className="v25-avatar">{superAdmin ? 'SA' : currentUser.name.split(' ').map(word => word[0]).join('')}</span><div><b>{superAdmin ? 'District Super Admin' : currentUser.name}</b><span>{superAdmin ? 'District configuration' : 'Assigned data management'}</span></div></div></div>
+      <div className="v25-sidebar-bottom"><Link to="/summary"><ArrowLeft size={16}/> Public dashboard</Link><div className="v25-person"><span className="v25-avatar">{superAdmin ? 'SA' : currentUser.name.split(' ').map(word => word[0]).join('')}</span><div><b>{superAdmin ? authenticatedUser?.name ?? 'Super Admin' : currentUser.name}</b><span>{superAdmin ? 'District configuration' : 'Assigned data management'}</span></div></div></div>
     </aside>
-    <main className="v25-main"><header className="v25-topbar"><div className="v25-breadcrumb">Strategic Plan <ChevronRight size={13}/><span>{superAdmin ? 'Super Admin' : 'Admin'}</span></div><div className="v25-top-actions">{!superAdmin && <label className="v25-review-as">Review as<select aria-label="Review as Admin" value={user} onChange={event => setUser(event.target.value)}>{stakeholders.map(person => <option key={person.id} value={person.id}>{person.name}</option>)}</select></label>}<button className="v25-icon" aria-label="Toggle theme" onClick={toggleTheme}>{theme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}</button><span className="v25-version">V2.5</span></div></header>
-      <div className="v25-content"><div className="v25-page-heading"><div><span className="v25-eyebrow">{superAdmin ? 'DISTRICT ADMINISTRATION' : 'YOUR WORKSPACE'}</span><h1>{section === 'home' ? superAdmin ? 'District overview' : `Welcome, ${currentUser.name.split(' ')[0]}` : sectionTitle}</h1></div>{superAdmin && <button className="v25-button" onClick={() => {if (window.confirm('Reset all V2.5 preview changes in this tab? Production data will not change.')) {setDraft(newDraft()); setNotice('Preview changes reset.')}}}><RotateCcw size={15}/> Reset preview</button>}</div>
+    <main className="v25-main"><header className="v25-topbar"><div className="v25-breadcrumb">Strategic Plan <ChevronRight size={13}/><span>{superAdmin ? 'Super Admin' : 'Admin'}</span></div><div className="v25-top-actions"><button className="v25-icon" aria-label="Toggle theme" onClick={toggleTheme}>{theme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}</button>{onSignOut&&<button className="v25-button" onClick={onSignOut}>Sign Out</button>}</div></header>
+      <div className="v25-content"><div className="v25-page-heading"><div><span className="v25-eyebrow">{superAdmin ? 'DISTRICT ADMINISTRATION' : 'YOUR WORKSPACE'}</span><h1>{section === 'home' ? superAdmin ? 'District overview' : `Welcome, ${currentUser.name.split(' ')[0]}` : sectionTitle}</h1></div>{superAdmin && <button className="v25-button" disabled={busy} onClick={()=>{if(window.confirm('Reload saved data and discard unsaved changes?')){setDraft(newDraft());setRetry(value=>value+1)}}}><RotateCcw size={15}/> Reload</button>}</div>
 
       {error ? <div className="v25-panel v25-error" role="alert"><h2>District data could not be loaded</h2><p>{error}</p><button className="v25-button" onClick={() => {setError(''); setRetry(value => value + 1)}}>Try again</button></div> : !dataset ? <div className="v25-panel v25-loading" role="status">Loading existing district data…</div> : <>
       {section === 'home' && <>
         <section className="v25-district-card"><div className="v25-district-symbol">{profile['District Logo'] ? <img src={text(profile, 'District Logo')} alt="District logo"/> : <Building2 size={32}/>}</div><div><span className="v25-eyebrow">{text(profile, 'Strategic Plan Duration')}</span><h2>{text(profile, 'School District Name')}</h2><p>{text(profile, 'Strategic Plan Name')}</p></div><span className="v25-badge"><ShieldCheck size={14}/>{superAdmin ? 'District Super Admin' : 'District Admin'}</span></section>
         <div className="v25-stat-grid">{[{label: superAdmin ? 'Goals' : 'Assigned goals', value: visibleGoals.length, icon: Goal, section: 'plan' as Section}, {label: superAdmin ? 'Indicators' : 'Assigned indicators', value: indicators.length, icon: BarChart3, section: 'indicators' as Section}, {label: superAdmin ? 'Initiatives' : 'Assigned initiatives', value: initiatives.length, icon: ClipboardList, section: 'initiatives' as Section}].map(stat => <button className="v25-stat" key={stat.label} onClick={() => stat.section === 'plan' ? setParams({section: 'plan', tab: 'goals'}) : navigateSection(stat.section)}><div><span>{stat.label}</span><stat.icon size={20}/></div><b>{stat.value}</b></button>)}</div>
         <section className="v25-panel"><div className="v25-panel-title"><div><h2>{superAdmin ? 'Stakeholder assignments' : 'Your assigned goals'}</h2></div><Users size={22}/></div>
-          {superAdmin ? <div className="v25-quick-actions"><button className="v25-button primary" onClick={() => setParams({section: 'plan', tab: 'goals'})}>Configure stakeholders <ArrowRight size={15}/></button><button className="v25-button" onClick={exampleAssignments}>Load example assignments</button></div> : visibleGoals.length ? <div className="v25-assigned-goals">{visibleGoals.map(goal => <article key={text(goal, 'Goal ID')}><span className="v25-goal-number">{text(goal, 'Goal ID')}</span><div><h3>{text(goal, 'Goal Name')}</h3><p>{text(goal, 'Goal Description')}</p></div></article>)}</div> : <Empty title="No goals assigned yet"/>}
+          {superAdmin ? <div className="v25-quick-actions"><button className="v25-button primary" onClick={() => setParams({section: 'plan', tab: 'goals'})}>Configure stakeholders <ArrowRight size={15}/></button></div> : visibleGoals.length ? <div className="v25-assigned-goals">{visibleGoals.map(goal => <article key={text(goal, 'Goal ID')}><span className="v25-goal-number">{text(goal, 'Goal ID')}</span><div><h3>{text(goal, 'Goal Name')}</h3><p>{text(goal, 'Goal Description')}</p></div></article>)}</div> : <Empty title="No goals assigned yet"/>}
         </section>
 
       </>}
@@ -168,9 +166,9 @@ export default function V25AdminPage() {
       </>}
       {(section === 'indicators' || section === 'initiatives') && <>
         <div className="v25-section-tabs" role="group" aria-label="Configuration sections"><button aria-pressed={resourceTab === 'master'} onClick={() => selectTab('master')}>{superAdmin ? kind === 'indicators' ? 'Indicator Master' : 'Initiative Master' : kind === 'indicators' ? 'Assigned Indicators' : 'Assigned Initiatives'} <span>{master.length}</span></button><button aria-pressed={resourceTab === 'data'} onClick={() => selectTab('data')}>{kind === 'indicators' ? 'Indicator Data' : 'Initiative Data'} <span>{indexedData.length}</span></button></div>
-        {resourceTab === 'master' && <section className="v25-panel"><MasterTable key={`${kind}-${user}-${superAdmin}`} kind={kind} records={master} goals={goals} assignments={assignments[kind]} superAdmin={superAdmin} accessMode={accessMode(kind)} onAdd={addMaster} onSave={(records, owners) => {if (!superAdmin) return; setDraft(previous => ({...previous, [kind === 'indicators' ? 'indicatorMasters' : 'initiativeMasters']: records, assignments: {...previous.assignments, [kind]: owners}})); setNotice('Saved locally.')}}/></section>}
-        {resourceTab === 'data' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{kind === 'indicators' ? 'Indicator' : 'Initiative'} Data <span className="v25-count">{indexedData.length}</span></h2></div><DataUpload key={`${kind}-${user}-${superAdmin}`} kind={kind} masters={master} goals={goals} rows={indexedData.map(item => item.row)} onUpload={uploadData}/></div>
-          {indexedData.length ? <DataEditor key={`${kind}-${user}-${superAdmin}`} kind={kind} rows={indexedData.map(item => item.row)} onSave={(index, row) => {const rowKey = text(sourceData[indexedData[index].index], '__previewKey'); setDraft(previous => ({...previous, [kind === 'indicators' ? 'indicatorEdits' : 'initiativeEdits']: {...(kind === 'indicators' ? previous.indicatorEdits : previous.initiativeEdits), [rowKey]: row}})); setNotice('Saved locally.')}}/> : <Empty title="No reporting data in your scope"/>}
+        {resourceTab === 'master' && <section className="v25-panel"><MasterTable key={`${kind}-${user}-${superAdmin}`} kind={kind} records={master} goals={goals} assignments={assignments[kind]} superAdmin={superAdmin} accessMode={accessMode(kind)} onAdd={addMaster} onSave={(records,owners)=>persist({action:'masters',kind,records,owners})}/></section>}
+        {resourceTab === 'data' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{kind === 'indicators' ? 'Indicator' : 'Initiative'} Data <span className="v25-count">{indexedData.length}</span></h2></div><DataUpload key={`${kind}-${user}-${superAdmin}`} kind={kind} masters={master} goals={goals} rows={indexedData.map(item => item.row)} onUpload={uploadData} allowedRoles={live?['All','Admin']:['All']}/></div>
+          {indexedData.length ? <DataEditor key={`${kind}-${user}-${superAdmin}`} kind={kind} rows={indexedData.map(item => item.row)} onSave={uploadData}/> : <Empty title="No reporting data in your scope"/>}
         </section>}
       </>}
       </>}
@@ -180,6 +178,7 @@ export default function V25AdminPage() {
     {masterEditing && superAdmin && <MasterEditor kind={masterEditing.kind} row={masterEditing.row} isNew={masterEditing.isNew} goals={goals} records={masterEditing.kind === 'indicators' ? allIndicators : allInitiatives} onClose={() => setMasterEditing(null)} onSave={saveMaster}/>}
     {pendingDeleteGoal && superAdmin && <DeleteGoalDialog goal={pendingDeleteGoal} dependencies={getGoalDependencies(text(pendingDeleteGoal, 'Goal ID'))} lastGoal={goals.length <= 1} onClose={() => setPendingDeleteGoal(null)} onDelete={deleteGoal}/>}
     {notice && <div className="v25-toast" role="status"><Check size={18}/><span>{notice}</span><button className="v25-icon" aria-label="Dismiss notification" onClick={() => setNotice('')}>×</button></div>}
-  </div>;
+    {busy&&<div className="v25-saving" role="status"><span>Saving…</span></div>}
+  </div></StakeholderContext.Provider>;
 }
 function Empty({title}: {title: string}) {return <div className="v25-empty"><Users size={26}/><h3>{title}</h3></div>}

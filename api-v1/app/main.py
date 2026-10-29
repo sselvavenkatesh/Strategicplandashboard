@@ -1,5 +1,5 @@
 from time import perf_counter
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -28,7 +28,7 @@ app.add_middleware(
 async def preview_write_guard(request: Request, call_next):
     started = perf_counter()
     path = request.url.path
-    if not settings.data_writes_enabled and request.method in {"POST", "PUT", "PATCH", "DELETE"} and path.startswith("/api/v1/superadmin/") and path != "/api/v1/superadmin/login":
+    if not settings.data_writes_enabled and request.method in {"POST", "PUT", "PATCH", "DELETE"} and path.startswith("/api/v1/superadmin/") and path not in {"/api/v1/superadmin/login", "/api/v1/superadmin/workspace", "/api/v1/superadmin/logout"}:
         return JSONResponse(status_code=503, content={"detail": "Data writes remain disabled until V2.5 authenticated storage is integrated."})
     response = await call_next(request)
     response.headers["Server-Timing"] = f"app;dur={(perf_counter() - started) * 1000:.1f}"
@@ -55,7 +55,7 @@ def get_preview_dataset():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "apiVersion": settings.api_version, "dataWritesEnabled": settings.data_writes_enabled}
+    return {"status": "ok", "apiVersion": settings.api_version, "dataWritesEnabled": settings.data_writes_enabled,"superAdminWritesEnabled":True}
 
 @app.get("/api/v1/bootstrap")
 def get_bootstrap():
@@ -327,12 +327,17 @@ def access_log(body: AccessLog):
     return None
 
 @app.post("/api/v1/superadmin/login")
-def superadmin_login(body: AdminLogin):
-    row=repo.validate_superadmin_login(body.email.strip(),body.password)
+def superadmin_login(body: AdminLogin, request: Request, response: Response):
+    from .superadmin import checked_origin, COOKIE
+    checked_origin(request)
+    try: row=repo.validate_superadmin_login(body.email.strip(),body.password)
+    except Exception: raise HTTPException(503,"Super Admin authentication is unavailable.")
     if not row: raise HTTPException(401,"Invalid credentials")
     token=row.get("session_token")
     if not token: raise HTTPException(500,"Super Admin session token was not returned")
-    return {"token":token,"email":row.get("user_email") or body.email.strip(),"name":row.get("user_name") or row.get("user_email") or body.email.strip()}
+    response.set_cookie(COOKIE,str(token),max_age=8*60*60,path='/',secure=True,httponly=True,samesite='strict')
+    response.headers['Cache-Control']='no-store'
+    return {"email":row.get("user_email") or body.email.strip(),"name":row.get("user_name") or 'Super Admin',"id":str(row.get('user_id',''))}
 
 @app.get("/api/v1/superadmin/configuration")
 def superadmin_configuration(token: str = Query(...)):
@@ -485,3 +490,6 @@ def validation_page():
     report=validation_json(); rows="".join(f"<tr><td>{c['status']}</td><td>{c['name']}</td><td><code>{c['endpoint']}</code></td><td>{c['expected']}</td><td>{c['actual']}</td></tr>" for c in report["checks"])
     s=report["summary"]
     return f"""<!doctype html><html><head><meta charset='utf-8'><title>StrategicPlan API V1 Validation</title><style>body{{font-family:Arial,sans-serif;margin:32px;color:#222}}table{{border-collapse:collapse;width:100%}}th,td{{border:1px solid #ddd;padding:8px;text-align:left}}th{{background:#f3f3f3}}code{{font-size:12px}}.summary{{font-size:20px;margin:18px 0}}</style></head><body><h1>StrategicPlan API V1 Validation</h1><div class='summary'>Total: {s['total']} &nbsp; Passed: {s['passed']} &nbsp; Failed: {s['failed']}</div><p>Read-only parity checks against the approved Supabase baseline.</p><table><thead><tr><th>Status</th><th>Check</th><th>API endpoint</th><th>Expected</th><th>Actual</th></tr></thead><tbody>{rows}</tbody></table></body></html>"""
+
+from .superadmin import router as superadmin_router
+app.include_router(superadmin_router)

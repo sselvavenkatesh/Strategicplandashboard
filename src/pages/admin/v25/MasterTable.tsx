@@ -5,7 +5,7 @@ import type {DataRow} from './model';
 import {StakeholderSelect} from './StakeholderSelect';
 
 type ResourceKind = 'indicators' | 'initiatives';
-type Props = {kind: ResourceKind; records: DataRow[]; goals: DataRow[]; assignments: Record<string, string[]>; superAdmin: boolean; accessMode: string; onAdd: (goalId: string) => void; onSave: (records: DataRow[], assignments: Record<string, string[]>) => void};
+type Props = {kind: ResourceKind; records: DataRow[]; goals: DataRow[]; assignments: Record<string, string[]>; superAdmin: boolean; accessMode: string; onAdd: (goalId: string) => void; onSave: (records: DataRow[], assignments: Record<string, string[]>) => void | Promise<void>};
 export function MasterTable({kind, records, goals, assignments, superAdmin, accessMode, onAdd, onSave}: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<DataRow[]>([]);
@@ -14,6 +14,7 @@ export function MasterTable({kind, records, goals, assignments, superAdmin, acce
   const [goalFilter, setGoalFilter] = useState('');
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
+  const [saving,setSaving]=useState(false);
   const indicator = kind === 'indicators';
   const entity = indicator ? 'Indicator' : 'Initiative';
   const nameKey = `${entity} Name`;
@@ -25,22 +26,24 @@ export function MasterTable({kind, records, goals, assignments, superAdmin, acce
   const types = [...new Set(['Percent','Number','Currency',...records.map(row => text(row,'Indicator Type'))].filter(Boolean))];
   const update = (id: string, field: string, value: string) => setDraft(previous => previous.map(row => text(row, idColumn(kind)) === id ? {...row, [field]: value} : row));
   function beginEdit() {setDraft(records.map(row => ({...row}))); setOwners(Object.fromEntries(Object.entries(assignments).map(([id, users]) => [id, [...users]]))); setEditing(true); setError(''); setSearch(''); setGoalFilter('')}
-  function save() {
+  async function save() {
+    if(saving)return;
     const names = new Set<string>();
     for (const row of draft) {
       const name = text(row, nameKey).trim();
       if (!name) {setError(`${entity} name is required.`); return}
       if (!goals.some(goal => goal['Goal ID'] === row['Goal ID'])) {setError('Select a valid goal for every row.'); return}
       const key = JSON.stringify([row['Goal ID'], name.toLowerCase()]);
-      if (names.has(key)) {setError(`Duplicate ${entity.toLowerCase()} name in the same goal.`); return}
+      const original=records.find(item=>item[idColumn(kind)]===row[idColumn(kind)]);
+      if (names.has(key) && (!original || original['Goal ID']!==row['Goal ID'] || text(original,nameKey)!==text(row,nameKey))) {setError(`Duplicate ${entity.toLowerCase()} name in the same goal.`); return}
       names.add(key);
     }
-    onSave(draft.map(row => ({...row, [nameKey]: text(row, nameKey).trim()})), owners);
-    setEditing(false); setError('');
+    setSaving(true);try{await onSave(draft.map(row => ({...row, [nameKey]: text(row, nameKey).trim()})), owners);
+    setEditing(false); setError('');}catch(reason){setError(reason instanceof Error?reason.message:'Save failed.')}finally{setSaving(false)}
   }
   const goalName = (id: string) => text(goals.find(goal => goal['Goal ID'] === id) ?? {}, 'Goal Name') || id;
   return <>
-    <div className="v25-panel-title"><h2>{superAdmin ? `${entity} Master` : `Assigned ${indicator ? 'Indicators' : 'Initiatives'}`} <span className="v25-count">{records.length}</span></h2><div className="v25-inline-actions">{superAdmin ? editing ? <><button className="v25-button" onClick={() => {setEditing(false); setError('')}}>Cancel</button><button className="v25-button primary v25-save" onClick={save}><Check size={13}/> Save</button></> : <><button className="v25-button" disabled={!records.length} onClick={beginEdit}><Pencil size={13}/> Edit</button><button className="v25-button primary" disabled={!goals.length} onClick={() => {onAdd(goalFilter); setSearch(''); setGoalFilter(''); setPage(Math.ceil((records.length + 1) / 5))}}><Plus size={14}/> Add {entity}</button></> : <span className="v25-badge">{accessMode}</span>}</div></div>
+    <div className="v25-panel-title"><h2>{superAdmin ? `${entity} Master` : `Assigned ${indicator ? 'Indicators' : 'Initiatives'}`} <span className="v25-count">{records.length}</span></h2><div className="v25-inline-actions">{superAdmin ? editing ? <><button className="v25-button" onClick={() => {setEditing(false); setError('')}}>Cancel</button><button className="v25-button primary v25-save" disabled={saving} onClick={save}><Check size={13}/> Save</button></> : <><button className="v25-button" disabled={!records.length} onClick={beginEdit}><Pencil size={13}/> Edit</button><button className="v25-button primary" disabled={!goals.length} onClick={() => {onAdd(goalFilter); setSearch(''); setGoalFilter(''); setPage(Math.ceil((records.length + 1) / 5))}}><Plus size={14}/> Add {entity}</button></> : <span className="v25-badge">{accessMode}</span>}</div></div>
     {error && <p className="v25-inline-error" role="alert">{error}</p>}
     <div className="v25-table-tools"><label className="v25-search"><Search size={14}/><input aria-label="Search master" placeholder={`Search ${kind}…`} value={search} onChange={event => {setSearch(event.target.value); setPage(1)}}/></label><select aria-label="Filter by goal" value={goalFilter} onChange={event => {setGoalFilter(event.target.value); setPage(1)}}><option value="">All goals</option>{goals.map(goal => <option key={text(goal,'Goal ID')} value={text(goal,'Goal ID')}>{text(goal,'Goal Name')}</option>)}</select>{editing && <span className="v25-badge">Editing</span>}</div>
     <div className="v25-table-scroll v25-master-scroll"><table className="v25-table v25-master-table"><thead><tr><th>{entity}</th><th>Goal</th><th>{indicator ? 'Type / Direction' : 'Sub-initiatives'}</th><th>{superAdmin ? 'Stakeholder' : 'Access'}</th></tr></thead><tbody>{filtered.slice((currentPage - 1) * 5, currentPage * 5).map(row => {

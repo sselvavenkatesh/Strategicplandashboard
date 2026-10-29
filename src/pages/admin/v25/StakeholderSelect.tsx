@@ -1,10 +1,12 @@
-import {useEffect, useId, useRef, useState} from 'react';
+import {createContext, useContext, useEffect, useId, useRef, useState} from 'react';
 import {Check, ChevronDown, Search, Users} from 'lucide-react';
 import {createPortal} from 'react-dom';
-import {stakeholders} from './model';
+import type {Stakeholder} from './model';
+export const StakeholderContext=createContext<Stakeholder[]>([]);
 
 type Props = {disabled?: boolean; label: string; value: string[]; onChange: (value: string[]) => void};
 export function StakeholderSelect({label, value, onChange, disabled = false}: Props) {
+  const stakeholders=useContext(StakeholderContext);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [position, setPosition] = useState({top: 0, left: 0, width: 265});

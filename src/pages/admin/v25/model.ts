@@ -5,16 +5,10 @@ export type DataRow = Record<string, string | number | null>;
 export type Kind = 'goals' | 'indicators' | 'initiatives';
 export type Assignments = Record<Kind, Record<string, string[]>>;
 export type Dataset = {
-  profile: DataRow; goals: DataRow[]; indicators: DataRow[]; initiatives: DataRow[];
+  stakeholders?:Stakeholder[]; revision?:string; profile: DataRow; goals: DataRow[]; indicators: DataRow[]; initiatives: DataRow[];
   indicatorData: DataRow[]; initiativeData: DataRow[];
 };
-// Display-only snapshot of active Admin names. No emails, credentials or session data.
-// Replace with an authenticated FastAPI stakeholder endpoint after UI approval.
-export const stakeholders = [
-  {id: '6', name: 'John Smith'}, {id: '7', name: 'Sarah Johnson'},
-  {id: '8', name: 'Michael Brown'}, {id: '9', name: 'Emily Davis'},
-  {id: '10', name: 'David Wilson'},
-];
+export type Stakeholder={id:string;name:string};
 export const emptyAssignments = (): Assignments => ({goals: {}, indicators: {}, initiatives: {}});
 export const idColumn = (kind: Kind) => kind === 'goals' ? 'Goal ID' : kind === 'indicators' ? 'Indicator ID' : 'Initiative ID';
 export const text = (row: DataRow, key: string) => String(row[key] ?? '');

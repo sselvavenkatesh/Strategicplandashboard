@@ -37,7 +37,7 @@ export function reportingKey(kind: ResourceKind, row: DataRow): string {
   return JSON.stringify(keys.map(key => text(row, key).trim()));
 }
 
-export function validateCsv(input: string, kind: ResourceKind, masters: DataRow[], goals: DataRow[]): DataRow[] {
+export function validateCsv(input: string, kind: ResourceKind, masters: DataRow[], goals: DataRow[], allowedRoles:string[]=['All']): DataRow[] {
   const parsed = parseCsv(input);
   const expected = csvColumns[kind];
   if (parsed.length < 2) throw new Error('CSV must contain headers and at least one data row.');
@@ -55,9 +55,9 @@ export function validateCsv(input: string, kind: ResourceKind, masters: DataRow[
     if (!master) throw new Error(`${prefix}unknown or unassigned ${entity.toLowerCase()} ID.`);
     const goal = goals.find(record => record['Goal ID'] === row['Goal ID']);
     if (!goal || master['Goal ID'] !== row['Goal ID']) throw new Error(`${prefix}goal does not match the ${entity.toLowerCase()}.`);
-    if (row.Role && row.Role !== 'All') throw new Error(`${prefix}this preview supports Role All only.`);
+    if (!allowedRoles.includes(text(row,'Role')||'All')) throw new Error(`${prefix}this Role is not allowed.`);
     if (row['Stakeholder ID'] && !/^\d+$/.test(text(row, 'Stakeholder ID'))) throw new Error(`${prefix}Stakeholder ID must be numeric.`);
-    row.Role = 'All';
+    row.Role = row.Role || 'All';
     row[`${entity} Name`] = master[`${entity} Name`];
     row['Goal Name'] = goal['Goal Name'];
     const key = reportingKey(kind, row);
