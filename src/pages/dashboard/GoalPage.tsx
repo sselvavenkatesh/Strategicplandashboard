@@ -1,4 +1,5 @@
 import {useEffect,useState} from 'react';
+import {FolderOpen,ExternalLink,X} from 'lucide-react';
 import {useNavigate,useParams} from 'react-router-dom';
 import {getGoals,getIndicators,getInitiatives,getIndicatorHistory,getStudentGroups,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
@@ -7,6 +8,10 @@ import {getAchievementSummary,getIndicatorTarget,numericTarget} from '../../lib/
 
 type HistoryMap=Record<string,any[]>;
 type AvgMap=Record<string,string>;
+
+function initiativeProgressColor(completion:number){
+  return completion>=100?'var(--green)':`hsl(${Math.round(completion*1.2)} 72% 48%)`;
+}
 
 function InitiativeBars({i}:{i:Initiative}){
   return <div className="subChart">
@@ -175,7 +180,7 @@ export function GoalPage(){
 
     <header className="goalHero">
       <div className="goalHeroCopy"><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
-      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}>Key Resources</button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
+      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}><FolderOpen size={16} aria-hidden="true"/><span>Key Resources</span><ExternalLink size={12} aria-hidden="true"/></button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
     </header>
 
     <div className="goalSectionTitle">
@@ -194,7 +199,7 @@ export function GoalPage(){
             <span className="duration">Duration: {i.start||'—'} — {i.end||'—'}</span>
             <div className="donePct"><b>{i.completion.toFixed(0)}%</b> Done</div>
           </div>
-          <div className="gauge" style={{'--pct':i.completion+'%','--progress-color':(i.completion>=100?'var(--green)':`hsl(${Math.round(i.completion*1.2)} 72% 48%)`)} as React.CSSProperties} tabIndex={0} aria-label={`${i.shortName} progress: ${i.completion.toFixed(0)}% completed`}>
+          <div className="gauge" style={{'--pct':i.completion+'%','--progress-color':initiativeProgressColor(i.completion)} as React.CSSProperties} tabIndex={0} aria-label={`${i.shortName} progress: ${i.completion.toFixed(0)}% completed`}>
             <b>{i.completion.toFixed(0)}%</b>
             <div className="initiativeProgressTooltip" role="tooltip">
               <div><span>Initiative Name</span><em>—</em><b>{i.shortName}</b></div>
@@ -249,16 +254,16 @@ export function GoalPage(){
 
     {initiative&&<div className="initiativeModal open" role="dialog" aria-modal="true" aria-label={initiative.shortName} onClick={()=>setInitiative(null)}>
       <div className="modalShell" onClick={e=>e.stopPropagation()}>
-        <button className="modalClose" onClick={()=>setInitiative(null)} aria-label="Close">×</button>
+        <button className="modalClose" type="button" onClick={()=>setInitiative(null)} aria-label="Close initiative details" title="Close"><X size={18} strokeWidth={1.8} aria-hidden="true"/></button>
         <div className="modalGoal">
           <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
-        <div className="modalInitiativeHead"><span className="statusDot"/><div><small>INITIATIVE</small><h3>{initiative.shortName} - {initiative.name}</h3></div></div>
+        <div className="modalInitiativeHead"><span className="statusDot" style={{background:initiativeProgressColor(initiative.completion)}} aria-hidden="true"/><div><small>INITIATIVE</small><h3>{initiative.shortName} - {initiative.name}</h3></div></div>
         <InitiativeTimeline initiative={initiative}/>
         <section className="overallPanel">
           <div><small>INITIATIVE OVERALL PROGRESS</small><div className="overallDone"><b>{initiative.completion.toFixed(0)}%</b><span>Done</span></div></div>
-          <div className="modalGauge" style={{'--pct':initiative.completion+'%','--progress-color':(initiative.completion>=100?'var(--green)':`hsl(${Math.round(initiative.completion*1.2)} 72% 48%)`)} as React.CSSProperties}><b>{initiative.completion.toFixed(0)}%</b></div>
+          <div className="modalGauge" style={{'--pct':initiative.completion+'%','--progress-color':initiativeProgressColor(initiative.completion)} as React.CSSProperties}><b>{initiative.completion.toFixed(0)}%</b></div>
         </section>
         <section className="progressPanel">
           <div className="progressTitle"><div><small>SUB-INITIATIVE STATUS</small><h3>Initiative Progress</h3></div><span>Done · In Progress · Not Started</span></div>
@@ -279,7 +284,7 @@ export function GoalPage(){
 
     {indicator&&<div className="indicatorModal open" role="dialog" aria-modal="true" aria-label={indicator.shortName} onClick={()=>setIndicator(null)}>
       <div className="indicatorModalShell" onClick={e=>e.stopPropagation()}>
-        <button className="modalClose" onClick={()=>setIndicator(null)} aria-label="Close">×</button>
+        <button className="modalClose" type="button" onClick={()=>setIndicator(null)} aria-label="Close indicator details" title="Close"><X size={18} strokeWidth={1.8} aria-hidden="true"/></button>
         <div className="indicatorModalGoal">
           <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>

@@ -530,12 +530,17 @@ html[data-theme="light"] .goalPage .initiativeProgressTooltip span{color:#64798d
 .indicatorModal{z-index:85;background:rgba(2,7,12,.84)}
 .modalShell,.indicatorModalShell{position:relative;max-width:1420px;margin:0 auto;background:#081421;border:1px solid #2a4157;border-radius:10px;box-shadow:0 24px 70px #0009;overflow:hidden;color:var(--text)}
 .indicatorModalShell{max-width:1450px;background:#091522;border-color:#2b4258;box-shadow:0 24px 70px #000a}
-.modalClose{position:absolute;right:14px;top:12px;z-index:2;width:34px;height:34px;border:1px solid #42586d;border-radius:50%;background:#0d1d2c;color:#fff;font-size:20px;cursor:pointer}
+.modalClose{position:absolute;right:14px;top:12px;z-index:2;display:grid;place-items:center;width:34px;height:34px;padding:0;line-height:1;border:1px solid #42586d;border-radius:9px;background:#172b3d;color:#c8d7e3;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.modalClose svg{display:block;flex:none}
+.modalClose:hover{background:#244159;border-color:#7196b2;color:#fff}
+.modalClose:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+html[data-theme="light"] .modalClose{background:#fff;border-color:#bdcdd9;color:#425f75}
+html[data-theme="light"] .modalClose:hover{background:#e1edf6;border-color:#7e9fb8;color:#173d59}
 .modalGoal,.indicatorModalGoal{display:flex;align-items:center;gap:14px;padding:18px 28px 14px;background:#26313b;border-bottom:1px solid #344655}
 .indicatorModalGoal{padding:17px 28px 13px;background:#29333d;border-bottom-color:#3a4855}
 .popupGoalIcon{flex:0 0 auto;width:40px;height:40px;display:grid;place-items:center;border:1px solid #4b657b;border-radius:9px;background:#172b3d;color:#70bdf3;font-size:18px}
 .modalGoal>div,.indicatorModalGoal>div{min-width:0}.modalGoal small,.indicatorModalGoal small{font-size:8px;letter-spacing:1.4px;color:#91a4b6}.modalGoal h2,.indicatorModalGoal h2{font-size:20px;margin:3px 0}.modalGoal p,.indicatorModalGoal p{font-size:10px;color:#bdc8d2;max-width:1050px;margin:0;line-height:1.35}
-.modalInitiativeHead,.indicatorModalHead{display:flex;align-items:center;gap:10px;padding:11px 28px;background:#121b24;border-bottom:1px solid #253747}.indicatorModalHead{padding:12px 28px;background:#151d25;border-bottom-color:#293847}.modalInitiativeHead small{font-size:7px;color:#758da1}.modalInitiativeHead h3{font-size:13px;margin:2px 0}.indicatorModalHead h3{font-size:15px;margin:0}.statusDot{width:13px;height:13px;border-radius:50%;background:#58ad54;flex:0 0 auto}
+.modalInitiativeHead,.indicatorModalHead{display:flex;align-items:center;gap:10px;padding:11px 28px;background:#121b24;border-bottom:1px solid #253747}.indicatorModalHead{padding:12px 28px;background:#151d25;border-bottom-color:#293847}.modalInitiativeHead small{font-size:7px;color:#758da1}.modalInitiativeHead h3{font-size:13px;margin:2px 0}.indicatorModalHead h3{font-size:15px;margin:0}.statusDot{width:13px;height:13px;border-radius:50%;background:var(--gray);flex:0 0 auto}
 .timelinePanel,.progressPanel{margin:14px 20px;border:1px solid #2b4055;border-radius:8px;background:#0b1726;padding:14px 16px}.timelineTitle{display:flex;justify-content:space-between;font-size:11px}.timelineTitle span{color:#b9c6d1}.timelineTrack{position:relative;display:grid;grid-template-columns:repeat(7,minmax(80px,1fr));gap:5px;margin:24px 0 8px;min-height:90px}.timelineLine{position:absolute;left:3%;right:3%;top:13px;height:1px;background:#3b5268}.milestone{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-width:0}.milestone i{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#132335;border:1px solid #41576c;font-style:normal}.milestone.start i{background:#16b95c}.milestone.end i{background:#d94d16}.milestone b{font-size:9px}.milestone span{max-width:100%;padding:5px 7px;background:#16283a;border-radius:4px;color:#c8d2dc;font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.timelineLegend{display:flex;gap:18px;color:#aebdca;font-size:8px}
 .overallPanel{margin:0 20px;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#0d1a2b;border-radius:7px}.overallPanel small{font-size:7px;color:#8296aa}.overallDone{display:flex;align-items:baseline;gap:6px;margin-top:3px}.overallDone b{font-size:25px}.overallDone span{font-size:10px}.modalGauge{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#58ad54 var(--pct),#33404c 0);position:relative}.modalGauge:after{content:'';position:absolute;width:45px;height:45px;border-radius:50%;background:#0d1a2b}.modalGauge b{z-index:1;font-size:10px}
 .progressTitle{display:flex;justify-content:space-between;align-items:end}.progressTitle small{font-size:7px;color:#7991a5}.progressTitle h3{font-size:14px;margin:2px 0}.progressTitle>span{font-size:8px;color:#8497a9}.modalProgressRow{display:grid;grid-template-columns:190px 1fr;gap:12px;align-items:center;margin:9px 0}.modalProgressRow>span{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.modalProgressBar{height:24px;display:flex;overflow:hidden;border-radius:3px}.modalProgressBar i{display:grid;place-items:center;font-style:normal;font-size:8px;color:#111;font-weight:700}.modalLegend{display:flex;gap:14px;margin:12px 0 0 202px;font-size:8px;color:#a9b8c5}.modalLegend span{display:flex;align-items:center;gap:4px}.modalLegend i{width:8px;height:8px;border-radius:2px}
@@ -694,7 +699,7 @@ html[data-theme="light"] .initiativeEndLabel{color:#687d91}
 
 /* V2.1 Goal Key Resources action. */
 .goalHeroActions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
-.keyResourcesBtn{height:38px;padding:0 16px;border:1px solid #39749e;border-radius:6px;background:#12334a;color:#eaf4fb;font:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease}
+.keyResourcesBtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 12px;border:1px solid #345c78;border-radius:8px;background:#102a3e;color:#d8edfc;font:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease}
 .keyResourcesBtn:hover:not(:disabled),.keyResourcesBtn:focus-visible:not(:disabled){background:#174560;border-color:#55a7dc;transform:translateY(-1px);outline:none}
 .keyResourcesBtn:disabled{opacity:.55;cursor:not-allowed}
 html[data-theme="light"] .keyResourcesBtn{background:#fff;color:#245a7e;border-color:#8ebbd7}
@@ -866,3 +871,8 @@ html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
   align-self:flex-start;
   margin-top:6px;
 }
+
+/* Reserve the close control column at every compact breakpoint. */
+.initiativeModal .modalGoal,.indicatorModal .indicatorModalGoal{padding-right:62px}
+.keyResourcesBtn svg{flex:none}
+.keyResourcesBtn:focus-visible:not(:disabled){outline:2px solid var(--blue);outline-offset:3px}
