@@ -887,3 +887,11 @@ html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
 .goalPage .goalInitiativeProgress>small{font:inherit;font-size:8px!important;font-weight:400;letter-spacing:0!important;text-transform:none;color:var(--muted)}
 @media(max-width:700px){.goalInitiativeActions{gap:8px}.goalInitiativeActions>span{display:none}.goalInitiativeProgress{width:150px}}
 .aiConversation .aiMessage.assistant>.aiBubble{width:100%;max-width:100%;overflow-wrap:anywhere}
+
+/* Neutral status labels: contrast with each theme's shared grey bar color. */
+.summaryPage .stack i.not,
+.goalPage .subBar i.not,
+.initiativeModal .modalProgressBar i.not{color:#fff}
+html[data-theme="light"] .summaryPage .stack i.not,
+html[data-theme="light"] .goalPage .subBar i.not,
+html[data-theme="light"] .initiativeModal .modalProgressBar i.not{color:#17283a}
