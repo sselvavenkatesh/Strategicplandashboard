@@ -38,8 +38,6 @@ class Login(BaseModel):
 def login(body:Login,request:Request,response:Response):
     checked_origin(request)
     try:
-        config=repo.admin_auth_config() or {}
-        if config.get('signin_method','Userbased')!='Userbased': raise HTTPException(409,'Use the configured district sign-in method.')
         user=repo.validate_admin_login(body.email.strip(),body.password)
         if not user or user.get('user_role')!='Admin': raise HTTPException(401,'Sign in failed. Check your Admin email and password.')
         token=repo.create_admin_session(user['user_id'])

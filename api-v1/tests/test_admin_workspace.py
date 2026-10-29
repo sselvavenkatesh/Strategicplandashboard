@@ -1,4 +1,5 @@
 from uuid import uuid4
+import pytest
 import psycopg
 from fastapi.testclient import TestClient
 from app import main, admin
@@ -60,10 +61,32 @@ def test_logout_revokes_cookie_and_session(monkeypatch):
     r=client().post('/api/v1/admin/logout')
     assert r.status_code==204 and calls==[TOKEN] and 'max-age=0' in r.headers['set-cookie'].lower()
 
-def test_sso_configuration_prevents_password_fallback(monkeypatch):
-    monkeypatch.setattr(admin.repo,'admin_auth_config',lambda:{'signin_method':'Google'})
-    monkeypatch.setattr(admin.repo,'validate_admin_login',lambda *args:(_ for _ in ()).throw(AssertionError('Password fallback')))
-    assert client().post('/api/v1/admin/login',json={'email':'a@example.invalid','password':'test'}).status_code==409
+@pytest.mark.parametrize('method',['Userbased','Google','Microsoft'])
+def test_password_signin_remains_available_with_every_provider_setting(monkeypatch,method):
+    monkeypatch.setattr(admin.repo,'admin_auth_config',lambda:{'signin_method':method})
+    monkeypatch.setattr(admin.repo,'validate_admin_login',lambda *args:{'user_id':6,'user_role':'Admin','user_email':'a@example.invalid'})
+    monkeypatch.setattr(admin.repo,'create_admin_session',lambda uid:TOKEN)
+    response=client().post('/api/v1/admin/login',json={'email':'a@example.invalid','password':'test'})
+    assert response.status_code==200 and response.json()['id']=='6'
+    assert 'httponly' in response.headers['set-cookie'].lower()
+
+@pytest.mark.parametrize('method',['Userbased','Google','Microsoft'])
+@pytest.mark.parametrize('provider',['google','microsoft'])
+def test_configured_provider_signin_is_available_alongside_passwords(monkeypatch,method,provider):
+    monkeypatch.setattr(main.repo,'admin_auth_config',lambda:{'signin_method':method,'google_client_id':'google-client','microsoft_client_id':'ms-client','microsoft_tenant_id':'tenant'})
+    monkeypatch.setattr(main.repo,'oauth_secret',lambda *args:'unit-test-only')
+    monkeypatch.setattr(main.repo,'create_admin_oauth_state',lambda *args:'state-only')
+    response=client().get(f'/api/v1/auth/admin/oauth/{provider}/start?return_to=https://testserver/strategic-plan/demo/admin',follow_redirects=False)
+    assert response.status_code==302
+    assert ('accounts.google.com' if provider=='google' else 'login.microsoftonline.com') in response.headers['location']
+    assert 'unit-test-only' not in response.headers['location']
+
+@pytest.mark.parametrize('provider',['google','microsoft'])
+def test_provider_without_credentials_cannot_start_signin(monkeypatch,provider):
+    monkeypatch.setattr(main.repo,'admin_auth_config',lambda:{'signin_method':'Userbased'})
+    monkeypatch.setattr(main.repo,'oauth_secret',lambda *args:None)
+    monkeypatch.setattr(main.repo,'create_admin_oauth_state',lambda *args:(_ for _ in ()).throw(AssertionError('State created without credentials')))
+    assert client().get(f'/api/v1/auth/admin/oauth/{provider}/start',follow_redirects=False).status_code==503
 
 def test_verified_workspace_oauth_sets_cookie_without_query_string_token(monkeypatch):
     monkeypatch.setattr(main.repo,'consume_admin_oauth_state',lambda *args:'https://testserver/strategic-plan/demo/admin')

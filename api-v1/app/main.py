@@ -264,8 +264,6 @@ def admin_oauth_start(provider: str, request: Request, return_to: str | None = N
     workspace_return=bool(return_to and urllib.parse.urlsplit(return_to).netloc==request.url.netloc and urllib.parse.urlsplit(return_to).path.rstrip("/").endswith("/admin"))
     callback_request=request if workspace_return else None
     cfg=repo.admin_auth_config() or {}
-    expected="Google" if provider=="google" else "Microsoft"
-    if cfg.get("signin_method")!=expected: raise HTTPException(409,f"{expected} is not the configured district sign-in method")
     secret=repo.oauth_secret(provider)
     if provider=="google":
         client_id=cfg.get("google_client_id")
