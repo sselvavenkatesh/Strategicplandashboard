@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
-import {FolderOpen,ExternalLink,X} from 'lucide-react';
+import {FolderOpen,X} from 'lucide-react';
 import {useNavigate,useParams} from 'react-router-dom';
-import {getGoals,getIndicators,getInitiatives,getIndicatorHistory,getStudentGroups,Goal,Indicator,Initiative} from '../../lib/dashboard';
+import {getGoals,getIndicators,getInitiatives,getGoalInitiativeProgress,getIndicatorHistory,getStudentGroups,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 import {AchievementProgress} from '../../components/AchievementProgress';
 import {getAchievementSummary,getIndicatorTarget,numericTarget} from '../../lib/achievement';
@@ -116,6 +116,9 @@ function formatStatewide(raw:string|undefined){
 export function GoalPage(){
   const{goalId:id}=useParams(),nav=useNavigate(),goals=useDashboard(getGoals);
   const achievement=useDashboard(getAchievementSummary);
+  const initiativeProgress=useDashboard(()=>id?getGoalInitiativeProgress(id):Promise.reject(new Error('Goal unavailable')),[id]);
+  const progressReady=!initiativeProgress.loading&&!initiativeProgress.error&&initiativeProgress.data?.goal_id===id;
+  const progressPercent=progressReady?Number(initiativeProgress.data?.done_percent??0):0;
   const goalAchievement=achievement.data?.goals.find(g=>g.goalId===id);
   const[goal,setGoal]=useState<Goal|null>(null),[initiatives,setInitiatives]=useState<Initiative[]>([]),[indicators,setIndicators]=useState<Indicator[]>([]);
   const[histories,setHistories]=useState<HistoryMap>({}),[stateAvgs,setStateAvgs]=useState<AvgMap>({});
@@ -180,12 +183,19 @@ export function GoalPage(){
 
     <header className="goalHero">
       <div className="goalHeroCopy"><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
-      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}><FolderOpen size={16} aria-hidden="true"/><span>Key Resources</span><ExternalLink size={12} aria-hidden="true"/></button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
+      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}><FolderOpen size={16} aria-hidden="true"/><span>Key Resources</span></button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
     </header>
 
     <div className="goalSectionTitle">
       <div><small>PROGRESS TOWARD THE GOAL</small><h3>Key Initiatives</h3></div>
-      <span>Click an initiative to view details</span>
+      <div className="goalInitiativeActions">
+        <div className="goalInitiativeProgress" role="group" aria-label="Goal initiative progress" title="Completed action items divided by total action items across this goal's public initiatives">
+          <div className="goalInitiativeProgressLabel"><span>Initiative Progress</span><b>{initiativeProgress.loading?'…':progressReady?progressPercent.toFixed(0)+'%':'—'}</b></div>
+          <div className="goalInitiativeProgressTrack" role="progressbar" aria-label="Initiative completion" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressReady?progressPercent:undefined}><i style={{width:progressPercent+'%',background:initiativeProgressColor(progressPercent)}}/></div>
+          <small>{initiativeProgress.loading?'Loading…':!progressReady?'Progress unavailable':initiativeProgress.data?.total_action_items?`${initiativeProgress.data.done_count} of ${initiativeProgress.data.total_action_items} action items completed`:'No action items'}</small>
+        </div>
+        <span>Click an initiative to view details</span>
+      </div>
     </div>
 
     <section className="initiativeGrid">

@@ -44,7 +44,22 @@ def subinitiative_progress(goal_id: str, initiative_id: str, school: str | None 
     return fetch_all("select * from public.fn_subinitiative_progress(%s,%s,%s)", (goal_id, initiative_id, school))
 
 def goal_initiative_progress(goal_id: str | None = None, school: str | None = None):
-    return fetch_all("select * from public.fn_goal_initiative_progress(%s,%s)", (goal_id, school))
+    # Match initiatives-full: only public masters and public reporting rows.
+    return fetch_all('''
+      select d."Goal ID" as goal_id, count(*) as total_action_items,
+        count(*) filter (where d."Status"='Done') as done_count,
+        count(*) filter (where d."Status"='In Progress') as in_progress_count,
+        count(*) filter (where d."Status"='Not Yet Started') as not_yet_started_count,
+        round(100.0*count(*) filter (where d."Status"='Done')/count(*),1) as done_percent,
+        round(100.0*count(*) filter (where d."Status"='In Progress')/count(*),1) as in_progress_percent,
+        round(100.0*count(*) filter (where d."Status"='Not Yet Started')/count(*),1) as not_yet_started_percent
+      from public."Initiative_Data" d
+      join public."Initiative_master" m on m."Initiative ID"=d."Initiative ID" and m."Goal ID"=d."Goal ID"
+      where d."Role"='All' and m."Role"='All'
+        and (%s::text is null or d."Goal ID"=%s)
+        and (%s::text is null or d."School"=%s)
+      group by d."Goal ID" order by d."Goal ID"
+    ''', (goal_id, goal_id, school, school))
 
 def feature_enabled(version: str, feature: str):
     row = fetch_one("select public.is_feature_enabled(%s,%s) as enabled", (version, feature))

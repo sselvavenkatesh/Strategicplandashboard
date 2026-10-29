@@ -52,3 +52,25 @@ def test_target_query_preserves_preview_override_and_exact_year_fallback(monkeyp
     assert params==(True,'ID8','2025-26','ID8','2025-26')
     repository.indicator_target('ID8','2024-25',False)
     assert calls[1][1]==(False,'ID8','2024-25','ID8','2024-25')
+
+
+def test_goal_initiative_progress_http_contract(monkeypatch):
+    expected=[{'goal_id':'G1','total_action_items':20,'done_count':11,'done_percent':55.0}]
+    calls=[]
+    monkeypatch.setattr(main.repo,'goal_initiative_progress',lambda goal,school:calls.append((goal,school)) or expected)
+    response=client.get('/api/v1/goals/G1/initiative-progress?school=Example')
+    assert response.status_code==200 and response.json()==expected
+    assert calls==[('G1','Example')]
+    monkeypatch.setattr(main.repo,'goal_initiative_progress',lambda *args:[])
+    assert client.get('/api/v1/goals/empty/initiative-progress').json()==[]
+
+
+def test_goal_progress_counts_public_actions_instead_of_averaging_initiatives(monkeypatch):
+    from app import repository
+    calls=[]
+    monkeypatch.setattr(repository,'fetch_all',lambda sql,params:calls.append((sql,params)) or [])
+    repository.goal_initiative_progress('G1',None)
+    sql,params=calls[0]
+    assert 'Initiative_master' in sql and 'm."Role"=\'All\'' in sql and 'd."Role"=\'All\'' in sql
+    assert 'count(*)' in sql and 'avg(' not in sql.lower()
+    assert params==('G1','G1',None,None)

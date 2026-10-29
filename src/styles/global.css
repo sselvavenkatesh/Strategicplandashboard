@@ -876,3 +876,14 @@ html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
 .initiativeModal .modalGoal,.indicatorModal .indicatorModalGoal{padding-right:62px}
 .keyResourcesBtn svg{flex:none}
 .keyResourcesBtn:focus-visible:not(:disabled){outline:2px solid var(--blue);outline-offset:3px}
+
+.goalInitiativeActions{display:flex;align-items:end;gap:24px}
+.goalInitiativeActions>span{font-size:9px;color:var(--muted)}
+.goalInitiativeProgress{width:200px;max-width:100%;display:grid;gap:4px}
+.goalInitiativeProgressLabel{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:10px;color:var(--muted)}
+.goalInitiativeProgressLabel b{font-size:13px;color:var(--text);font-variant-numeric:tabular-nums}
+.goalInitiativeProgressTrack{height:4px;border-radius:999px;background:var(--gray);overflow:hidden}
+.goalInitiativeProgressTrack i{display:block;height:100%;border-radius:inherit}
+.goalInitiativeProgress>small{font-size:8px;letter-spacing:0;color:var(--muted)}
+@media(max-width:700px){.goalInitiativeActions{gap:8px}.goalInitiativeActions>span{display:none}.goalInitiativeProgress{width:160px}}
+@media(max-width:400px){.goalInitiativeProgress{width:125px}}

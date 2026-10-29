@@ -26,3 +26,14 @@ export async function getInitiatives(goalId:string):Promise<Initiative[]>{if(fas
  const firstDate=(a:any[])=>a.map(r=>r['Start Date']).filter(Boolean).sort((x,y)=>(dateValue(x)||0)-(dateValue(y)||0))[0];
  const lastDate=(a:any[])=>a.map(r=>r['End Date']).filter(Boolean).sort((x,y)=>(dateValue(x)||0)-(dateValue(y)||0)).at(-1);
  return(masters||[]).map(m=>{const rr=validRows.filter(r=>r['Initiative ID']===m['Initiative ID']);const counts=(a:any[])=>({done:a.filter(x=>x.Status==='Done').length,inProgress:a.filter(x=>x.Status==='In Progress').length,notStarted:a.filter(x=>x.Status==='Not Yet Started').length});const c=counts(rr),total=rr.length;const names=[...new Set(rr.map(r=>r['Sub Initiative Name']).filter(Boolean))] as string[];return{id:m['Initiative ID'],name:m['Initiative Name']||m['Initiative ID'],shortName:m['Initiative_Short_name']||m['Initiative Name']||m['Initiative ID'],description:m['Initiative Name']||'',done:c.done,inProgress:c.inProgress,notStarted:c.notStarted,completion:total?100*c.done/total:0,totalActionItems:total,start:firstDate(rr),end:lastDate(rr),subInitiatives:names.map(name=>{const sr=rr.filter(r=>r['Sub Initiative Name']===name),x=counts(sr),t=x.done+x.inProgress+x.notStarted||1;return{name,done:100*x.done/t,inProgress:100*x.inProgress/t,notStarted:100*x.notStarted/t,start:firstDate(sr),end:lastDate(sr),totalActionItems:sr.length,completion:100*x.done/t}})}})}
+
+export type GoalInitiativeProgress={goal_id:string;total_action_items:number;done_count:number;done_percent:number};
+export async function getGoalInitiativeProgress(goalId:string):Promise<GoalInitiativeProgress>{
+ if(fastApiEnabled){
+  const rows=await apiGet<GoalInitiativeProgress[]>(`/api/v1/goals/${encodeURIComponent(goalId)}/initiative-progress`);
+  return rows.find(row=>row.goal_id===goalId)??{goal_id:goalId,total_action_items:0,done_count:0,done_percent:0};
+ }
+ const initiatives=await getInitiatives(goalId);
+ const total=initiatives.reduce((sum,i)=>sum+i.totalActionItems,0),done=initiatives.reduce((sum,i)=>sum+i.done,0);
+ return{goal_id:goalId,total_action_items:total,done_count:done,done_percent:total?100*done/total:0};
+}
