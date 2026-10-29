@@ -7,7 +7,7 @@ export type AiAnswer={answer:string;sources:string[];outOfScope?:boolean};
 let indicatorLabels:Promise<IndicatorLabel[]>|null=null;
 function getIndicatorLabels(){
   if(!indicatorLabels)indicatorLabels=(async()=>{
-    if(fastApiV25Enabled)return apiGet<IndicatorLabel[]>('/api/v1/indicator-labels');
+    if(fastApiEnabled)return apiGet<IndicatorLabel[]>('/api/v1/indicator-labels');
     const {data,error}=await supabase.from('Indicator_master').select('"Indicator ID","Indicator_short_name","Indicator Name"').eq('Role','All');
     if(error)throw error;
     return (data??[]).map(row=>({id:String(row['Indicator ID']),name:String(row.Indicator_short_name||row['Indicator Name']||'indicator')}));

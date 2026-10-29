@@ -70,8 +70,28 @@ begin
   perform public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',s->'goals','owners',jsonb_build_object(g,jsonb_build_array(sa::text))));
   raise exception 'SuperAdmin accepted as stakeholder';
  exception when raise_exception then if sqlerrm='SuperAdmin accepted as stakeholder' then raise; end if; end;
+
+ -- Privacy uses existing Role metadata; preserve reporting data and assignments.
+ select md5(coalesce(string_agg(x,'' order by x),'')) into old_hash from (select 'i'||ctid::text||xmin::text x from public."Indicator_Data" union all select 'n'||ctid::text||xmin::text from public."Initiative_Data")q;
+ select x into rowdata from jsonb_array_elements(s->'indicators')x where x->>'Indicator ID'=ind;
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','indicators','records',jsonb_build_array(rowdata||jsonb_build_object('Role','Admin'))));
+ if (select "Role" from public."Indicator_master" where "Indicator ID"=ind)<>'Admin' then raise exception 'Indicator Private did not persist'; end if;
+ if exists(select 1 from jsonb_array_elements(public.fn_indicator_achievement_summary(false)->'goals') x,jsonb_array_elements(x->'indicators') i where i->>'id'=ind) then raise exception 'Private indicator leaked in Achievement';end if;
+ if not public.v25_admin_can_manage(adm,'indicators',ind) then raise exception 'Privacy changed Admin assignment access';end if;
+ select x into rowdata from jsonb_array_elements(s->'initiatives')x where x->>'Initiative ID'=ini;
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','initiatives','records',jsonb_build_array(rowdata||jsonb_build_object('Role','Admin'))));
+ if (select "Role" from public."Initiative_master" where "Initiative ID"=ini)<>'Admin' then raise exception 'Initiative Private did not persist'; end if;
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',(select jsonb_agg(case when x->>'Goal ID'=g then x||jsonb_build_object('Role','Admin') else x end) from jsonb_array_elements(s->'goals') x)));
+ if (select "Role" from public."Goal_master" where "Goal ID"=g)<>'Admin' then raise exception 'Goal Private did not persist'; end if;
+ if exists(select 1 from jsonb_array_elements(public.fn_indicator_achievement_summary(false)->'goals') x where x->>'goalId'=g) then raise exception 'Private goal leaked in Achievement';end if;
+ -- Changing Yes back to No must be reversible without editing reporting rows.
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',(select jsonb_agg(case when x->>'Goal ID'=g then x||jsonb_build_object('Role','All') else x end) from jsonb_array_elements(s->'goals') x)));
+ if (select "Role" from public."Goal_master" where "Goal ID"=g)<>'All' then raise exception 'Goal could not be made public again';end if;
+ select md5(coalesce(string_agg(x,'' order by x),'')) into new_hash from (select 'i'||ctid::text||xmin::text x from public."Indicator_Data" union all select 'n'||ctid::text||xmin::text from public."Initiative_Data")q;
+ if old_hash<>new_hash then raise exception 'Privacy rewrote reporting data';end if;
+
  perform public.v25_superadmin_logout(tok);
  begin perform public.v25_superadmin_snapshot(tok);raise exception 'Revoked session accepted';exception when invalid_authorization_specification then null;end;
 end $$;
 rollback;
-select 'PASS: real SQL login, no-op preservation, assignment persistence, master creation, indicator update, nested action rename, public KPI visibility, conflict/deletion/role checks, logout; all fixtures rolled back' as result;
+select 'PASS: real SQL login, no-op preservation, assignment persistence, master creation, indicator update, nested action rename, public KPI visibility, Private save/reload/reversal without reporting rewrites, conflict/deletion/role checks, logout; all fixtures rolled back' as result;

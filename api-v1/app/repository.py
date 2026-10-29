@@ -23,25 +23,25 @@ def goals():
     return fetch_all('select * from public."Goal_master" where "Role"=%s order by "Goal ID"', ("All",))
 
 def indicator_master(goal_id: str):
-    return fetch_all('select * from public."Indicator_master" where "Goal ID"=%s and "Role"=%s order by "Indicator ID"', (goal_id, "All"))
+    return fetch_all("""select m.* from public."Indicator_master" m where m."Goal ID"=%s and m."Role"=%s and exists(select 1 from public."Goal_master" g where g."Goal ID"=m."Goal ID" and g."Role"='All') order by m."Indicator ID" """, (goal_id, "All"))
 
 def indicator_key_values(goal_id: str, school: str | None = None):
-    return fetch_all("select * from public.fn_indicator_key_values(%s,%s)", (goal_id, school))
+    return fetch_all("select f.* from public.fn_indicator_key_values(%s,%s) f where exists(select 1 from public.\"Indicator_master\" m join public.\"Goal_master\" g on g.\"Goal ID\"=m.\"Goal ID\" where m.\"Indicator ID\"=f.indicator_id and m.\"Role\"='All' and g.\"Role\"='All')", (goal_id, school))
 
 def indicator_history(indicator_id: str, school: str | None = None):
-    return fetch_all("select * from public.fn_indicator_year_history(%s,%s)", (indicator_id, school))
+    return fetch_all("select f.* from public.fn_indicator_year_history(%s,%s) f where exists(select 1 from public.\"Indicator_master\" m join public.\"Goal_master\" g on g.\"Goal ID\"=m.\"Goal ID\" where m.\"Indicator ID\"=f.indicator_id and m.\"Role\"='All' and g.\"Role\"='All')", (indicator_id, school))
 
 def indicator_student_groups(indicator_id: str, school_year: str, school: str | None = None):
-    return fetch_all("select * from public.fn_indicator_student_groups(%s,%s,%s)", (indicator_id, school_year, school))
+    return fetch_all("select f.* from public.fn_indicator_student_groups(%s,%s,%s) f where exists(select 1 from public.\"Indicator_master\" m join public.\"Goal_master\" g on g.\"Goal ID\"=m.\"Goal ID\" where m.\"Indicator ID\"=f.indicator_id and m.\"Role\"='All' and g.\"Role\"='All')", (indicator_id, school_year, school))
 
 def initiative_master(goal_id: str):
-    return fetch_all('select * from public."Initiative_master" where "Goal ID"=%s and "Role"=%s order by "Initiative ID"', (goal_id, "All"))
+    return fetch_all("""select m.* from public."Initiative_master" m where m."Goal ID"=%s and m."Role"=%s and exists(select 1 from public."Goal_master" g where g."Goal ID"=m."Goal ID" and g."Role"='All') order by m."Initiative ID" """, (goal_id, "All"))
 
 def initiative_progress(goal_id: str, school: str | None = None):
-    return fetch_all("select * from public.fn_initiative_progress(%s,%s)", (goal_id, school))
+    return fetch_all("select f.* from public.fn_initiative_progress(%s,%s) f where exists(select 1 from public.\"Initiative_master\" m join public.\"Goal_master\" g on g.\"Goal ID\"=m.\"Goal ID\" where m.\"Initiative ID\"=f.initiative_id and m.\"Role\"='All' and g.\"Role\"='All')", (goal_id, school))
 
 def subinitiative_progress(goal_id: str, initiative_id: str, school: str | None = None):
-    return fetch_all("select * from public.fn_subinitiative_progress(%s,%s,%s)", (goal_id, initiative_id, school))
+    return fetch_all("""select f.* from public.fn_subinitiative_progress(%s,%s,%s) f where exists(select 1 from public."Initiative_master" m join public."Goal_master" g on g."Goal ID"=m."Goal ID" where m."Initiative ID"=%s and m."Goal ID"=%s and m."Role"='All' and g."Role"='All')""", (goal_id, initiative_id, school, initiative_id, goal_id))
 
 def goal_initiative_progress(goal_id: str | None = None, school: str | None = None):
     # Match initiatives-full: only public masters and public reporting rows.
@@ -55,7 +55,7 @@ def goal_initiative_progress(goal_id: str | None = None, school: str | None = No
         round(100.0*count(*) filter (where d."Status"='Not Yet Started')/count(*),1) as not_yet_started_percent
       from public."Initiative_Data" d
       join public."Initiative_master" m on m."Initiative ID"=d."Initiative ID" and m."Goal ID"=d."Goal ID"
-      where d."Role"='All' and m."Role"='All'
+      where d."Role"='All' and m."Role"='All' and exists(select 1 from public."Goal_master" g where g."Goal ID"=m."Goal ID" and g."Role"='All')
         and (%s::text is null or d."Goal ID"=%s)
         and (%s::text is null or d."School"=%s)
       group by d."Goal ID" order by d."Goal ID"
@@ -175,12 +175,12 @@ def indicator_target(indicator_id: str, school_year: str, preview: bool):
     row = fetch_one("""select coalesce(
         (select target_1 from public."Indicator_Target_Preview" where %s and indicator_id=%s and school_year=%s),
         (select target_1 from public.vw_indicator_reporting_normalized where indicator_id=%s and school_year=%s and category='All' and student_group='All Students' and role='All' and school is null)
-    ) as target_1""", (preview, indicator_id, school_year, indicator_id, school_year))
+    ) as target_1 where exists(select 1 from public."Indicator_master" m join public."Goal_master" g on g."Goal ID"=m."Goal ID" where m."Indicator ID"=%s and m."Role"='All' and g."Role"='All')""", (preview, indicator_id, school_year, indicator_id, school_year, indicator_id))
     return row.get('target_1') if row else None
 
 
 def indicator_labels():
-    return fetch_all('select "Indicator ID" as id, coalesce(nullif("Indicator_short_name",\'\'),"Indicator Name",\'indicator\') as name from public."Indicator_master" where "Role"=%s order by "Indicator ID"', ('All',))
+    return fetch_all('select "Indicator ID" as id, coalesce(nullif("Indicator_short_name",\'\'),"Indicator Name",\'indicator\') as name from public."Indicator_master" m where "Role"=%s and exists(select 1 from public."Goal_master" g where g."Goal ID"=m."Goal ID" and g."Role"=\'All\') order by "Indicator ID"', ('All',))
 
 
 def preview_dataset():
@@ -201,6 +201,12 @@ def preview_dataset():
             result[key] = (cur.fetchone() or {}) if key == 'profile' else cur.fetchall()
         cur.execute('select indicator_id,school_year,target_1 from public."Indicator_Target_Preview"')
         targets = {(row['indicator_id'], row['school_year']): row['target_1'] for row in cur.fetchall()}
+    public_goals={row['Goal ID'] for row in result['goals']}
+    for key in ('indicators','initiatives'):
+        result[key]=[row for row in result[key] if row['Goal ID'] in public_goals]
+    for kind,key,identifier in (('indicators','indicatorData','Indicator ID'),('initiatives','initiativeData','Initiative ID')):
+        allowed={row[identifier] for row in result[kind]}
+        result[key]=[row for row in result[key] if row[identifier] in allowed and row['Goal ID'] in public_goals]
     for row in result['indicatorData']:
         if row.get('Category') == 'All' and row.get('Student Group') == 'All Students' and not row.get('School'):
             row['Target 1'] = targets.get((row['Indicator ID'], row['School Year']), row.get('Target 1'))

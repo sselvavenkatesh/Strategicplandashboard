@@ -49,9 +49,9 @@ def test_target_query_preserves_preview_override_and_exact_year_fallback(monkeyp
     assert repository.indicator_target('ID8','2025-26',True)=='90%'
     sql,params=calls[0]
     assert 'coalesce(' in sql and 'Indicator_Target_Preview' in sql and 'vw_indicator_reporting_normalized' in sql
-    assert params==(True,'ID8','2025-26','ID8','2025-26')
+    assert params==(True,'ID8','2025-26','ID8','2025-26','ID8')
     repository.indicator_target('ID8','2024-25',False)
-    assert calls[1][1]==(False,'ID8','2024-25','ID8','2024-25')
+    assert calls[1][1]==(False,'ID8','2024-25','ID8','2024-25','ID8')
 
 
 def test_goal_initiative_progress_http_contract(monkeypatch):

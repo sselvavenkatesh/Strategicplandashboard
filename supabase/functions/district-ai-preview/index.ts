@@ -38,7 +38,12 @@ Deno.serve(async(req)=>{
 
     const dataMs=Date.now()-dataStarted;
     const sources=["District_Profile","Goal_master","Indicator_master","Initiative_master","Indicator_Data","Initiative_Data"];
-    const context={profile:profile.data?.[0]??null,goals:goals.data??[],indicators:indicators.data??[],initiatives:initiatives.data??[],indicatorData:indicatorData.data??[],initiativeData:initiativeData.data??[]};
+    const publicGoals=new Set((goals.data??[]).map(row=>row['Goal ID']));
+    const publicIndicators=(indicators.data??[]).filter(row=>publicGoals.has(row['Goal ID']));
+    const publicInitiatives=(initiatives.data??[]).filter(row=>publicGoals.has(row['Goal ID']));
+    const indicatorIds=new Set(publicIndicators.map(row=>row['Indicator ID']));
+    const initiativeIds=new Set(publicInitiatives.map(row=>row['Initiative ID']));
+    const context={profile:profile.data?.[0]??null,goals:goals.data??[],indicators:publicIndicators,initiatives:publicInitiatives,indicatorData:(indicatorData.data??[]).filter(row=>publicGoals.has(row['Goal ID'])&&indicatorIds.has(row['Indicator ID'])),initiativeData:(initiativeData.data??[]).filter(row=>publicGoals.has(row['Goal ID'])&&initiativeIds.has(row['Initiative ID']))};
 
     const apiKey=clean(Deno.env.get("OLLAMA_API_KEY"));
     const model=clean(Deno.env.get("OLLAMA_MODEL"))||"gpt-oss:20b-cloud";
