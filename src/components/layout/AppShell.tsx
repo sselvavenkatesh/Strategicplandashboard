@@ -1,6 +1,6 @@
-import {Menu,Moon,Sparkles,Sun,X} from 'lucide-react';
+import {Menu,Moon,Sparkles,Sun,X,Home,LayoutDashboard,Target,Scale,HeartHandshake,UsersRound,ShieldCheck,LogOut,ChevronRight} from 'lucide-react';
 import {FormEvent,useEffect,useRef,useState} from 'react';
-import {Link,Outlet,useLocation,useNavigate} from 'react-router-dom';
+import {Link,NavLink,Outlet,useLocation,useNavigate} from 'react-router-dom';
 import {getGoals,getProfile} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 import {supabase} from '../../lib/supabase';
@@ -8,9 +8,10 @@ import {useTheme} from '../../app/ThemeProvider';
 import {apiGet,apiPost,fastApiEnabled} from '../../lib/api';
 import {getAdminSession,loginAdmin,logoutAdmin} from '../../pages/admin/v25/adminApi';
 import {isAiEnabled} from '../../lib/ai';
+import './publicNavigation.css';
 
 const liveAdmin=import.meta.env.VITE_V25_UI_PREVIEW==='true'&&fastApiEnabled;
-type AdminProfile={name:string;email:string};
+type AdminProfile={name:string;email:string;role?:string};
 
 export function AppShell(){
   const{theme,toggleTheme}=useTheme();
@@ -26,6 +27,29 @@ export function AppShell(){
   const nav=useNavigate();
   const location=useLocation();
   const initialPath=useRef(location.pathname);
+  const menuButton=useRef<HTMLButtonElement>(null);
+  const navigation=useRef<HTMLElement>(null);
+  const closeNavigation=useRef<HTMLButtonElement>(null);
+  const initials=(admin?.name??'').split(/\s+/).filter(Boolean).slice(0,2).map(word=>word[0]).join('').toUpperCase();
+  const role=admin?.role||'Admin';
+  const goalIcons=[Target,Scale,HeartHandshake,UsersRound];
+  useEffect(()=>{
+    if(!open)return;
+    const trigger=menuButton.current;
+    closeNavigation.current?.focus();
+    const keydown=(event:KeyboardEvent)=>{
+      if(event.key==='Escape'){setOpen(false);return}
+      if(event.key==='Tab'){
+        const controls=navigation.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled])');
+        if(!controls?.length)return;
+        const first=controls[0],last=controls[controls.length-1];
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+      }
+    };
+    document.addEventListener('keydown',keydown);
+    return()=>{document.removeEventListener('keydown',keydown);trigger?.focus()};
+  },[open]);
   const[pageLoading,setPageLoading]=useState(false);
   const[aiEnabled,setAiEnabled]=useState(false);
 
@@ -82,26 +106,34 @@ export function AppShell(){
     if(error){setAuthMessage('SSO sign in could not be started. Please contact your administrator.');setAuthBusy(false)}
   }
 
-  async function signOut(){if(liveAdmin){setAuthBusy(true);try{await logoutAdmin();setAdmin(null);setPassword('');setEmail('');nav('/')}catch(reason){setAuthMessage(reason instanceof Error?reason.message:'Sign out failed.')}finally{setAuthBusy(false)}return}sessionStorage.removeItem('district360_admin');setAdmin(null);supabase.auth.signOut();nav('/')}
+  async function signOut(){if(liveAdmin){setAuthBusy(true);try{await logoutAdmin();setAdmin(null);setPassword('');setEmail('');setOpen(false);nav('/')}catch(reason){setAuthMessage(reason instanceof Error?reason.message:'Sign out failed.')}finally{setAuthBusy(false)}return}sessionStorage.removeItem('district360_admin');setAdmin(null);supabase.auth.signOut();setOpen(false);nav('/')}
 
-  return <div className="app-shell">
+  return <div className={'app-shell '+(admin?'hasAccount':'')}>
     {pageLoading&&<div className="pageLoader" role="status" aria-live="polite" aria-label="Loading page"><img className="k12LoaderLogo" src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/><div className="k12LoaderPulse"/><small>Loading strategic plan…</small></div>}
     <header className="topbar">
       <Link to="/" className="brand"><span className="districtLogo" aria-hidden="true">{p.data?.logo?<img src={p.data.logo} alt=""/>:<svg viewBox="0 0 48 48"><path d="M8 17c6 0 11 2 16 6 5-4 10-6 16-6v20c-6 0-11 2-16 5-5-3-10-5-16-5V17Z"/><path d="M24 23v19M13 13l3 3M35 13l-3 3M24 7v5M17 9l2 4M31 9l-2 4"/><path d="M17 17a8 8 0 0 1 14 0"/></svg>}</span><b>{p.data?.districtName||'District'}</b><span className="headerPowered"><span>Powered By</span><img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/></span></Link>
       <div className="tools">
-        {admin?<><Link className="signInBtn" to="/admin">Admin workspace</Link><button disabled={authBusy} className="signInBtn welcomeUserBtn" onClick={signOut} title="Sign out">{authBusy?'Signing out…':`Welcome ${admin.name}`}</button></>:<button className="signInBtn" onClick={()=>{setAuthMessage('');setSignInOpen(true)}}>Sign In</button>}
+        {admin?<><Link className="workspaceShortcut" to="/admin" title="Open Admin workspace"><ShieldCheck size={15}/><span>Admin workspace</span></Link><div className="headerAccount" aria-label={`Signed in as ${admin.name}, ${role}`}><span className="accountAvatar" aria-hidden="true">{initials}</span><span className="accountCopy"><b title={admin.name}>{admin.name}</b><small>{role}</small></span></div></>:<button className="signInBtn" onClick={()=>{setAuthMessage('');setSignInOpen(true)}}>Sign In</button>}
         {aiEnabled&&<button className="aiHeaderBtn" onClick={()=>nav('/ai')} aria-label="Open K12 AI Assistant" title="K12 AI Assistant"><span className="aiMarkText">AI</span><Sparkles className="aiMarkSpark" size={10}/></button>}
         <button className="themeBtn" onClick={toggleTheme} aria-label={theme==='dark'?'Switch to light theme':'Switch to dark theme'} title={theme==='dark'?'Switch to light theme':'Switch to dark theme'}>{theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button>
-        <button className="menuBtn" onClick={()=>setOpen(true)} aria-label="Open navigation"><Menu size={20}/></button>
+        <button ref={menuButton} className="menuBtn" onClick={()=>setOpen(true)} aria-label="Open navigation" aria-expanded={open} aria-controls="dashboard-navigation"><Menu size={20}/></button>
       </div>
     </header>
     {liveAdmin&&admin&&authMessage&&<div className="signInError" role="alert">{authMessage}</div>}
     <Outlet/>
     <div className={'scrim '+(open?'on':'')} onClick={()=>setOpen(false)}/>
-    <aside className={'navPanel '+(open?'open':'')}>
-      <div className="navTitle"><b>Explore the Dashboard</b><button onClick={()=>setOpen(false)}><X size={18}/></button></div>
-      <nav><Link to="/" onClick={()=>setOpen(false)}>⌂ <span>Home</span></Link><Link to="/summary" onClick={()=>setOpen(false)}>▦ <span>Summary</span></Link><small>GOALS</small>{g.data?.map((x,i)=><Link to={'/goals/'+x.id} onClick={()=>setOpen(false)} key={x.id}><i>{['★','◆','♥','✦','●','▲','⬟','✚'][i%8]}</i><span>{x.name}</span></Link>)}</nav>
-      <div className="navPowered"><span>Powered By</span><img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/></div>
+    <aside ref={navigation} id="dashboard-navigation" className={'navPanel dashboardNav '+(open?'open':'')} aria-label="Dashboard navigation" aria-hidden={!open} inert={!open}>
+      <div className="navTitle"><div><span className="navEyebrow">STRATEGIC PLAN</span><b>Explore the dashboard</b></div><button ref={closeNavigation} aria-label="Close navigation" onClick={()=>setOpen(false)}><X size={17}/></button></div>
+      <div className="navDistrict" title={p.data?.districtName}>{p.data?.districtName||'District dashboard'}</div>
+      <nav aria-label="Dashboard pages">
+        <small>OVERVIEW</small>
+        <NavLink to="/" end onClick={()=>setOpen(false)}><span className="navItemIcon"><Home size={17}/></span><span>Home</span><ChevronRight size={13} className="navArrow"/></NavLink>
+        <NavLink to="/summary" onClick={()=>setOpen(false)}><span className="navItemIcon"><LayoutDashboard size={17}/></span><span>Goal summary</span><ChevronRight size={13} className="navArrow"/></NavLink>
+        <small>STRATEGIC GOALS</small>{g.data?.map((goal,index)=>{const Icon=goalIcons[index%goalIcons.length];return <NavLink to={'/goals/'+goal.id} onClick={()=>setOpen(false)} key={goal.id}><span className="navItemIcon"><Icon size={17}/></span><span className="navGoalLabel"><small>Goal {index+1}</small><b>{goal.name}</b></span><ChevronRight size={13} className="navArrow"/></NavLink>})}
+        {admin&&<><small>ADMINISTRATION</small><NavLink to="/admin" onClick={()=>setOpen(false)}><span className="navItemIcon"><ShieldCheck size={17}/></span><span>Admin workspace</span><ChevronRight size={13} className="navArrow"/></NavLink></>}
+      </nav>
+      <div className="navAccountFooter">{admin&&<><div className="navAccount"><span className="accountAvatar" aria-hidden="true">{initials}</span><span className="accountCopy"><b title={admin.name}>{admin.name}</b><small>{role}</small></span></div><button className="navSignOut" disabled={authBusy} onClick={signOut}><LogOut size={16}/><span>{authBusy?'Signing out…':'Sign Out'}</span></button></>}
+      <div className="navPowered"><span>Powered by</span><img src={`${import.meta.env.BASE_URL}${theme==='light'?'k12matrix-logo-light.svg':'k12matrix-logo.svg'}`} alt="K12Matrix"/></div></div>
     </aside>
     {signInOpen&&<div className="signInModal open" role="dialog" aria-modal="true" aria-labelledby="signInTitle" onMouseDown={e=>{if(e.target===e.currentTarget)setSignInOpen(false)}}>
       <form className="signInCard" onSubmit={submitSignIn}>

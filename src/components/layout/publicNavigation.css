@@ -1,0 +1,32 @@
+/* Public dashboard identity and compact, keyboard-accessible left navigation. */
+.tools{align-items:center}
+.workspaceShortcut{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;color:var(--text);background:var(--panel);text-decoration:none;font-size:10px;font-weight:650;white-space:nowrap;transition:background .15s,border-color .15s}
+.workspaceShortcut:hover{background:var(--panel2);border-color:var(--blue)}
+.workspaceShortcut svg{color:var(--blue);flex-shrink:0}
+.headerAccount{display:flex;align-items:center;gap:7px;padding:0 8px 0 4px;max-width:200px}
+.accountAvatar{width:30px;height:30px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--blue) 15%,var(--panel));color:var(--blue);border:1px solid color-mix(in srgb,var(--blue) 20%,transparent);font-size:10px;font-weight:750}
+.accountCopy{display:grid;gap:2px;min-width:0}.accountCopy b{font-size:11px;line-height:1.2;font-weight:650;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.accountCopy small{font-size:9px;line-height:1.2;color:var(--muted)}
+.navPanel.dashboardNav{left:0;right:auto;top:0;bottom:0;width:min(310px,90vw);transform:translateX(-105%);padding:20px 14px 12px;background:var(--panel);color:var(--text);border:0;border-right:1px solid var(--line);box-shadow:12px 0 36px #0002;display:flex;flex-direction:column;transition:transform .22s ease;visibility:hidden}
+.navPanel.dashboardNav.open{transform:translateX(0);visibility:visible}
+.dashboardNav .navTitle{gap:12px;padding:0 4px}.dashboardNav .navTitle>div{min-width:0}.dashboardNav .navTitle b{display:block;font-size:15px;letter-spacing:-.2px;margin-top:4px}.dashboardNav .navEyebrow{font-size:8px;letter-spacing:1.5px;font-weight:750;color:var(--blue)}
+.dashboardNav .navTitle button{width:28px;height:28px;flex-shrink:0;border-radius:7px;border-color:var(--line);background:var(--panel2);color:var(--text);cursor:pointer}
+.navDistrict{padding:10px 4px 15px;border-bottom:1px solid var(--line);font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.navPanel.dashboardNav nav{flex:1;min-height:0;max-height:none;overflow-y:auto;padding:8px 0 12px;gap:3px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.navPanel.dashboardNav nav>small{margin:13px 10px 6px;font-size:8px;letter-spacing:1.2px;font-weight:700;color:var(--muted)}
+.navPanel.dashboardNav nav a{gap:10px;padding:9px 10px;border:1px solid transparent;border-radius:8px;font-size:11px;color:var(--muted);min-height:43px;line-height:1.4;transition:background .15s,color .15s}
+.navPanel.dashboardNav nav a:hover{background:var(--panel2);color:var(--text)}
+.navPanel.dashboardNav nav a.active{background:color-mix(in srgb,var(--blue) 10%,var(--panel));border-color:color-mix(in srgb,var(--blue) 22%,transparent);color:var(--text)}
+.navItemIcon{height:29px;width:29px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;background:var(--panel2);color:var(--blue)}
+.dashboardNav .navArrow{margin-left:auto;flex-shrink:0;opacity:.5}.dashboardNav a.active .navArrow{color:var(--blue);opacity:1}
+.navPanel.dashboardNav .navGoalLabel{min-width:0;flex:1}.navPanel.dashboardNav .navGoalLabel small{display:block;margin:0 0 2px;font-size:8px;letter-spacing:0;color:var(--muted)}.navGoalLabel b{font-size:10px;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.navAccountFooter{border-top:1px solid var(--line);padding:12px 4px 0;flex-shrink:0}.navAccount{display:flex;align-items:center;gap:9px;margin-bottom:10px}.navAccount .accountCopy{flex:1}
+.navSignOut{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--muted);font-size:11px;text-align:left;cursor:pointer}.navSignOut:hover{background:var(--panel2);color:var(--text)}.navSignOut:disabled{opacity:.5;cursor:wait}
+.dashboardNav .navPowered{position:static;display:flex;align-items:center;justify-content:flex-end;gap:5px;border:0;padding:12px 0 0;font-size:8px;color:var(--muted)}.dashboardNav .navPowered img{width:84px;height:22px;margin:0}
+.dashboardNav a:focus-visible,.dashboardNav button:focus-visible,.workspaceShortcut:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(max-width:850px){.headerAccount{max-width:145px;padding-right:2px;gap:5px}.workspaceShortcut{font-size:9px;padding:6px 8px}.accountCopy b{font-size:10px}}
+@media(max-width:650px){.headerAccount{max-width:110px}.headerAccount .accountAvatar{display:none}.workspaceShortcut span{display:none}.workspaceShortcut{width:30px;height:30px;min-height:30px;padding:0;justify-content:center}.headerAccount .accountCopy small{font-size:8px}.headerAccount .accountCopy b{max-width:95px}.navPanel.dashboardNav{padding-top:16px}}
+@media(prefers-reduced-motion:reduce){.navPanel.dashboardNav,.workspaceShortcut{transition:none}}
+
+html[data-theme="light"] .navPanel.dashboardNav{box-shadow:12px 0 36px #263e541f;border-right-color:var(--line)}
+@media(max-width:650px){.hasAccount .headerPowered{display:none}}
+@media(max-width:430px){.hasAccount .workspaceShortcut{display:none}.hasAccount .headerAccount{max-width:78px}.hasAccount .headerAccount .accountCopy b{max-width:72px}.hasAccount .brand>b{max-width:19vw}}
