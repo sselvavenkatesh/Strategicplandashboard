@@ -90,10 +90,9 @@
 .v25-dense-data{table-layout:fixed;min-width:0;width:100%;font-size:10px}
 .v25-dense-data th{font-size:9px;padding:5px 6px;height:25px}
 .v25-dense-data td,.v25-dense-data td:first-child{height:23px;padding:1px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:none;line-height:18px}
-.v25-dense-data.indicator th:first-child{width:19%}.v25-dense-data.indicator th:nth-child(2){width:9%}.v25-dense-data.indicator th:nth-child(3){width:18%}
-.v25-dense-data.indicator th:nth-child(n+4){width:9%}
-.v25-dense-data.initiative th:first-child{width:17%}.v25-dense-data.initiative th:nth-child(2){width:14%}.v25-dense-data.initiative th:nth-child(3){width:22%}
-.v25-dense-data.initiative th:nth-child(4),.v25-dense-data.initiative th:nth-child(5){width:9%}.v25-dense-data.initiative th:nth-child(6){width:11%}.v25-dense-data.initiative th:nth-child(n+7){width:6%}
+/* Keep 15 reporting rows visible with a compact Goal column. */
+.v25-dense-data.indicator th:nth-child(n){width:8%}.v25-dense-data.indicator th:first-child{width:13%}.v25-dense-data.indicator th:nth-child(2){width:17%}.v25-dense-data.indicator th:nth-child(3){width:9%}.v25-dense-data.indicator th:nth-child(4){width:13%}
+.v25-dense-data.initiative th:nth-child(n){width:5%}.v25-dense-data.initiative th:first-child{width:12%}.v25-dense-data.initiative th:nth-child(2){width:16%}.v25-dense-data.initiative th:nth-child(3){width:13%}.v25-dense-data.initiative th:nth-child(4){width:20%}.v25-dense-data.initiative th:nth-child(5),.v25-dense-data.initiative th:nth-child(6),.v25-dense-data.initiative th:nth-child(7){width:8%}
 .v25-root .v25-dense-data input,.v25-root .v25-dense-data select{min-height:20px;height:20px;padding:1px 4px;font-size:10px;border-radius:3px;width:100%}
 .v25-dense-data .v25-status{max-width:100%;overflow:hidden;text-overflow:ellipsis;display:block;font-size:9px;padding:0 4px;line-height:17px;height:19px}
 .v25-dense-scroll{overflow-y:visible;max-height:none}
@@ -120,3 +119,8 @@
 @media(max-width:700px){.v25-panel-title>.v25-goal-count-control{flex-wrap:wrap}.v25-goal-card-head>span:nth-child(2){margin-left:auto}.v25-goal-card-head{gap:6px}}
 
 .v25-auth{display:grid;place-items:center;padding:24px}.v25-login{width:min(390px,100%);display:grid;gap:16px}.v25-login img{width:155px}.v25-login h1{font-size:22px}.v25-login label{display:grid;gap:5px}.v25-login input{padding:10px;border:1px solid var(--v-line);background:var(--v-input);color:var(--v-text);border-radius:6px}.v25-login>a{font-size:12px}.v25-saving{position:fixed;inset:0;z-index:120;background:#10203030;display:grid;place-items:center}.v25-saving>span{background:var(--v-panel);padding:14px 24px;border-radius:8px;box-shadow:var(--v-shadow)}
+
+.v25-master-expanded th:nth-child(n){width:18%}.v25-master-expanded th:first-child{width:31%}.v25-master-expanded th:nth-child(2){width:15%}.v25-master-expanded th:nth-child(3){width:22%}.v25-master-expanded th:nth-child(4){width:12%}.v25-master-expanded th:last-child{width:20%}
+.v25-master-expanded td{vertical-align:top}.v25-master-expanded td>b{min-height:30px}.v25-master-expanded td:last-child{min-width:0}.v25-master-expanded select,.v25-master-expanded input{min-width:0}
+.v25-select-trigger>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v25-inherited{display:block;font-size:8px;line-height:10px;color:var(--v-muted)}
+.v25-sort{display:flex;align-items:center;justify-content:space-between;gap:3px;width:100%;border:0;background:none;color:inherit;padding:0;text-align:left;font:inherit}.v25-sort svg{flex-shrink:0}.v25-sort:hover{color:var(--v-blue)}

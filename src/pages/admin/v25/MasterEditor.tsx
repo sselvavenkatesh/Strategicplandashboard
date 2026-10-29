@@ -19,6 +19,7 @@ export function MasterEditor({kind, row, isNew, goals, records, onClose, onSave}
   const indicator = kind === 'indicators';
   const nameKey = indicator ? 'Indicator Name' : 'Initiative Name';
   const entity = indicator ? 'Indicator' : 'Initiative';
+  const shortKey = indicator ? 'Indicator_short_name' : 'Initiative_Short_name';
   const types = [...new Set(['Percent', 'Number', 'Currency', ...records.map(record => text(record, 'Indicator Type'))].filter(Boolean))];
   useEffect(() => {
     const modal = dialog.current;
@@ -46,6 +47,7 @@ export function MasterEditor({kind, row, isNew, goals, records, onClose, onSave}
       <div className="v25-dialog-head"><h2 id={titleId}>{isNew ? 'Add' : 'Edit'} {entity}</h2><button type="button" className="v25-icon" aria-label="Close master editor" onClick={onClose}><X size={18}/></button></div>
       <div className="v25-form-grid">
         <label className="wide">{entity} Name<textarea autoFocus required maxLength={1000} value={text(draft, nameKey)} onChange={event => setDraft({...draft, [nameKey]: event.target.value})}/></label>
+        <label className="wide">Short Name<input value={text(draft,shortKey)} onChange={event => setDraft({...draft,[shortKey]:event.target.value})}/></label>
         <label>Goal<select required disabled={!isNew} value={text(draft, 'Goal ID')} onChange={event => setDraft({...draft, 'Goal ID': event.target.value})}><option value="">Select goal</option>{goals.map(goal => <option key={text(goal, 'Goal ID')} value={text(goal, 'Goal ID')}>{text(goal, 'Goal Name')}</option>)}</select></label>
         <label>{entity} ID<input readOnly value={text(draft, idColumn(kind))}/></label>
         {indicator && <><label>Indicator Type<select value={text(draft, 'Indicator Type')} onChange={event => setDraft({...draft, 'Indicator Type': event.target.value})}>{types.map(type => <option key={type}>{type}</option>)}</select></label><label>KPI Nature<select value={text(draft, 'KPI Nature')} onChange={event => setDraft({...draft, 'KPI Nature': event.target.value})}><option>Positive</option><option>Negative</option></select></label></>}

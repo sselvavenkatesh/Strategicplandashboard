@@ -13,14 +13,14 @@ export const emptyAssignments = (): Assignments => ({goals: {}, indicators: {}, 
 export const idColumn = (kind: Kind) => kind === 'goals' ? 'Goal ID' : kind === 'indicators' ? 'Indicator ID' : 'Initiative ID';
 export const text = (row: DataRow, key: string) => String(row[key] ?? '');
 
-// A stakeholder's explicit assignments override inherited access for that resource type.
-// If they have no explicit assignments, access follows their assigned goals.
+// Empty resource selections inherit dynamically; nonempty selections restrict that row.
+export function resourceStakeholders(row: DataRow, kind: 'indicators' | 'initiatives', assignments: Assignments): string[] {
+  const goal = assignments.goals[text(row, 'Goal ID')] ?? [];
+  const selected = assignments[kind][text(row, idColumn(kind))] ?? [];
+  return selected.length ? selected.filter(id => goal.includes(id)) : goal;
+}
 export function accessibleRows(rows: DataRow[], kind: 'indicators' | 'initiatives', user: string, assignments: Assignments) {
-  const explicit = Object.entries(assignments[kind]).filter(([, users]) => users.includes(user)).map(([id]) => id);
-  const selected = new Set(explicit);
-  return rows.filter(row => explicit.length > 0
-    ? selected.has(text(row, idColumn(kind)))
-    : (assignments.goals[text(row, 'Goal ID')] ?? []).includes(user));
+  return rows.filter(row => resourceStakeholders(row, kind, assignments).includes(user));
 }
 
 async function readRows(table: string, columns: string, allRole = true): Promise<DataRow[]> {

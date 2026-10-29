@@ -1,7 +1,8 @@
 import {useState} from 'react';
-import {Check, Pencil, Search} from 'lucide-react';
+import {ArrowDown, ArrowUp, ArrowUpDown, Check, Pencil, Search} from 'lucide-react';
 import type {DataRow} from './model';
 import {text} from './model';
+import {compareDataValues} from './tableSort';
 
 type Props = {kind: 'indicators' | 'initiatives'; rows: DataRow[]; onSave: (rows: DataRow[]) => void | Promise<void>};
 export function DataEditor({kind, rows, onSave}: Props) {
@@ -9,6 +10,7 @@ export function DataEditor({kind, rows, onSave}: Props) {
   const [year, setYear] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<{column:string; direction:'asc'|'desc'} | null>(null);
   const [editing, setEditing] = useState(false);
   const [changes, setChanges] = useState<Record<string, DataRow>>({});
   const [error, setError] = useState('');
@@ -20,10 +22,11 @@ export function DataEditor({kind, rows, onSave}: Props) {
   const filtered = rows.map((row, index) => ({row, index})).filter(({row}) =>
     (!year || row['School Year'] === year) && (!category || row.Category === category) &&
     Object.entries(row).filter(([key]) => key !== '__previewKey').map(([,value]) => value).join(' ').toLowerCase().includes(search.toLowerCase()));
+  if(sort) filtered.sort((a,b) => compareDataValues(a.row[sort.column],b.row[sort.column],sort.column,sort.direction) || a.index-b.index);
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, pages);
   const editable = new Set(indicator ? ['Value 1','Value 2','Value 3','Target 1','Target 2','Target 3'] : ['Start Date','End Date','Status','Action Item','Target 1','Target 2','Target 3']);
-  const columns = indicator ? ['Indicator Name','School Year','Student Group','Value 1','Value 2','Value 3','Target 1','Target 2','Target 3'] : ['Initiative Name','Sub Initiative Name','Action Item','Start Date','End Date','Status','Target 1','Target 2','Target 3'];
+  const columns = indicator ? ['Goal Name','Indicator Name','School Year','Student Group','Value 1','Value 2','Value 3','Target 1','Target 2','Target 3'] : ['Goal Name','Initiative Name','Sub Initiative Name','Action Item','Start Date','End Date','Status','Target 1','Target 2','Target 3'];
   async function save() {
     if(saving)return;
     if (!indicator && Object.values(changes).some(row => !text(row, 'Action Item').trim())) {setError('Action item is required.'); return}
@@ -36,7 +39,7 @@ export function DataEditor({kind, rows, onSave}: Props) {
       <span>{filtered.length} records</span><div className="v25-inline-actions">{editing ? <><button className="v25-button" onClick={() => {setEditing(false); setChanges({}); setError('')}}>Cancel</button><button className="v25-button primary v25-save" disabled={saving} onClick={save}><Check size={13}/> Save</button></> : <button className="v25-button" onClick={() => {setChanges({}); setError(''); setEditing(true)}}><Pencil size={13}/> Edit</button>}</div>
     </div>
     {error && <p className="v25-inline-error" role="alert">{error}</p>}
-    <div className="v25-table-scroll v25-dense-scroll"><table className={`v25-table v25-data-table v25-dense-data ${indicator ? 'indicator' : 'initiative'}`}><thead><tr>{columns.map(column => <th key={column}>{column.replace('Value','Actual')}</th>)}</tr></thead>
+    <div className="v25-table-scroll v25-dense-scroll"><table className={`v25-table v25-data-table v25-dense-data ${indicator ? 'indicator' : 'initiative'}`}><thead><tr>{columns.map(column => <th key={column} aria-sort={sort?.column === column ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}><button type="button" className="v25-sort" onClick={() => {setSort({column,direction:sort?.column===column && sort.direction==='asc'?'desc':'asc'});setPage(1)}}>{column.replace('Value','Actual')}{sort?.column===column ? sort.direction==='asc'?<ArrowUp size={11}/>:<ArrowDown size={11}/> : <ArrowUpDown size={11}/>}</button></th>)}</tr></thead>
       <tbody>{filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(({row: original, index}) => {
         const key = text(original,'__previewKey'); const row = changes[key] ?? original;
         return <tr key={key || index}>{columns.map(column => <td key={column} title={text(row,column)}>{editing && editable.has(column) ? column === 'Status' ? <select aria-label={`Status row ${index + 1}`} value={text(row,column)} onChange={event => setChanges(previous => ({...previous,[key]:{...row,[column]:event.target.value}}))}><option value="">Not set</option>{[...new Set(['Not Started','In Progress','Done','On Hold',text(row,column)].filter(Boolean))].map(status => <option key={status}>{status}</option>)}</select> : <input aria-label={`${column.replace('Value','Actual')} row ${index + 1}`} value={text(row,column)} onChange={event => setChanges(previous => ({...previous,[key]:{...row,[column]:event.target.value || null}}))}/> : column === 'Status' ? <span className={`v25-status ${text(row,column) === 'Done' ? 'done' : ''}`}>{text(row,column) || '—'}</span> : text(row,column) || '—'}</td>)}</tr>;

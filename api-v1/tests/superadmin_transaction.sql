@@ -1,10 +1,11 @@
 begin;
 do $$
-declare sa bigint; adm bigint; pw text:=gen_random_uuid()::text; tok uuid; s jsonb; r jsonb; g text; ind text; ini text; n bigint; rowdata jsonb; old_hash text; new_hash text;
+declare sa bigint; adm bigint; other_admin bigint; pw text:=gen_random_uuid()::text; tok uuid; s jsonb; r jsonb; g text; ind text; ini text; n bigint; rowdata jsonb; old_hash text; new_hash text;
 begin
  select coalesce(max(id),0)+1 into sa from public.admin_users;
  insert into public.admin_users(id,"Email","Name","Role","Password Hash") values(sa,gen_random_uuid()::text||'@example.invalid','Transactional QA Super Admin','SuperAdmin',extensions.crypt(pw,extensions.gen_salt('bf')));
  adm:=sa+1; insert into public.admin_users(id,"Email","Name","Role") values(adm,gen_random_uuid()::text||'@example.invalid','Transactional QA Admin','Admin');
+ other_admin:=adm+1; insert into public.admin_users(id,"Email","Name","Role") values(other_admin,gen_random_uuid()::text||'@example.invalid','Transactional QA Other Admin','Admin');
  select session_token into tok from public.validate_superadmin_login((select "Email" from public.admin_users where id=sa),pw);
  if tok is null then raise exception 'Login failed'; end if;
  s:=public.v25_superadmin_snapshot(tok);
@@ -20,7 +21,18 @@ begin
  s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',(s->'goals')||jsonb_build_array(jsonb_build_object('Goal ID',g,'Goal Name','Transactional QA Goal','Goal Description','Rollback only')),'owners',jsonb_build_object(g,jsonb_build_array(adm::text))));
  if s->'assignments'->'goals'->g<>jsonb_build_array(adm::text) then raise exception 'Goal assignment was not saved'; end if;
  select 'ID'||(coalesce(max(substring("Indicator ID" from 3)::int),0)+1) into ind from public."Indicator_master" where "Indicator ID"~'^ID[0-9]+$';
- s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','indicators','create',true,'records',jsonb_build_array(jsonb_build_object('Indicator ID',ind,'Indicator Name','Transactional QA Indicator','Goal ID',g,'Indicator Type','Number','KPI Nature','Positive')),'owners',jsonb_build_object(ind,jsonb_build_array(adm::text))));
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','indicators','create',true,'records',jsonb_build_array(jsonb_build_object('Indicator ID',ind,'Indicator Name','Transactional QA Indicator','Goal ID',g,'Indicator Type','Number','KPI Nature','Positive','Indicator_short_name','QA KPI')),'owners',jsonb_build_object(ind,jsonb_build_array(adm::text))));
+ if (select "Indicator_short_name" from public."Indicator_master" where "Indicator ID"=ind)<>'QA KPI' then raise exception 'Indicator short name missing'; end if;
+ begin
+  perform public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','indicators','records','[]'::jsonb,'owners',jsonb_build_object(ind,jsonb_build_array(other_admin::text))));
+  raise exception 'Outside Goal stakeholder accepted';
+ exception when raise_exception then if sqlerrm='Outside Goal stakeholder accepted' then raise; end if;end;
+ -- Goal changes remove obsolete restrictions; children then inherit dynamically.
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',s->'goals','owners',jsonb_build_object(g,jsonb_build_array(other_admin::text))));
+ if exists(select 1 from public.v25_indicator_stakeholders where indicator_id=ind) then raise exception 'Obsolete override survived Goal owner change'; end if;
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','configuration','profile',s->'profile','goals',s->'goals','owners',jsonb_build_object(g,jsonb_build_array(adm::text,other_admin::text))));
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','indicators','records','[]'::jsonb,'owners',jsonb_build_object(ind,jsonb_build_array(adm::text))));
+ if s->'assignments'->'indicators'->ind<>jsonb_build_array(adm::text) then raise exception 'Restricted subset did not round-trip'; end if;
  rowdata:=jsonb_build_object('Indicator ID',ind,'Goal ID',g,'Indicator Name','Transactional QA Indicator','School Year','2030-31','Category','All','Student Group','All Students','Value 3','7','Target 1','5');
  s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','indicators','dataRows',jsonb_build_array(rowdata)));
  insert into public."Indicator_Target_Preview"(indicator_id,school_year,target_1) values(ind,'2030-31','10');
@@ -41,7 +53,8 @@ begin
  if (select count(*) from public.fn_indicator_key_values(g,null) where indicator_id=ind)<>1 then raise exception 'Assignments hid a public KPI'; end if;
  select 'IN'||(coalesce(max(substring("Initiative ID" from 3)::int),0)+1) into ini from public."Initiative_master" where "Initiative ID"~'^IN[0-9]+$';
  rowdata:=jsonb_build_object('Initiative ID',ini,'Initiative Name','Transactional QA Initiative','Goal ID',g,'Sub Initiative Name','QA Sub','Action Item','QA action','Status','Not Started');
- s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','initiatives','create',true,'records',jsonb_build_array(jsonb_build_object('Initiative ID',ini,'Initiative Name','Transactional QA Initiative','Goal ID',g)),'dataRows',jsonb_build_array(rowdata)));
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','initiatives','create',true,'records',jsonb_build_array(jsonb_build_object('Initiative ID',ini,'Initiative Name','Transactional QA Initiative','Goal ID',g,'Initiative_Short_name','QA Initiative')),'dataRows',jsonb_build_array(rowdata)));
+ if (select "Initiative_Short_name" from public."Initiative_master" where "Initiative ID"=ini)<>'QA Initiative' then raise exception 'Initiative short name missing'; end if;
  select x into rowdata from jsonb_array_elements(s->'initiativeData')x where x->>'Initiative ID'=ini;
  s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','initiatives','dataRows',jsonb_build_array(rowdata||jsonb_build_object('Action Item','Renamed QA action','Status','Done'))));
  if (select count(*) from public."Initiative_Data" where "Initiative ID"=ini)<>1 or not exists(select 1 from public."Initiative_Data" where "Initiative ID"=ini and "Action Item"='Renamed QA action' and "Status"='Done') then raise exception 'Action edit duplicated or lost data'; end if;

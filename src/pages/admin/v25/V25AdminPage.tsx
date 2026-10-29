@@ -71,7 +71,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut}:{authenticate
   const nameColumn = kind === 'indicators' ? 'Indicator Name' : 'Initiative Name';
   const mastersById = new Map(master.map(row => [text(row, idColumn(kind)), row]));
   const allowedIds = new Set(master.map(row => text(row, idColumn(kind))));
-  const indexedData = sourceData.map((original, index) => {const row = edits[text(original, '__previewKey')] ?? original; const definition = mastersById.get(text(row, idColumn(kind))); return {row: {...row, [nameColumn]: definition?.[nameColumn] ?? row[nameColumn], 'Goal ID': definition?.['Goal ID'] ?? row['Goal ID']}, index}}).filter(({row}) => allowedIds.has(text(row, idColumn(kind))));
+  const indexedData = sourceData.map((original, index) => {const row = edits[text(original, '__previewKey')] ?? original; const definition = mastersById.get(text(row, idColumn(kind))); return {row: {...row, [nameColumn]: definition?.[nameColumn] ?? row[nameColumn], 'Goal ID': definition?.['Goal ID'] ?? row['Goal ID'], 'Goal Name': text(goals.find(goal => goal['Goal ID']===(definition?.['Goal ID'] ?? row['Goal ID'])) ?? {}, 'Goal Name')}, index}}).filter(({row}) => allowedIds.has(text(row, idColumn(kind))));
   const navigateSection=(next:Section)=>{
     if(section==='plan'&&next!=='plan'&&(draft.profile||draft.goals||JSON.stringify(assignments.goals)!==JSON.stringify((dataset as Workspace|null)?.assignments?.goals??{}))){
       if(!window.confirm('Discard unsaved configuration changes?'))return;
@@ -128,7 +128,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut}:{authenticate
     setMasterEditing(null);
   }
   async function uploadData(rows:DataRow[]){await persist({action:'reporting',kind,dataRows:rows})}
-  function accessMode(resource: 'indicators' | 'initiatives') {return Object.values(assignments[resource]).some(users => users.includes(user)) ? 'Explicit assignment' : 'Inherited from assigned goals'}
+  function accessMode(resource: 'indicators' | 'initiatives') {return Object.values(assignments[resource]).some(users => users.includes(user)) ? 'Goal access with item restrictions' : 'Inherited from assigned goals'}
   const sectionTitle = menus.find(menu => menu.id === section)?.label;
 
   return <StakeholderContext.Provider value={stakeholders}><div className="v25-root">
@@ -166,7 +166,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut}:{authenticate
       </>}
       {(section === 'indicators' || section === 'initiatives') && <>
         <div className="v25-section-tabs" role="group" aria-label="Configuration sections"><button aria-pressed={resourceTab === 'master'} onClick={() => selectTab('master')}>{superAdmin ? kind === 'indicators' ? 'Indicator Master' : 'Initiative Master' : kind === 'indicators' ? 'Assigned Indicators' : 'Assigned Initiatives'} <span>{master.length}</span></button><button aria-pressed={resourceTab === 'data'} onClick={() => selectTab('data')}>{kind === 'indicators' ? 'Indicator Data' : 'Initiative Data'} <span>{indexedData.length}</span></button></div>
-        {resourceTab === 'master' && <section className="v25-panel"><MasterTable key={`${kind}-${user}-${superAdmin}`} kind={kind} records={master} goals={goals} assignments={assignments[kind]} superAdmin={superAdmin} accessMode={accessMode(kind)} onAdd={addMaster} onSave={(records,owners)=>persist({action:'masters',kind,records,owners})}/></section>}
+        {resourceTab === 'master' && <section className="v25-panel"><MasterTable key={`${kind}-${user}-${superAdmin}`} kind={kind} records={master} goals={goals} assignments={assignments[kind]} goalAssignments={assignments.goals} superAdmin={superAdmin} accessMode={accessMode(kind)} onAdd={addMaster} onSave={(records,owners)=>persist({action:'masters',kind,records,owners})}/></section>}
         {resourceTab === 'data' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{kind === 'indicators' ? 'Indicator' : 'Initiative'} Data <span className="v25-count">{indexedData.length}</span></h2></div><DataUpload key={`${kind}-${user}-${superAdmin}`} kind={kind} masters={master} goals={goals} rows={indexedData.map(item => item.row)} onUpload={uploadData} allowedRoles={live?['All','Admin']:['All']}/></div>
           {indexedData.length ? <DataEditor key={`${kind}-${user}-${superAdmin}`} kind={kind} rows={indexedData.map(item => item.row)} onSave={uploadData}/> : <Empty title="No reporting data in your scope"/>}
         </section>}
