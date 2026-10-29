@@ -1,5 +1,5 @@
 import {supabase} from './supabase';
-import {apiGet, apiPost, fastApiEnabled, fastApiV25Enabled} from './api';
+import {apiGet, apiPost, fastApiEnabled} from './api';
 import {formatIndicatorReferences,type IndicatorLabel} from './aiAnswerText';
 
 export type AiAnswer={answer:string;sources:string[];outOfScope?:boolean};
@@ -25,7 +25,11 @@ export async function isAiEnabled(){
 export async function askDistrictAi(question:string,sessionId:string):Promise<AiAnswer>{
   // Load labels alongside the AI request; this does not add a request per turn.
   const labels=getIndicatorLabels();
-  if(fastApiV25Enabled){const result=await apiPost<AiAnswer>('/api/v1/ai/ask',{question,sessionId});return {...result,answer:formatIndicatorReferences(result.answer,await labels)}}
+  if(fastApiEnabled){
+    // Keep the working Edge flow until the native service has its server-only key.
+    const status=await apiGet<{nativeReady:boolean}>('/api/v1/ai/status');
+    if(status.nativeReady){const result=await apiPost<AiAnswer>('/api/v1/ai/ask',{question,sessionId});return {...result,answer:formatIndicatorReferences(result.answer,await labels)}}
+  }
   const functionName=import.meta.env.VITE_ACHIEVEMENT_PREVIEW==='true'?'district-ai-preview':'district-ai';
   const{data,error}=await supabase.functions.invoke(functionName,{body:{question,sessionId}});
   if(error)throw new Error(error.message||'AI service is unavailable.');

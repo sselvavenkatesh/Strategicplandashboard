@@ -28,7 +28,7 @@ app.add_middleware(
 
 @app.exception_handler(RequestValidationError)
 async def confidential_validation_error(request:Request,error:RequestValidationError):
-    if request.url.path.endswith(('/superadmin/sso-settings','/superadmin/users')):
+    if request.url.path.endswith(('/superadmin/sso-settings','/superadmin/users','/superadmin/ai-settings')):
         return JSONResponse(status_code=422,content={'detail':'Check the submitted fields and their allowed lengths.'},headers={'Cache-Control':'no-store'})
     return await request_validation_exception_handler(request,error)
 
@@ -36,7 +36,7 @@ async def confidential_validation_error(request:Request,error:RequestValidationE
 async def preview_write_guard(request: Request, call_next):
     started = perf_counter()
     path = request.url.path
-    if not settings.data_writes_enabled and request.method in {"POST", "PUT", "PATCH", "DELETE"} and path.startswith("/api/v1/superadmin/") and path not in {"/api/v1/superadmin/login", "/api/v1/superadmin/workspace", "/api/v1/superadmin/logout", "/api/v1/superadmin/users", "/api/v1/superadmin/sso-settings"}:
+    if not settings.data_writes_enabled and request.method in {"POST", "PUT", "PATCH", "DELETE"} and path.startswith("/api/v1/superadmin/") and path not in {"/api/v1/superadmin/login", "/api/v1/superadmin/workspace", "/api/v1/superadmin/logout", "/api/v1/superadmin/users", "/api/v1/superadmin/sso-settings", "/api/v1/superadmin/ai-settings"}:
         return JSONResponse(status_code=503, content={"detail": "Data writes remain disabled until V2.5 authenticated storage is integrated."})
     response = await call_next(request)
     response.headers["Server-Timing"] = f"app;dur={(perf_counter() - started) * 1000:.1f}"
@@ -400,30 +400,12 @@ def bulk_initiatives(body: SuperAdminBulkData):
     try: return {"result":repo.superadmin_bulk_upsert_data(body.token,"initiative",body.rows)}
     except Exception as e: raise HTTPException(400,str(e))
 
-class AiQuestion(BaseModel):
-    question: str
-    sessionId: str = "api-v1"
-
-@app.get("/api/v1/diagnostics/ai-config")
-def ai_config_diagnostics():
-    return {
-        "supabaseUrlConfigured": bool(os.getenv("SUPABASE_URL")),
-        "supabaseAnonKeyConfigured": bool(os.getenv("SUPABASE_ANON_KEY")),
-        "viteSupabaseUrlConfigured": bool(os.getenv("VITE_SUPABASE_URL")),
-        "viteSupabaseAnonKeyConfigured": bool(os.getenv("VITE_SUPABASE_ANON_KEY")),
-    }
+from .ai import router as ai_router, run_ai
+app.include_router(ai_router)
 
 def _ask_ai(question, session_id):
-    base=os.getenv("VITE_SUPABASE_URL") or os.getenv("SUPABASE_URL")
-    key=os.getenv("VITE_SUPABASE_ANON_KEY") or os.getenv("SUPABASE_ANON_KEY")
-    if not base or not key: raise RuntimeError("AI proxy environment not configured")
-    req=urllib.request.Request(base.rstrip("/")+"/functions/v1/"+("district-ai-preview" if settings.demo_targets else "district-ai"),data=json.dumps({"question":question,"sessionId":session_id}).encode(),headers={"Content-Type":"application/json","apikey":key,"Authorization":"Bearer "+key},method="POST")
-    with urllib.request.urlopen(req,timeout=45) as resp: return json.loads(resp.read().decode())
-
-@app.post("/api/v1/ai/ask")
-def ask_ai(body: AiQuestion):
-    try: return _ask_ai(body.question,body.sessionId)
-    except Exception as e: raise HTTPException(502, f"AI service unavailable: {type(e).__name__}")
+    # Retain the internal diagnostics contract, using public-only native context.
+    return run_ai(question, session_id)
 
 def _validation_checks():
     checks = []

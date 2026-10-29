@@ -11,6 +11,7 @@ import {getAdminWorkspace,saveAdminWorkspace} from './adminApi';
 import {MasterEditor} from './MasterEditor';
 import {UserManagement} from './UserManagement';
 import {SsoSettings} from './SsoSettings';
+import {AiSettings} from './AiSettings';
 import {MasterTable} from './MasterTable';
 import {DataUpload} from './DataUpload';
 import {DistrictLogoControl, GoalCountControl} from './DistrictControls';
@@ -18,8 +19,8 @@ import {DeleteGoalDialog} from './DeleteGoalDialog';
 import {goalDependencies, increaseGoalCount, validateGoalNames} from './goalConfiguration';
 import './v25.css';
 
-type Section = 'home' | 'plan' | 'indicators' | 'initiatives' | 'users';
-const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}, {id:'users',label:'User Management',icon:Users}] as const;
+type Section = 'home' | 'plan' | 'indicators' | 'initiatives' | 'users' | 'ai';
+const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}, {id:'users',label:'User Management',icon:Users},{id:'ai',label:'AI Configuration',icon:ShieldCheck}] as const;
 const draftKey = 'strategic-v25-ui-draft-v1';
 type Draft = {assignments: Assignments; indicatorEdits: Record<string, DataRow>; initiativeEdits: Record<string, DataRow>; profile?: DataRow; goals?: DataRow[]; indicatorMasters?: DataRow[]; initiativeMasters?: DataRow[]; nextGoalNumber?: number};
 function newDraft(): Draft {return {assignments: emptyAssignments(), indicatorEdits: {}, initiativeEdits: {}}}
@@ -32,7 +33,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
   const superAdmin = location.pathname.replace(/\/$/, '').endsWith('/superadmin');
   const [params, setParams] = useSearchParams();
   const requested = params.get('section');
-  const section: Section = menus.some(item => item.id === requested && (superAdmin || item.id!=='users')) ? requested as Section : 'home';
+  const section: Section = menus.some(item => item.id === requested && (superAdmin || !['users','ai'].includes(item.id))) ? requested as Section : 'home';
   const live=Boolean(authenticatedUser);
   const [user] = useState(authenticatedUser?.id ?? '');
   const [busy,setBusy]=useState(false);
@@ -144,7 +145,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
     <div className="v25-layout"><aside className="v25-sidebar">
       <Link to="/" className="v25-brand"><img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/></Link>
       <div className="v25-workspace"><span className="v25-workspace-icon"><Building2 size={20}/></span><div><b>Strategic Plan</b><span>{superAdmin ? 'Super Admin workspace' : 'Admin workspace'}</span></div></div>
-      <div className="v25-nav-caption">WORKSPACE</div><nav aria-label="Administration">{menus.filter(menu=>superAdmin||menu.id!=='users').map(menu => {const Icon = menu.icon; return <button type="button" key={menu.id} aria-current={section === menu.id ? 'page' : undefined} className={section === menu.id ? 'active' : ''} onClick={() => navigateSection(menu.id)}><Icon size={18}/><span>{menu.label}</span>{section === menu.id && <ChevronRight size={14}/>}</button>})}</nav>
+      <div className="v25-nav-caption">WORKSPACE</div><nav aria-label="Administration">{menus.filter(menu=>superAdmin||!['users','ai'].includes(menu.id)).map(menu => {const Icon = menu.icon; return <button type="button" key={menu.id} aria-current={section === menu.id ? 'page' : undefined} className={section === menu.id ? 'active' : ''} onClick={() => navigateSection(menu.id)}><Icon size={18}/><span>{menu.label}</span>{section === menu.id && <ChevronRight size={14}/>}</button>})}</nav>
       <div className="v25-sidebar-bottom"><Link to="/summary"><ArrowLeft size={16}/> Public dashboard</Link><div className="v25-person"><span className="v25-avatar">{superAdmin ? 'SA' : currentUser.name.split(' ').map(word => word[0]).join('')}</span><div><b>{superAdmin ? authenticatedUser?.name ?? 'Super Admin' : currentUser.name}</b><span>{superAdmin ? 'District configuration' : 'Assigned data management'}</span></div></div></div>
     </aside>
     <main className="v25-main"><header className="v25-topbar"><div className="v25-breadcrumb">Strategic Plan <ChevronRight size={13}/><span>{superAdmin ? 'Super Admin' : 'Admin'}</span></div><div className="v25-top-actions"><button className="v25-icon" aria-label="Toggle theme" onClick={toggleTheme}>{theme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}</button>{onSignOut&&<button className="v25-button" disabled={signingOut} onClick={onSignOut}>{signingOut?'Signing out…':'Sign Out'}</button>}</div></header>
@@ -183,6 +184,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
       </>}
       </>}
       {superAdmin && section==='users' && <UserManagement onChanged={()=>{setRetry(value=>value+1);setNotice('Details are saved.')}}/>}
+      {superAdmin && section==='ai' && <AiSettings/>}
       <footer className="v25-footer"><span>Strategic Plan · V2.5</span><span>Powered by <b>K12Matrix</b></span></footer>
       </div>
     </main></div>

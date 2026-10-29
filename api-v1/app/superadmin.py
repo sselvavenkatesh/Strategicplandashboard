@@ -83,6 +83,24 @@ class SsoSecrets(BaseModel):
     googleSecret:str|None=Field(default=None,max_length=4000)
     microsoftSecret:str|None=Field(default=None,max_length=4000)
 
+@router.get('/ai-settings')
+def ai_settings(request:Request,response:Response):
+    response.headers['Cache-Control']='no-store'
+    try:return repo.fetch_one('select public.v25_superadmin_ai_settings(%s::uuid) as data',(token_from(request),))['data']
+    except psycopg.Error as error:db_error(error)
+
+class AiSettings(BaseModel):
+    model_config={'extra':'forbid'}
+    model:str=Field(min_length=1,max_length=150)
+    apiKey:str|None=Field(default=None,max_length=4000)
+
+@router.post('/ai-settings')
+def save_ai_settings(body:AiSettings,request:Request,response:Response):
+    token=token_from(request);checked_origin(request)
+    response.headers['Cache-Control']='no-store'
+    try:return repo.fetch_one('select public.v25_superadmin_save_ai_settings(%s::uuid,%s,%s) as data',(token,body.model,body.apiKey))['data']
+    except psycopg.Error as error:db_error(error)
+
 @router.post('/sso-settings')
 def save_sso_settings(body:SsoSecrets,request:Request,response:Response):
     token=token_from(request);checked_origin(request)

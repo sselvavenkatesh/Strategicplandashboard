@@ -1,5 +1,39 @@
 from .db import connection
 
+AI_CONTEXT_QUERIES = [
+    ('profile', '''select "School District Name","Strategic Plan Name","Strategic Plan Duration","Mission Statement","Vision Statement" from public."District_Profile" limit 1''', False),
+    ('goals', '''select "Goal ID","Goal Name","Goal Description","Total Indicators","Total Initiatives" from public."Goal_master" where (%s or "Role"='All') order by "Goal ID"''', True),
+    ('indicators', '''select m."Indicator ID",m."Indicator Name",m."Indicator_short_name",m."Indicator Type",m."Goal ID",m."KPI Nature" from public."Indicator_master" m join public."Goal_master" g on g."Goal ID"=m."Goal ID" where (%s or (m."Role"='All' and g."Role"='All')) order by m."Indicator ID"''', True),
+    ('initiatives', '''select m."Initiative ID",m."Initiative Name",m."Initiative_Short_name",m."Goal ID" from public."Initiative_master" m join public."Goal_master" g on g."Goal ID"=m."Goal ID" where (%s or (m."Role"='All' and g."Role"='All')) order by m."Initiative ID"''', True),
+    ('indicatorData', '''select d."Goal ID",d."Indicator ID",d."Indicator Name",d."School Year",d."Category",d."Student Group",d."Value 1",d."Value 2",d."Value 3",d."Target 1",d."Target 2",d."Target 3",d."School" from public."Indicator_Data" d join public."Indicator_master" m on m."Indicator ID"=d."Indicator ID" and m."Goal ID"=d."Goal ID" join public."Goal_master" g on g."Goal ID"=m."Goal ID" where (%s or (d."Role"='All' and m."Role"='All' and g."Role"='All')) order by d."Indicator ID",d."School Year",d."Category",d."Student Group" limit 300''', True),
+    ('initiativeData', '''select d."Goal ID",d."Initiative ID",d."Initiative Name",d."Sub Initiative Name",d."Start Date",d."End Date",d."Action Item",d."Status",d."Target 1",d."Target 2",d."Target 3",d."School" from public."Initiative_Data" d join public."Initiative_master" m on m."Initiative ID"=d."Initiative ID" and m."Goal ID"=d."Goal ID" join public."Goal_master" g on g."Goal ID"=m."Goal ID" where (%s or (d."Role"='All' and m."Role"='All' and g."Role"='All')) order by d."Initiative ID",d."Sub Initiative Name",d."Action Item" limit 300''', True),
+]
+
+def ai_credentials():
+    return fetch_one('select * from public.v25_server_ai_credentials()') or {}
+
+def ai_context(include_private: bool = False):
+    result = {}
+    with connection() as conn, conn.cursor() as cur:
+        cur.execute('set transaction isolation level repeatable read read only')
+        cur.execute('select count(*) as count from public."District_Profile"')
+        if cur.fetchone()['count'] != 1:
+            raise ValueError('District routing is not configured')
+        for name, sql, scoped in AI_CONTEXT_QUERIES:
+            cur.execute(sql, (include_private,) if scoped else ())
+            rows = cur.fetchall()
+            result[name] = rows[0] if name == 'profile' and rows else None if name == 'profile' else rows
+    # Public counts must not disclose excluded children of otherwise public Goals.
+    for goal in result['goals']:
+        goal['Total Indicators'] = sum(row['Goal ID'] == goal['Goal ID'] for row in result['indicators'])
+        goal['Total Initiatives'] = sum(row['Goal ID'] == goal['Goal ID'] for row in result['initiatives'])
+    return result
+
+def log_ai_conversation(session_id, user_id, question, answer, in_scope, sources, ms):
+    import json
+    return fetch_one('select public.v25_log_ai_conversation(%s::uuid,%s,%s,%s,%s,%s::jsonb,%s)',
+                     (session_id,user_id,question,answer,in_scope,json.dumps(sources),ms))
+
 def fetch_one(sql: str, params=()):
     with connection() as conn, conn.cursor() as cur:
         cur.execute(sql, params)
