@@ -6,8 +6,8 @@ import type {DataRow} from './model';
 import {text} from './model';
 
 type Pending = {rows: DataRow[]; updated: number; added: number};
-type Props = {kind: ResourceKind; masters: DataRow[]; goals: DataRow[]; rows: DataRow[]; allowedRoles?:string[]; onUpload: (rows: DataRow[]) => void | Promise<void>};
-export function DataUpload({kind, masters, goals, rows, onUpload, allowedRoles}: Props) {
+type Props = {kind: ResourceKind; masters: DataRow[]; goals: DataRow[]; rows: DataRow[]; allowedRoles?:string[]; assignedOnly?:boolean; onUpload: (rows: DataRow[]) => void | Promise<void>};
+export function DataUpload({kind, masters, goals, rows, onUpload, allowedRoles, assignedOnly=false}: Props) {
   const [pending, setPending] = useState<Pending | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -34,7 +34,7 @@ export function DataUpload({kind, masters, goals, rows, onUpload, allowedRoles}:
     setError(''); setBusy(true);
     try {
       if (file.size > 2 * 1024 * 1024) throw new Error('CSV file must be 2 MB or smaller.');
-      const validated = validateCsv(await file.text(), kind, masters, goals, allowedRoles);
+      const validated = validateCsv(await file.text(), kind, masters, goals, allowedRoles, assignedOnly);
       setPending(prepareUpload(kind, validated, rows));
     } catch (reason) {setError(reason instanceof Error ? reason.message : 'CSV could not be processed.')}
     finally {setBusy(false)}

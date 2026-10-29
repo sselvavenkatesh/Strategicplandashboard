@@ -4,23 +4,26 @@ import type {DataRow} from './model';
 import {text} from './model';
 import {compareDataValues} from './tableSort';
 
-type Props = {kind: 'indicators' | 'initiatives'; rows: DataRow[]; onSave: (rows: DataRow[]) => void | Promise<void>};
-export function DataEditor({kind, rows, onSave}: Props) {
+type Props = {kind: 'indicators' | 'initiatives'; rows: DataRow[]; initialResourceId?:string; startEditing?:boolean; onSave: (rows: DataRow[]) => void | Promise<void>};
+export function DataEditor({kind, rows, initialResourceId='', startEditing=false, onSave}: Props) {
   const [search, setSearch] = useState('');
   const [year, setYear] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<{column:string; direction:'asc'|'desc'} | null>(null);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(startEditing);
+  const [resource,setResource]=useState(initialResourceId);
   const [changes, setChanges] = useState<Record<string, DataRow>>({});
   const [error, setError] = useState('');
   const [saving,setSaving]=useState(false);
   const pageSize = 15;
   const indicator = kind === 'indicators';
+  const entity=indicator?'Indicator':'Initiative';
+  const resources=[...new Map(rows.map(row=>[text(row,`${entity} ID`),text(row,`${entity} Name`)])).entries()];
   const years = [...new Set(rows.map(row => text(row, 'School Year')).filter(Boolean))].sort().reverse();
   const categories = [...new Set(rows.map(row => text(row, 'Category')).filter(Boolean))].sort();
   const filtered = rows.map((row, index) => ({row, index})).filter(({row}) =>
-    (!year || row['School Year'] === year) && (!category || row.Category === category) &&
+    (!resource || text(row,`${entity} ID`)===resource) && (!year || row['School Year'] === year) && (!category || row.Category === category) &&
     Object.entries(row).filter(([key]) => key !== '__previewKey').map(([,value]) => value).join(' ').toLowerCase().includes(search.toLowerCase()));
   if(sort) filtered.sort((a,b) => compareDataValues(a.row[sort.column],b.row[sort.column],sort.column,sort.direction) || a.index-b.index);
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -35,6 +38,7 @@ export function DataEditor({kind, rows, onSave}: Props) {
   }
   return <>
     <div className="v25-table-tools"><label className="v25-search"><Search size={14}/><input aria-label="Search reporting data" placeholder="Search reporting data…" value={search} onChange={event => {setSearch(event.target.value); setPage(1)}}/></label>
+      {initialResourceId && <select aria-label={`Filter ${entity.toLowerCase()} data`} value={resource} onChange={event=>{setResource(event.target.value);setPage(1)}}><option value="">All {kind}</option>{resources.map(([id,name])=><option key={id} value={id}>{name}</option>)}</select>}
       {indicator && <><select aria-label="School year" value={year} onChange={event => {setYear(event.target.value); setPage(1)}}><option value="">All school years</option>{years.map(value => <option key={value}>{value}</option>)}</select><select aria-label="Category" value={category} onChange={event => {setCategory(event.target.value); setPage(1)}}><option value="">All categories</option>{categories.map(value => <option key={value}>{value}</option>)}</select></>}
       <span>{filtered.length} records</span><div className="v25-inline-actions">{editing ? <><button className="v25-button" onClick={() => {setEditing(false); setChanges({}); setError('')}}>Cancel</button><button className="v25-button primary v25-save" disabled={saving} onClick={save}><Check size={13}/> Save</button></> : <button className="v25-button" onClick={() => {setChanges({}); setError(''); setEditing(true)}}><Pencil size={13}/> Edit</button>}</div>
     </div>

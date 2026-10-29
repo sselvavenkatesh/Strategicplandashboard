@@ -132,3 +132,7 @@
 .v25-notice-icon{display:grid;place-items:center;width:28px;height:28px;flex-shrink:0;border-radius:50%;background:#e7f5ee;color:#238059}.v25-toast>.v25-icon{width:24px;height:24px;margin-left:8px}.v25-toast>span:nth-child(2){min-width:0}
 @keyframes v25-notice-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.v25-toast{animation:none}}
+
+/* Keep save and validation notices beside the active workspace controls. */
+.v25-toast{top:18px;right:20px;bottom:auto}
+.v25-table-tools{flex-wrap:wrap}

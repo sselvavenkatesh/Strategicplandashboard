@@ -40,7 +40,7 @@ export function reportingKey(kind: ResourceKind, row: DataRow): string {
 // Compare complete names, never fuzzy-match a different master. Unicode spaces,
 // repeated whitespace, letter case and equivalent Unicode forms are normalized.
 export const normalizeName = (value: string) => value.normalize('NFKC').replace(/\s+/gu,' ').trim().toLowerCase();
-export function validateCsv(input: string, kind: ResourceKind, masters: DataRow[], goals: DataRow[], allowedRoles:string[]=['All']): DataRow[] {
+export function validateCsv(input: string, kind: ResourceKind, masters: DataRow[], goals: DataRow[], allowedRoles:string[]=['All'], assignedOnly=false): DataRow[] {
   const parsed = parseCsv(input);
   const expected = csvColumns[kind];
   if (parsed.length < 2) throw new Error('CSV must contain headers and at least one data row.');
@@ -60,6 +60,7 @@ export function validateCsv(input: string, kind: ResourceKind, masters: DataRow[
     const name=text(row,`${entity} Name`);
     const goalName=normalizeName(text(row,'Goal Name'));
     const candidates=masters.filter(record=>normalizeName(text(record,`${entity} Name`))===normalizeName(name)).filter(record=>!goalName || goals.some(goal=>goal['Goal ID']===record['Goal ID'] && normalizeName(text(goal,'Goal Name'))===goalName));
+    if(!candidates.length && assignedOnly)throw new Error(`${prefix}${entity} "${name}" is not matching your assigned items. Please upload data which are assigned to you.`);
     if(!candidates.length) throw new Error(`${prefix}${entity} "${name}" is not available${goalName?' for this Goal':''}. Check the file and upload again.`);
     if(candidates.length>1) throw new Error(`${prefix}${entity} "${name}" matches more than one master. Check the Goal Name or ask Super Admin to give the masters distinct names, then upload again.`);
     const master=candidates[0];

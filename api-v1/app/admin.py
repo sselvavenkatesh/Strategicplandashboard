@@ -14,9 +14,11 @@ def token_from(request:Request):
     try: return str(UUID(request.cookies.get(COOKIE,'')))
     except ValueError: raise HTTPException(401,'Sign in with your Admin account.')
 
-def db_error(error):
+def db_error(error,kind=None):
     if error.sqlstate=='28000': raise HTTPException(401,'Invalid or expired Admin session.')
-    if error.sqlstate=='42501': raise HTTPException(403,'This item is not assigned to you. Reload your assigned data.')
+    if error.sqlstate=='42501':
+        entity='Indicator' if kind=='indicators' else 'Initiative' if kind=='initiatives' else 'Item'
+        raise HTTPException(403,f'{entity} is not matching your assigned items. Please upload data which are assigned to you.')
     if error.sqlstate=='40001': raise HTTPException(409,'Data or assignments changed. Reload and try again.')
     if error.sqlstate=='23505': raise HTTPException(409,'A record with the same reporting key already exists.')
     if error.sqlstate in ('P0001','23503','23514','22P02','23502'):
@@ -73,7 +75,7 @@ def save(body:Save,request:Request,response:Response):
     if len(payload.encode())>3_000_000: raise HTTPException(413,'Upload is too large.')
     response.headers['Cache-Control']='no-store'
     try: return repo.fetch_one('select public.v25_admin_save(%s::uuid,%s,%s,%s::jsonb) as data',(token,body.revision,body.kind,payload))['data']
-    except psycopg.Error as error: db_error(error)
+    except psycopg.Error as error: db_error(error,body.kind)
 
 @router.post('/logout',status_code=204)
 def logout(request:Request,response:Response):

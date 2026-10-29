@@ -79,3 +79,12 @@ def test_verified_workspace_oauth_sets_cookie_without_query_string_token(monkeyp
     assert response.headers['location']=='https://testserver/strategic-plan/demo/admin'
     assert 'httponly' in response.headers['set-cookie'].lower()
     assert TOKEN not in response.headers['location']
+
+
+def test_unassigned_upload_returns_functional_assignment_message(monkeypatch):
+    def deny(*args):raise psycopg.errors.InsufficientPrivilege('unassigned')
+    monkeypatch.setattr(admin.repo,'fetch_one',deny)
+    for kind,entity in [('indicators','Indicator'),('initiatives','Initiative')]:
+        response=client().post('/api/v1/admin/workspace',json={'revision':'0'*32,'kind':kind,'rows':[]})
+        assert response.status_code==403
+        assert response.json()['detail']==f'{entity} is not matching your assigned items. Please upload data which are assigned to you.'

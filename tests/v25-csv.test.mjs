@@ -70,3 +70,10 @@ test('Re-upload preserves an existing row stakeholder without an ID in the file'
  const validated=validateCsv(csv('initiatives',[initiative]),'initiatives',initiativeMasters,goals);
  const result=prepareUpload('initiatives',validated,[{...initiative,'Stakeholder ID':12,__previewKey:'a'}]);assert.equal(result.rows[0]['Stakeholder ID'],12);
 });
+
+test('Admin uploads reject unassigned names with actionable assignment validation for both types',()=>{
+ for(const [kind,row,available] of [['indicators',indicator,masters],['initiatives',initiative,initiativeMasters]]){
+  const field=kind==='indicators'?'Indicator Name':'Initiative Name';
+  assert.throws(()=>validateCsv(csv(kind,[row,{...row,[field]:'Not assigned'}]),kind,available,goals,['All','Admin'],true),/not matching your assigned items.*Please upload data which are assigned to you/);
+ }
+});
