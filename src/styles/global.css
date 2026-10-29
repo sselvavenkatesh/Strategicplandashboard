@@ -30,7 +30,7 @@
 .summaryPage .sectionLabel{margin:11px 0 7px;font-size:12px}.summaryPage .sectionLabel span{font-size:10px;color:#20a6ff}
 .summaryPage .stack{margin:8px 0 6px}.summaryPage .stack i{display:grid;place-items:center;color:#101820;font-size:9px;font-weight:800}.summaryPage .stack i span{display:block}
 .summaryPage .legend{display:flex;gap:7px;flex-wrap:wrap;font-size:9px;margin-top:0}.summaryPage .legend span:nth-child(3){color:#b9b2b0}
-.summaryPage .kpis{gap:6px;margin-top:8px}.summaryPage .kpi{min-height:70px;padding:7px 8px;cursor:help}.summaryPage .kpi>span{min-height:18px;font-size:9px}.summaryPage .kpiValue{display:block;margin-top:2px}.summaryPage .kpiValue b{font-size:18px;line-height:1}
+.summaryPage .kpis{gap:6px;margin-top:8px}.summaryPage .kpi{min-height:70px;padding:7px 8px;cursor:pointer}.summaryPage .kpi>span{min-height:18px;font-size:9px}.summaryPage .kpiValue{display:block;margin-top:2px}.summaryPage .kpiValue b{font-size:18px;line-height:1}
 .summaryPage .varianceLine{display:flex;align-items:center;gap:4px;margin-top:3px;height:16px}.summaryPage .varianceLine small{font-size:8px;color:#74879a}.summaryPage .varianceLine em{padding:1px 4px;height:15px;border-radius:5px;font-size:7.5px;opacity:.78}
 .kpiYear{display:block;color:#60788e;font-size:7px;margin-top:3px}.summaryUnavailable{height:34px;border:1px dashed #30465a;border-radius:5px;display:grid;place-items:center;color:#75899c;font-size:9px;margin:8px 0 6px}
 .summaryGoal:focus-visible{outline:2px solid #1597ff;outline-offset:2px}
@@ -879,11 +879,11 @@ html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
 
 .goalInitiativeActions{display:flex;align-items:end;gap:24px}
 .goalInitiativeActions>span{font-size:9px;color:var(--muted)}
-.goalInitiativeProgress{width:200px;max-width:100%;display:grid;gap:4px}
+.goalInitiativeProgress{width:168px;max-width:100%;display:grid;gap:4px;line-height:1.2}
 .goalInitiativeProgressLabel{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:10px;color:var(--muted)}
-.goalInitiativeProgressLabel b{font-size:13px;color:var(--text);font-variant-numeric:tabular-nums}
+.goalInitiativeProgressLabel b{font-size:12px;font-weight:750;color:var(--text);font-variant-numeric:tabular-nums}
 .goalInitiativeProgressTrack{height:4px;border-radius:999px;background:var(--gray);overflow:hidden}
 .goalInitiativeProgressTrack i{display:block;height:100%;border-radius:inherit}
-.goalInitiativeProgress>small{font-size:8px;letter-spacing:0;color:var(--muted)}
-@media(max-width:700px){.goalInitiativeActions{gap:8px}.goalInitiativeActions>span{display:none}.goalInitiativeProgress{width:160px}}
-@media(max-width:400px){.goalInitiativeProgress{width:125px}}
+.goalPage .goalInitiativeProgress>small{font:inherit;font-size:8px!important;font-weight:400;letter-spacing:0!important;text-transform:none;color:var(--muted)}
+@media(max-width:700px){.goalInitiativeActions{gap:8px}.goalInitiativeActions>span{display:none}.goalInitiativeProgress{width:150px}}
+.aiConversation .aiMessage.assistant>.aiBubble{width:100%;max-width:100%;overflow-wrap:anywhere}

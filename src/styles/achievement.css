@@ -40,7 +40,7 @@
 .goalPage .indicatorTargetDot{display:inline-block;width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:var(--gray)}
 .goalPage .indicatorTargetDot.met{background:#32d18a}
 .goalPage .indicatorTargetDot.unmet{background:#f07878}
-@media(max-width:700px){.goalPage .goalHero{flex-wrap:wrap;gap:12px}.goalPage .goalHeroCopy{flex-basis:100%}.goalPage .goalHeroActions{width:100%}.goalPage .goalHeroActions>.achievementProgress{width:150px;flex:1;max-width:180px;margin-right:auto}.goalPage .indicatorTargetBadge{font-size:9px}}
+@media(max-width:700px){.goalPage .goalHero{flex-wrap:wrap;gap:12px}.goalPage .goalHeroCopy{flex-basis:100%}.goalPage .goalHeroActions{width:100%}.goalPage .goalHeroActions>.achievementProgress{width:150px;flex:0 0 150px;margin-right:auto}.goalPage .indicatorTargetBadge{font-size:9px}}
 
 /* Indicator popup actual/target scorecard. Both values share currentKpi's font. */
 .indicatorModal .currentKpi.currentKpiWithTarget{width:auto;max-width:none;display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(90px,1fr) minmax(130px,1fr) minmax(100px,.7fr);gap:20px;align-items:center}
