@@ -1,3 +1,4 @@
+import {formatIndicatorVariance} from '../../lib/indicatorFormatting';
 import {useEffect,useState} from 'react';
 import {FolderOpen,X} from 'lucide-react';
 import {useNavigate,useParams} from 'react-router-dom';
@@ -182,11 +183,11 @@ export function GoalPage(){
     </nav>
 
     <header className="goalHero">
-      <div className="goalHeroCopy"><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
-      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}><FolderOpen size={16} aria-hidden="true"/><span>Key Resources</span></button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
+      <div className="goalHeroCopy"><small>GOAL {goalIndex+1}</small><h2>{goal.name}<span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></h2><p>{goal.description}</p></div>
+      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}><FolderOpen size={16} aria-hidden="true"/><span>Key Resources</span></button></div>
     </header>
 
-    <div className="goalSectionTitle">
+    <div className="goalSectionTitle initiativeSectionTitle">
       <div><small>PROGRESS TOWARD THE GOAL</small><h3>Key Initiatives</h3></div>
       <div className="goalInitiativeActions">
         <div className="goalInitiativeProgress" role="group" aria-label="Goal initiative progress" title="Completed action items divided by total action items across this goal's public initiatives">
@@ -244,8 +245,8 @@ export function GoalPage(){
             <div className="indicatorValueWrap">
               <span className="indicatorValue">{formatIndicatorValue(k)}</span>
               {k.variance!=null&&<span className="varianceLine">
-                <span className={'variance '+(favorable?'positive':'negative')} title={`Current year minus last year: ${k.variance.toFixed(1)}${k.isPercent?'%':''}`}>
-                  <span className="trend">{k.variance>=0?'↗':'↘'}</span>{k.variance.toFixed(1)}{k.isPercent?'%':''}
+                <span className={'variance '+(favorable?'positive':'negative')} title={`Current year minus last year: ${formatIndicatorVariance(k)}`}>
+                  <span className="trend">{k.variance>=0?'↗':'↘'}</span>{formatIndicatorVariance(k)}
                 </span>
                 <span className="varianceLabel">LY Var</span>
               </span>}

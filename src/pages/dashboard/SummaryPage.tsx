@@ -1,3 +1,4 @@
+import {formatIndicatorVariance} from '../../lib/indicatorFormatting';
 import {useEffect,useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {getGoals,getIndicators,getInitiatives,getProfile,Goal,Indicator,Initiative} from '../../lib/dashboard';
@@ -43,7 +44,7 @@ export function SummaryPage(){
       </div><div className="legend"><span>■ Done</span><span>■ In Progress</span><span>■ Not Yet Started</span></div></>:<div className="summaryUnavailable" title="No initiative action-item data is currently available for this goal.">Initiative data unavailable</div>}
      <div className="sectionLabel"><b>Key Indicators</b><span>View All →</span></div>
      <div className="kpis">{indicators.map(k=><div className="kpi" key={k.id} title={k.description||`${k.name}: latest available value ${k.value}`} onClick={e=>e.stopPropagation()}>
-       <span>{k.shortName}</span><div className="kpiValue"><b>{summaryIndicatorValue(k)}</b>{k.variance!=null&&<span className="varianceLine"><small>LY Var</small><em className={(k.nature==='Negative'?k.variance<=0:k.variance>=0)?'up':'down'}>{k.variance>=0?'↗':'↘'} {k.variance.toFixed(1)}{k.isPercent?'%':''}</em></span>}</div>{k.year!=='—'&&<small className="kpiYear">{k.year}</small>}
+       <span>{k.shortName}</span><div className="kpiValue"><b>{summaryIndicatorValue(k)}</b>{k.variance!=null&&<span className="varianceLine"><small>LY Var</small><em className={(k.nature==='Negative'?k.variance<=0:k.variance>=0)?'up':'down'}>{k.variance>=0?'↗':'↘'} {formatIndicatorVariance(k)}</em></span>}</div>{k.year!=='—'&&<small className="kpiYear">{k.year}</small>}
       </div>)}</div>
     </div>
    </article>})}</section>

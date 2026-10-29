@@ -50,3 +50,13 @@
 .indicatorModal .currentKpiWithTarget .indicatorTargetDot{width:11px;height:11px;flex-basis:11px}
 .indicatorModal .currentKpiWithTarget .popupAchievementStatus>span{font-size:11px;font-weight:600;color:var(--muted)}
 @media(max-width:700px){.indicatorModal .currentKpi.currentKpiWithTarget{grid-template-columns:1fr 1fr;gap:12px}.indicatorModal .currentKpiWithTarget .popupKpiContext,.indicatorModal .currentKpiWithTarget .popupAchievementStatus{grid-column:1/-1}.indicatorModal .currentKpiWithTarget .popupKpiMetric>b{font-size:20px}}
+
+/* Shared right-hand columns keep both goal progress bars aligned. */
+.goalPage .goalHeroActions,.goalPage .goalInitiativeActions{width:320px;flex:0 0 320px;display:grid;grid-template-columns:168px minmax(0,1fr);gap:16px;align-items:center}
+.goalPage .goalHeroActions>.achievementProgress{margin:0}
+.goalPage .initiativeSectionTitle{padding-inline:4px}
+.goalPage .goalInitiativeActions>span{line-height:1.35}
+.goalPage .goalHeroCopy h2{display:flex;align-items:center;gap:10px}
+.app-shell:has(.goalPage) .goalHeroCopy h2>.goalHeroIcon{width:28px;height:28px;font-size:15px;border-radius:8px;flex:0 0 28px}
+@media(max-width:700px){.goalPage .goalHeroActions{width:100%;flex-basis:100%;grid-template-columns:150px minmax(0,1fr)}.goalPage .goalInitiativeActions{width:150px;flex-basis:150px;grid-template-columns:150px}.goalPage .goalHeroActions>.achievementProgress{margin:0}.goalPage .goalHeroCopy h2{flex-wrap:wrap}}
+@media(max-width:700px){.goalPage .initiativeSectionTitle{flex-wrap:wrap;gap:8px}.goalPage .initiativeSectionTitle>div:first-child{flex-basis:100%}.goalPage .goalInitiativeActions{width:100%;flex-basis:100%}}
