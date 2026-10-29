@@ -2,7 +2,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {Link, useLocation, useSearchParams} from 'react-router-dom';
 import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, CheckCircle2, ChevronRight, ClipboardList, Eye, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Trash2, Users, X} from 'lucide-react';
 import {useTheme} from '../../../app/ThemeProvider';
-import {accessibleRows, emptyAssignments, idColumn, loadDataset, text} from './model';
+import {accessibleRows, assignedGoalRows, emptyAssignments, idColumn, loadDataset, text} from './model';
 import type {Assignments, DataRow, Dataset, Kind} from './model';
 import {StakeholderSelect,StakeholderContext} from './StakeholderSelect';
 import {getSuperAdminWorkspace,saveSuperAdminWorkspace,type SuperAdminUser,type Workspace} from './superadminApi';
@@ -62,13 +62,15 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
   const profile = draft.profile ?? dataset?.profile ?? {};
   const goals = draft.goals ?? dataset?.goals ?? [];
   const visibleGoals = goals;
+  const assignedGoals = assignedGoalRows(goals,user,assignments);
   const allIndicators = useMemo(() => draft.indicatorMasters ?? dataset?.indicators ?? [], [draft.indicatorMasters, dataset]);
   const allInitiatives = useMemo(() => draft.initiativeMasters ?? dataset?.initiatives ?? [], [draft.initiativeMasters, dataset]);
   const indicators = allIndicators;
   const initiatives = allInitiatives;
   const kind = section === 'initiatives' ? 'initiatives' : 'indicators';
   const master = kind === 'indicators' ? indicators : initiatives;
-  const editableIds = superAdmin ? undefined : live ? (dataset as (Workspace & {editable?:Record<string,string[]>}) | null)?.editable?.[kind] ?? [] : accessibleRows(master,kind,user,assignments).map(row=>text(row,idColumn(kind)));
+  const editableResources = (dataset as (Workspace & {editable?:Record<string,string[]>}) | null)?.editable;
+  const editableIds = superAdmin ? undefined : live ? editableResources?.[kind] ?? [] : accessibleRows(master,kind,user,assignments).map(row=>text(row,idColumn(kind)));
   const canEditResource=(id:string)=>superAdmin||Boolean(editableIds?.includes(id));
   const baseData = kind === 'indicators' ? dataset?.indicatorData ?? [] : dataset?.initiativeData ?? [];
   const edits = kind === 'indicators' ? draft.indicatorEdits : draft.initiativeEdits;
@@ -151,9 +153,9 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
       {error ? <div className="v25-panel v25-error" role="alert"><h2>District data could not be loaded</h2><p>{error}</p><button className="v25-button" onClick={() => {setError(''); setRetry(value => value + 1)}}>Try again</button></div> : !dataset ? <div className="v25-panel v25-loading" role="status">Loading existing district data…</div> : <>
       {section === 'home' && <>
         <section className="v25-district-card"><div className="v25-district-symbol">{profile['District Logo'] ? <img src={text(profile, 'District Logo')} alt="District logo"/> : <Building2 size={32}/>}</div><div><span className="v25-eyebrow">{text(profile, 'Strategic Plan Duration')}</span><h2>{text(profile, 'School District Name')}</h2><p>{text(profile, 'Strategic Plan Name')}</p></div><span className="v25-badge"><ShieldCheck size={14}/>{superAdmin ? 'District Super Admin' : 'District Admin'}</span></section>
-        <div className="v25-stat-grid">{[{label: superAdmin ? 'Goals' : 'Goals', value: visibleGoals.length, icon: Goal, section: 'plan' as Section}, {label: superAdmin ? 'Indicators' : 'Indicators', value: indicators.length, icon: BarChart3, section: 'indicators' as Section}, {label: superAdmin ? 'Initiatives' : 'Initiatives', value: initiatives.length, icon: ClipboardList, section: 'initiatives' as Section}].map(stat => <button className="v25-stat" key={stat.label} onClick={() => stat.section === 'plan' ? setParams({section: 'plan', tab: 'goals'}) : navigateSection(stat.section)}><div><span>{stat.label}</span><stat.icon size={20}/></div><b>{stat.value}</b></button>)}</div>
+        <div className="v25-stat-grid">{[{label: superAdmin ? 'Goals' : 'Assigned goals', value: superAdmin ? visibleGoals.length : assignedGoals.length, icon: Goal, section: 'plan' as Section}, {label: superAdmin ? 'Indicators' : 'Assigned indicators', value: superAdmin ? indicators.length : live ? (editableResources?.indicators ?? []).length : accessibleRows(indicators,'indicators',user,assignments).length, icon: BarChart3, section: 'indicators' as Section}, {label: superAdmin ? 'Initiatives' : 'Assigned initiatives', value: superAdmin ? initiatives.length : live ? (editableResources?.initiatives ?? []).length : accessibleRows(initiatives,'initiatives',user,assignments).length, icon: ClipboardList, section: 'initiatives' as Section}].map(stat => <button className="v25-stat" key={stat.label} onClick={() => stat.section === 'plan' ? setParams({section: 'plan', tab: 'goals'}) : navigateSection(stat.section)}><div><span>{stat.label}</span><stat.icon size={20}/></div><b>{stat.value}</b></button>)}</div>
         <section className="v25-panel"><div className="v25-panel-title"><div><h2>{superAdmin ? 'Stakeholder assignments' : 'Your assigned goals'}</h2></div><Users size={22}/></div>
-          {superAdmin ? <div className="v25-quick-actions"><button className="v25-button primary" onClick={() => setParams({section: 'plan', tab: 'goals'})}>Configure stakeholders <ArrowRight size={15}/></button></div> : visibleGoals.length ? <div className="v25-assigned-goals">{visibleGoals.map(goal => <article key={text(goal, 'Goal ID')}><span className="v25-goal-number">{text(goal, 'Goal ID')}</span><div><h3>{text(goal, 'Goal Name')}</h3><p>{text(goal, 'Goal Description')}</p></div></article>)}</div> : <Empty title="No goals assigned yet"/>}
+          {superAdmin ? <div className="v25-quick-actions"><button className="v25-button primary" onClick={() => setParams({section: 'plan', tab: 'goals'})}>Configure stakeholders <ArrowRight size={15}/></button></div> : assignedGoals.length ? <div className="v25-assigned-goals">{assignedGoals.map(goal => <article key={text(goal, 'Goal ID')}><span className="v25-goal-number">{text(goal, 'Goal ID')}</span><div><h3>{text(goal, 'Goal Name')}</h3><p>{text(goal, 'Goal Description')}</p></div></article>)}</div> : <Empty title="No goals assigned yet"/>}
         </section>
 
       </>}

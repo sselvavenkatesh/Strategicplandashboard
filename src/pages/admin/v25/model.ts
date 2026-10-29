@@ -13,6 +13,10 @@ export const emptyAssignments = (): Assignments => ({goals: {}, indicators: {}, 
 export const idColumn = (kind: Kind) => kind === 'goals' ? 'Goal ID' : kind === 'indicators' ? 'Indicator ID' : 'Initiative ID';
 export const text = (row: DataRow, key: string) => String(row[key] ?? '');
 
+export function assignedGoalRows(rows: DataRow[], user: string, assignments: Assignments) {
+  return rows.filter(row => Boolean(user) && (assignments.goals[text(row, 'Goal ID')] ?? []).includes(user));
+}
+
 // Empty resource selections inherit dynamically; nonempty selections restrict that row.
 export function resourceStakeholders(row: DataRow, kind: 'indicators' | 'initiatives', assignments: Assignments): string[] {
   const goal = assignments.goals[text(row, 'Goal ID')] ?? [];
