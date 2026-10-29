@@ -99,6 +99,10 @@
 .v25-dense-data.indicator th:nth-child(n){width:8%}.v25-dense-data.indicator th:first-child{width:13%}.v25-dense-data.indicator th:nth-child(2){width:17%}.v25-dense-data.indicator th:nth-child(3){width:9%}.v25-dense-data.indicator th:nth-child(4){width:13%}
 .v25-dense-data.initiative th:nth-child(n){width:5%}.v25-dense-data.initiative th:first-child{width:12%}.v25-dense-data.initiative th:nth-child(2){width:16%}.v25-dense-data.initiative th:nth-child(3){width:13%}.v25-dense-data.initiative th:nth-child(4){width:20%}.v25-dense-data.initiative th:nth-child(5),.v25-dense-data.initiative th:nth-child(6),.v25-dense-data.initiative th:nth-child(7){width:8%}
 .v25-root .v25-dense-data input,.v25-root .v25-dense-data select{min-height:20px;height:20px;padding:1px 4px;font-size:10px;border-radius:3px;width:100%}
+.v25-root .v25-dense-data input:focus,.v25-root .v25-dense-data select:focus{outline:2px solid var(--v-blue);outline-offset:-2px;border-color:var(--v-blue);box-shadow:none}
+.v25-dismissible-error{display:flex;align-items:flex-start;gap:8px}
+.v25-dismissible-error>span{flex:1;min-width:0}
+.v25-dismissible-error>.v25-icon{flex:none;width:22px;height:22px;min-height:22px;padding:3px;color:inherit}
 .v25-dense-data .v25-status{max-width:100%;overflow:hidden;text-overflow:ellipsis;display:block;font-size:9px;padding:0 4px;line-height:17px;height:19px}
 .v25-dense-scroll{overflow-y:visible;max-height:none}
 .v25-initiative-dialog{max-width:680px}
