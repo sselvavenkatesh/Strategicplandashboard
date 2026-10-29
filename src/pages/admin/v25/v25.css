@@ -141,3 +141,5 @@
 /* Keep save and validation notices beside the active workspace controls. */
 .v25-toast{top:18px;right:20px;bottom:auto}
 .v25-table-tools{flex-wrap:wrap}
+
+.themeScope .v25-root.v25-auth-dark{--v-bg:#081523;--v-panel:#102235;--v-text:#e0eaf6;--v-muted:#9aacc2;--v-line:#2b3c52;--v-input:#15273c;--v-soft:#17283d;--v-blue:#71b5ff;--v-blue-soft:#1a3453;--v-shadow:none;color-scheme:dark;background:radial-gradient(ellipse at 50% 35%,#122c43 0%,#081523 70%);min-height:100dvh;padding-bottom:55px}

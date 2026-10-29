@@ -4,8 +4,8 @@ import type {DataRow} from './model';
 import {text} from './model';
 import {compareDataValues} from './tableSort';
 
-type Props = {kind: 'indicators' | 'initiatives'; rows: DataRow[]; initialResourceId?:string; startEditing?:boolean; onSave: (rows: DataRow[]) => void | Promise<void>};
-export function DataEditor({kind, rows, initialResourceId='', startEditing=false, onSave}: Props) {
+type Props = {kind: 'indicators' | 'initiatives'; rows: DataRow[]; initialResourceId?:string; startEditing?:boolean; editableIds?:string[]; onSave: (rows: DataRow[]) => void | Promise<void>};
+export function DataEditor({kind, rows, initialResourceId='', startEditing=false, editableIds, onSave}: Props) {
   const [search, setSearch] = useState('');
   const [year, setYear] = useState('');
   const [category, setCategory] = useState('');
@@ -19,6 +19,7 @@ export function DataEditor({kind, rows, initialResourceId='', startEditing=false
   const pageSize = 15;
   const indicator = kind === 'indicators';
   const entity=indicator?'Indicator':'Initiative';
+  const canEdit=(row:DataRow)=>!editableIds||editableIds.includes(text(row,`${entity} ID`));
   const resources=[...new Map(rows.map(row=>[text(row,`${entity} ID`),text(row,`${entity} Name`)])).entries()];
   const years = [...new Set(rows.map(row => text(row, 'School Year')).filter(Boolean))].sort().reverse();
   const categories = [...new Set(rows.map(row => text(row, 'Category')).filter(Boolean))].sort();
@@ -40,13 +41,13 @@ export function DataEditor({kind, rows, initialResourceId='', startEditing=false
     <div className="v25-table-tools"><label className="v25-search"><Search size={14}/><input aria-label="Search reporting data" placeholder="Search reporting data…" value={search} onChange={event => {setSearch(event.target.value); setPage(1)}}/></label>
       {initialResourceId && <select aria-label={`Filter ${entity.toLowerCase()} data`} value={resource} onChange={event=>{setResource(event.target.value);setPage(1)}}><option value="">All {kind}</option>{resources.map(([id,name])=><option key={id} value={id}>{name}</option>)}</select>}
       {indicator && <><select aria-label="School year" value={year} onChange={event => {setYear(event.target.value); setPage(1)}}><option value="">All school years</option>{years.map(value => <option key={value}>{value}</option>)}</select><select aria-label="Category" value={category} onChange={event => {setCategory(event.target.value); setPage(1)}}><option value="">All categories</option>{categories.map(value => <option key={value}>{value}</option>)}</select></>}
-      <span>{filtered.length} records</span><div className="v25-inline-actions">{editing ? <><button className="v25-button" onClick={() => {setEditing(false); setChanges({}); setError('')}}>Cancel</button><button className="v25-button primary v25-save" disabled={saving} onClick={save}><Check size={13}/> Save</button></> : <button className="v25-button" onClick={() => {setChanges({}); setError(''); setEditing(true)}}><Pencil size={13}/> Edit</button>}</div>
+      <span>{filtered.length} records</span><div className="v25-inline-actions">{editing ? <><button className="v25-button" onClick={() => {setEditing(false); setChanges({}); setError('')}}>Cancel</button><button className="v25-button primary v25-save" disabled={saving} onClick={save}><Check size={13}/> Save</button></> : <button className="v25-button" disabled={!rows.some(canEdit)} onClick={() => {setChanges({}); setError(''); setEditing(true)}}><Pencil size={13}/> Edit</button>}</div>
     </div>
     {error && <p className="v25-inline-error" role="alert">{error}</p>}
     <div className="v25-table-scroll v25-dense-scroll"><table className={`v25-table v25-data-table v25-dense-data ${indicator ? 'indicator' : 'initiative'}`}><thead><tr>{columns.map(column => <th key={column} aria-sort={sort?.column === column ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}><button type="button" className="v25-sort" onClick={() => {setSort({column,direction:sort?.column===column && sort.direction==='asc'?'desc':'asc'});setPage(1)}}>{column.replace('Value','Actual')}{sort?.column===column ? sort.direction==='asc'?<ArrowUp size={11}/>:<ArrowDown size={11}/> : <ArrowUpDown size={11}/>}</button></th>)}</tr></thead>
       <tbody>{filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(({row: original, index}) => {
         const key = text(original,'__previewKey'); const row = changes[key] ?? original;
-        return <tr key={key || index}>{columns.map(column => <td key={column} title={text(row,column)}>{editing && editable.has(column) ? column === 'Status' ? <select aria-label={`Status row ${index + 1}`} value={text(row,column)} onChange={event => setChanges(previous => ({...previous,[key]:{...row,[column]:event.target.value}}))}><option value="">Not set</option>{[...new Set(['Not Started','In Progress','Done','On Hold',text(row,column)].filter(Boolean))].map(status => <option key={status}>{status}</option>)}</select> : <input aria-label={`${column.replace('Value','Actual')} row ${index + 1}`} value={text(row,column)} onChange={event => setChanges(previous => ({...previous,[key]:{...row,[column]:event.target.value || null}}))}/> : column === 'Status' ? <span className={`v25-status ${text(row,column) === 'Done' ? 'done' : ''}`}>{text(row,column) || '—'}</span> : text(row,column) || '—'}</td>)}</tr>;
+        return <tr key={key || index}>{columns.map(column => <td key={column} title={text(row,column)}>{editing && canEdit(row) && editable.has(column) ? column === 'Status' ? <select aria-label={`Status row ${index + 1}`} value={text(row,column)} onChange={event => setChanges(previous => ({...previous,[key]:{...row,[column]:event.target.value}}))}><option value="">Not set</option>{[...new Set(['Not Started','In Progress','Done','On Hold',text(row,column)].filter(Boolean))].map(status => <option key={status}>{status}</option>)}</select> : <input aria-label={`${column.replace('Value','Actual')} row ${index + 1}`} value={text(row,column)} onChange={event => setChanges(previous => ({...previous,[key]:{...row,[column]:event.target.value || null}}))}/> : column === 'Status' ? <span className={`v25-status ${text(row,column) === 'Done' ? 'done' : ''}`}>{text(row,column) || '—'}</span> : text(row,column) || '—'}</td>)}</tr>;
       })}</tbody>
     </table>{!filtered.length && <div className="v25-empty"><h3>No matching records</h3></div>}</div>
     <div className="v25-pagination"><span>{filtered.length ? (currentPage - 1) * pageSize + 1 : 0}–{Math.min(currentPage * pageSize, filtered.length)} of {filtered.length}</span><div><button disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>Previous</button><span>{currentPage} / {pages}</span><button disabled={currentPage === pages} onClick={() => setPage(currentPage + 1)}>Next</button></div></div>

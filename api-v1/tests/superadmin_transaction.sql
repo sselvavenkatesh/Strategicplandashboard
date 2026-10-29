@@ -90,6 +90,16 @@ begin
  select md5(coalesce(string_agg(x,'' order by x),'')) into new_hash from (select 'i'||ctid::text||xmin::text x from public."Indicator_Data" union all select 'n'||ctid::text||xmin::text from public."Initiative_Data")q;
  if old_hash<>new_hash then raise exception 'Privacy rewrote reporting data';end if;
 
+
+ -- Reject duplicate master names across goals, including whitespace/case differences.
+ begin
+ perform public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','indicators','create',true,'records',jsonb_build_array(jsonb_build_object('Indicator ID',ind||'0','Indicator Name','  TRANSACTIONAL   QA INDICATOR  ','Goal ID',(select "Goal ID" from public."Goal_master" where "Goal ID"<>g limit 1),'KPI Nature','Positive'))));
+ raise exception 'Duplicate indicator accepted';
+ exception when raise_exception then if sqlerrm='Duplicate indicator accepted' or position('already exists' in sqlerrm)=0 then raise;end if;end;
+ begin
+ perform public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','initiatives','create',true,'records',jsonb_build_array(jsonb_build_object('Initiative ID',ini||'0','Initiative Name',' TRANSACTIONAL   QA INITIATIVE ','Goal ID',(select "Goal ID" from public."Goal_master" where "Goal ID"<>g limit 1)))));
+ raise exception 'Duplicate initiative accepted';
+ exception when raise_exception then if sqlerrm='Duplicate initiative accepted' or position('already exists' in sqlerrm)=0 then raise;end if;end;
  perform public.v25_superadmin_logout(tok);
  begin perform public.v25_superadmin_snapshot(tok);raise exception 'Revoked session accepted';exception when invalid_authorization_specification then null;end;
 end $$;

@@ -9,7 +9,7 @@ begin
  token:=public.create_admin_session(a::text);token_b:=public.create_admin_session(b::text);
  if public.v25_admin_identity(token)->>'id'<>a::text then raise exception 'Numeric session mapping failed';end if;
  s:=public.v25_admin_snapshot(token);
- if jsonb_array_length(s->'indicators')<>0 or jsonb_array_length(s->'initiativeData')<>0 then raise exception 'Unassigned Admin received reporting data';end if;
+ if jsonb_array_length(s->'indicators')<>(select count(*) from public."Indicator_master") or jsonb_array_length(s->'editable'->'indicators')<>0 then raise exception 'Admin view-all / assigned-edit boundary failed';end if;
  select 'G'||(coalesce(max(substring("Goal ID" from 2)::int),0)+1) into g from public."Goal_master";
  g_other:='G'||(substring(g from 2)::int+1);
  insert into public."Goal_master"("Goal ID","Goal Name","Role") values(g,'Admin rollback QA Goal','All'),(g_other,'Admin rollback QA Other Goal','All');
@@ -22,7 +22,7 @@ begin
  insert into public."Initiative_master"("Initiative ID","Initiative Name","Goal ID","Role") values(ini,'Admin QA Initiative',g,'All');
  if not public.v25_admin_can_manage(a,'indicators',ind) or public.v25_admin_can_manage(a,'indicators',ind_b) or public.v25_admin_can_manage(a,'indicators',ind_other) then raise exception 'Inheritance/restriction boundary failed';end if;
  s:=public.v25_admin_snapshot(token);
- if jsonb_array_length(s->'indicators')<>1 or s->'profile' ? 'Google Auth ID' then raise exception 'Snapshot scope or private config leaked';end if;
+ if jsonb_array_length(s->'indicators')<>(select count(*) from public."Indicator_master") or s->'editable'->'indicators'<>jsonb_build_array(ind) or s->'profile' ? 'Google Auth ID' then raise exception 'View-all snapshot, edit scope or private config boundary failed';end if;
  rowdata:=jsonb_build_object('Goal ID',g,'Indicator ID',ind,'Indicator Name','Admin QA Indicator','School Year','2030-31','Category','All','Student Group','All Students','Value 3','7','Target 1','5','Role','All');
  s:=public.v25_admin_save(token,s->>'revision','indicators',jsonb_build_array(rowdata));
  update public."Indicator_Data" set "Indicator Name"='Legacy QA Indicator' where "Indicator ID"=ind;
@@ -62,7 +62,7 @@ begin
  if (select count(*) from public.fn_indicator_key_values(g,null) where indicator_id=ind)<>1 then raise exception 'Assignments affected public visibility';end if;
  insert into public.v25_indicator_stakeholders values(ind,b);
  begin perform public.v25_admin_save(token,s->>'revision','indicators','[]');raise exception 'Changed assignments accepted';exception when serialization_failure then null;end;
- if jsonb_array_length(public.v25_admin_snapshot(token)->'indicators')<>0 then raise exception 'Revoked assignment still readable';end if;
+ if jsonb_array_length(public.v25_admin_snapshot(token)->'editable'->'indicators')<>0 then raise exception 'Revoked assignment still editable';end if;
  update public.admin_users set "Is Active"=false where id=a;
  if public.v25_admin_identity(token) is not null then raise exception 'Inactive account retained access';end if;
  update public.admin_users set "Is Active"=true where id=a;

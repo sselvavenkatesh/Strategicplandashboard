@@ -32,7 +32,7 @@ export function MasterEditor({kind, row, isNew, goals, records, onClose, onSave}
     const name = text(draft, nameKey).trim();
     if (!name) {setError(`${entity} name is required.`); return}
     if (!goals.some(goal => goal['Goal ID'] === draft['Goal ID'])) {setError('Select a valid goal.'); return}
-    if (records.some(record => record[idColumn(kind)] !== draft[idColumn(kind)] && record['Goal ID'] === draft['Goal ID'] && text(record, nameKey).trim().toLowerCase() === name.toLowerCase())) {setError(`This goal already has an ${entity.toLowerCase()} with that name.`); return}
+    if (records.some(record => record[idColumn(kind)] !== draft[idColumn(kind)] && text(record, nameKey).trim().replace(/\s+/g,' ').toLowerCase() === name.replace(/\s+/g,' ').toLowerCase())) {setError(`There is already an ${entity.toLowerCase()} with that name.`); return}
     const master = {...draft, [nameKey]: name};
     setSaving(true);
     try {
