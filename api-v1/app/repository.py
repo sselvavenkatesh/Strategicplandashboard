@@ -77,8 +77,8 @@ def validate_admin_login(email: str, password: str):
     rows = fetch_all("select * from public.validate_admin_login(%s,%s)", (email, password))
     return rows[0] if rows else None
 
-def validate_sso_admin(email: str):
-    rows = fetch_all("select * from public.validate_sso_admin(%s)", (email,))
+def validate_sso_admin(email: str, provider: str | None = None):
+    rows = fetch_all("select * from public.v25_validate_sso_admin(%s,%s)", (email,provider)) if provider else fetch_all("select * from public.validate_sso_admin(%s)", (email,))
     return rows[0] if rows else None
 
 def validate_superadmin_login(email: str, password: str):

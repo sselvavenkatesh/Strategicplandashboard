@@ -9,6 +9,8 @@ import {getSuperAdminWorkspace,saveSuperAdminWorkspace,type SuperAdminUser,type 
 import {DataEditor} from './DataEditor';
 import {getAdminWorkspace,saveAdminWorkspace} from './adminApi';
 import {MasterEditor} from './MasterEditor';
+import {UserManagement} from './UserManagement';
+import {SsoSettings} from './SsoSettings';
 import {MasterTable} from './MasterTable';
 import {DataUpload} from './DataUpload';
 import {DistrictLogoControl, GoalCountControl} from './DistrictControls';
@@ -16,8 +18,8 @@ import {DeleteGoalDialog} from './DeleteGoalDialog';
 import {goalDependencies, increaseGoalCount, validateGoalNames} from './goalConfiguration';
 import './v25.css';
 
-type Section = 'home' | 'plan' | 'indicators' | 'initiatives';
-const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}] as const;
+type Section = 'home' | 'plan' | 'indicators' | 'initiatives' | 'users';
+const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}, {id:'users',label:'User Management',icon:Users}] as const;
 const draftKey = 'strategic-v25-ui-draft-v1';
 type Draft = {assignments: Assignments; indicatorEdits: Record<string, DataRow>; initiativeEdits: Record<string, DataRow>; profile?: DataRow; goals?: DataRow[]; indicatorMasters?: DataRow[]; initiativeMasters?: DataRow[]; nextGoalNumber?: number};
 function newDraft(): Draft {return {assignments: emptyAssignments(), indicatorEdits: {}, initiativeEdits: {}}}
@@ -30,7 +32,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
   const superAdmin = location.pathname.replace(/\/$/, '').endsWith('/superadmin');
   const [params, setParams] = useSearchParams();
   const requested = params.get('section');
-  const section: Section = menus.some(item => item.id === requested) ? requested as Section : 'home';
+  const section: Section = menus.some(item => item.id === requested && (superAdmin || item.id!=='users')) ? requested as Section : 'home';
   const live=Boolean(authenticatedUser);
   const [user] = useState(authenticatedUser?.id ?? '');
   const [busy,setBusy]=useState(false);
@@ -139,7 +141,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
     <div className="v25-layout"><aside className="v25-sidebar">
       <Link to="/" className="v25-brand"><img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/></Link>
       <div className="v25-workspace"><span className="v25-workspace-icon"><Building2 size={20}/></span><div><b>Strategic Plan</b><span>{superAdmin ? 'Super Admin workspace' : 'Admin workspace'}</span></div></div>
-      <div className="v25-nav-caption">WORKSPACE</div><nav aria-label="Administration">{menus.map(menu => {const Icon = menu.icon; return <button type="button" key={menu.id} aria-current={section === menu.id ? 'page' : undefined} className={section === menu.id ? 'active' : ''} onClick={() => navigateSection(menu.id)}><Icon size={18}/><span>{menu.label}</span>{section === menu.id && <ChevronRight size={14}/>}</button>})}</nav>
+      <div className="v25-nav-caption">WORKSPACE</div><nav aria-label="Administration">{menus.filter(menu=>superAdmin||menu.id!=='users').map(menu => {const Icon = menu.icon; return <button type="button" key={menu.id} aria-current={section === menu.id ? 'page' : undefined} className={section === menu.id ? 'active' : ''} onClick={() => navigateSection(menu.id)}><Icon size={18}/><span>{menu.label}</span>{section === menu.id && <ChevronRight size={14}/>}</button>})}</nav>
       <div className="v25-sidebar-bottom"><Link to="/summary"><ArrowLeft size={16}/> Public dashboard</Link><div className="v25-person"><span className="v25-avatar">{superAdmin ? 'SA' : currentUser.name.split(' ').map(word => word[0]).join('')}</span><div><b>{superAdmin ? authenticatedUser?.name ?? 'Super Admin' : currentUser.name}</b><span>{superAdmin ? 'District configuration' : 'Assigned data management'}</span></div></div></div>
     </aside>
     <main className="v25-main"><header className="v25-topbar"><div className="v25-breadcrumb">Strategic Plan <ChevronRight size={13}/><span>{superAdmin ? 'Super Admin' : 'Admin'}</span></div><div className="v25-top-actions"><button className="v25-icon" aria-label="Toggle theme" onClick={toggleTheme}>{theme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}</button>{onSignOut&&<button className="v25-button" disabled={signingOut} onClick={onSignOut}>{signingOut?'Signing out…':'Sign Out'}</button>}</div></header>
@@ -159,7 +161,8 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
         <div className="v25-section-tabs" role="group" aria-label="Strategic Plan sections"><button aria-pressed={planTab === 'district'} onClick={() => selectTab('district')}>District & Strategic Plan</button><button aria-pressed={planTab === 'goals'} onClick={() => selectTab('goals')}>{superAdmin ? 'Goal Master' : 'Goals'} <span>{visibleGoals.length}</span></button></div>
         {planTab === 'district' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>District & Strategic Plan</h2></div>{!superAdmin && <span className="v25-badge"><Eye size={14}/> View only</span>}</div>
           <div className="v25-form-grid">{['School District Name', 'Strategic Plan Name', 'District Logo', 'Strategic Plan Duration', 'Total Goals', 'Admin Signin Method', 'Mission Statement', 'Vision Statement'].filter(field=>superAdmin||field!=='Admin Signin Method').map(field => field === 'District Logo' ? <DistrictLogoControl key={field} logo={text(profile, field)} readOnly={!superAdmin} onChange={logo => updateProfile(field, logo)}/> : field === 'Total Goals' ? superAdmin ? <GoalCountControl key={field} count={goals.length} onChange={changeGoalCount} onError={setConfigurationError}/> : <label key={field}>Number of Goals<input readOnly value={goals.length}/></label> : <label key={field} className="">{field}{field.endsWith('Statement') ? <textarea readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/> : field === 'Admin Signin Method' && superAdmin ? <select value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}>{['Userbased', 'Google', 'Microsoft'].map(method => <option key={method}>{method}</option>)}</select> : <input readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/>}</label>)}
-          {(text(profile, 'Admin Signin Method') === 'Google' ? ['Google Client ID', 'Google Auth ID'] : text(profile, 'Admin Signin Method') === 'Microsoft' ? ['Microsoft Client ID', 'Microsoft Tenant ID', 'Microsoft Auth ID'] : []).map(field => <label key={field}>{field}<input readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/></label>)}</div>
+          {(superAdmin ? ['Google Client ID', 'Google Auth ID','Microsoft Client ID', 'Microsoft Tenant ID', 'Microsoft Auth ID'] : []).map(field => <label key={field}>{field}<input readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/></label>)}</div>
+          {superAdmin && live && <SsoSettings saveConfiguration={async()=>{validateGoalNames(goals);await persist({action:'configuration',profile,goals,owners:assignments.goals})}}/>}
           {superAdmin && <div className="v25-panel-footer"><button className="v25-button primary v25-save" onClick={saveConfiguration}><Check size={14}/> Save</button></div>}
         </section>}
         {planTab === 'goals' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>{superAdmin ? 'Goal Master' : 'Goals'} <span className="v25-count">{visibleGoals.length}</span></h2></div>{superAdmin ? <GoalCountControl count={goals.length} onChange={changeGoalCount} onError={setConfigurationError}/> : <span className="v25-badge"><Eye size={14}/> View only</span>}</div>
@@ -176,6 +179,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
         </section>}
       </>}
       </>}
+      {superAdmin && section==='users' && <UserManagement onChanged={()=>{setRetry(value=>value+1);setNotice('Details are saved.')}}/>}
       <footer className="v25-footer"><span>Strategic Plan · V2.5</span><span>Powered by <b>K12Matrix</b></span></footer>
       </div>
     </main></div>

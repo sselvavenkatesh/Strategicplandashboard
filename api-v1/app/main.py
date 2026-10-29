@@ -1,5 +1,7 @@
 from time import perf_counter
 from fastapi import FastAPI, HTTPException, Query, Request, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -24,11 +26,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.exception_handler(RequestValidationError)
+async def confidential_validation_error(request:Request,error:RequestValidationError):
+    if request.url.path.endswith(('/superadmin/sso-settings','/superadmin/users')):
+        return JSONResponse(status_code=422,content={'detail':'Check the submitted fields and their allowed lengths.'},headers={'Cache-Control':'no-store'})
+    return await request_validation_exception_handler(request,error)
+
 @app.middleware("http")
 async def preview_write_guard(request: Request, call_next):
     started = perf_counter()
     path = request.url.path
-    if not settings.data_writes_enabled and request.method in {"POST", "PUT", "PATCH", "DELETE"} and path.startswith("/api/v1/superadmin/") and path not in {"/api/v1/superadmin/login", "/api/v1/superadmin/workspace", "/api/v1/superadmin/logout"}:
+    if not settings.data_writes_enabled and request.method in {"POST", "PUT", "PATCH", "DELETE"} and path.startswith("/api/v1/superadmin/") and path not in {"/api/v1/superadmin/login", "/api/v1/superadmin/workspace", "/api/v1/superadmin/logout", "/api/v1/superadmin/users", "/api/v1/superadmin/sso-settings"}:
         return JSONResponse(status_code=503, content={"detail": "Data writes remain disabled until V2.5 authenticated storage is integrated."})
     response = await call_next(request)
     response.headers["Server-Timing"] = f"app;dur={(perf_counter() - started) * 1000:.1f}"
@@ -209,8 +217,8 @@ def get_admin_signin_config():
     return {
       "districtId":row.get("district_id"),
       "signinMethod":row.get("signin_method") or "Userbased",
-      "google":{"clientId":row.get("google_client_id"),"authId":row.get("google_auth_id"),"configured":bool(row.get("google_configured"))},
-      "microsoft":{"clientId":row.get("microsoft_client_id"),"tenantId":row.get("microsoft_tenant_id"),"authId":row.get("microsoft_auth_id"),"configured":bool(row.get("microsoft_configured"))}
+      "google":{"configured":bool(row.get("google_configured"))},
+      "microsoft":{"configured":bool(row.get("microsoft_configured"))}
     }
 
 @app.put("/api/v1/superadmin/oauth-secrets")
@@ -297,7 +305,7 @@ def admin_oauth_callback(provider: str, request: Request, code: str | None = Non
             user=_json_get("https://graph.microsoft.com/v1.0/me?$select=displayName,mail,userPrincipalName",tokens["access_token"])
             email=user.get("mail") or user.get("userPrincipalName")
         if not email: raise ValueError("Provider did not return an email address")
-        admin=repo.validate_sso_admin(email)
+        admin=repo.validate_sso_admin(email,provider)
         if not admin:
             return RedirectResponse(return_to+"?"+urllib.parse.urlencode({"authError":"not_authorized"}),status_code=302)
         token=repo.create_admin_session(admin.get("user_id"))

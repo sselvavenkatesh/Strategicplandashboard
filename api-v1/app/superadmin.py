@@ -49,6 +49,49 @@ class SaveWorkspace(BaseModel):
     revision: str = Field(min_length=32,max_length=32)
     change: dict
 
+@router.get('/users')
+def users(request:Request,response:Response):
+    response.headers['Cache-Control']='no-store'
+    try: return repo.fetch_one('select public.v25_superadmin_users(%s::uuid) as data',(token_from(request),))['data']
+    except psycopg.Error as error: db_error(error)
+
+class SaveUser(BaseModel):
+    revision:str=Field(min_length=32,max_length=32)
+    user:dict
+
+@router.post('/users')
+def save_user(body:SaveUser,request:Request,response:Response):
+    token=token_from(request);checked_origin(request)
+    if set(body.user)-{'id','name','email','googleEmail','microsoftEmail','active','password'}: raise HTTPException(422,'Unknown user fields.')
+    payload=json.dumps(body.user)
+    if len(payload.encode())>5000: raise HTTPException(413,'User details are too large.')
+    response.headers['Cache-Control']='no-store'
+    try: return repo.fetch_one('select public.v25_superadmin_save_user(%s::uuid,%s,%s::jsonb) as data',(token,body.revision,payload))['data']
+    except psycopg.Error as error: db_error(error)
+
+@router.get('/sso-settings')
+def sso_settings(request:Request,response:Response):
+    response.headers['Cache-Control']='no-store'
+    try:
+        if not repo.validate_superadmin_session(token_from(request)): raise HTTPException(401,'Invalid or expired Super Admin session.')
+        config=repo.admin_auth_config() or {}
+        base=str(request.base_url).rstrip('/')
+        return {'googleConfigured':bool(config.get('google_configured')),'microsoftConfigured':bool(config.get('microsoft_configured')),'googleCallback':base+'/api/v1/auth/admin/oauth/google/callback','microsoftCallback':base+'/api/v1/auth/admin/oauth/microsoft/callback'}
+    except psycopg.Error as error: db_error(error)
+
+class SsoSecrets(BaseModel):
+    googleSecret:str|None=Field(default=None,max_length=4000)
+    microsoftSecret:str|None=Field(default=None,max_length=4000)
+
+@router.post('/sso-settings')
+def save_sso_settings(body:SsoSecrets,request:Request,response:Response):
+    token=token_from(request);checked_origin(request)
+    try:
+        if not repo.validate_superadmin_session(token): raise HTTPException(401,'Invalid or expired Super Admin session.')
+        repo.save_oauth_secrets(token,body.googleSecret or None,body.microsoftSecret or None)
+    except psycopg.Error as error: db_error(error)
+    return sso_settings(request,response)
+
 @router.post('/workspace')
 def save_workspace(body: SaveWorkspace, request: Request, response: Response):
     token=token_from(request); checked_origin(request)
