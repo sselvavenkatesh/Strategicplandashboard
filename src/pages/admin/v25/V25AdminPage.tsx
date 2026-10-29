@@ -79,7 +79,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
   const nameColumn = kind === 'indicators' ? 'Indicator Name' : 'Initiative Name';
   const mastersById = new Map(master.map(row => [text(row, idColumn(kind)), row]));
   const allowedIds = new Set(master.map(row => text(row, idColumn(kind))));
-  const indexedData = sourceData.map((original, index) => {const row = edits[text(original, '__previewKey')] ?? original; const definition = mastersById.get(text(row, idColumn(kind))); return {row: {...row, [nameColumn]: definition?.[nameColumn] ?? row[nameColumn], 'Goal ID': definition?.['Goal ID'] ?? row['Goal ID'], 'Goal Name': text(goals.find(goal => goal['Goal ID']===(definition?.['Goal ID'] ?? row['Goal ID'])) ?? {}, 'Goal Name')}, index}}).filter(({row}) => allowedIds.has(text(row, idColumn(kind))));
+  const indexedData = sourceData.map((original, index) => {const row = edits[text(original, '__previewKey')] ?? original; const definition = mastersById.get(text(row, idColumn(kind))); return {row: {...row, [nameColumn]: definition?.[nameColumn] ?? row[nameColumn], 'Goal ID': definition?.['Goal ID'] ?? row['Goal ID'], 'Goal Name': text(goals.find(goal => goal['Goal ID']===(definition?.['Goal ID'] ?? row['Goal ID'])) ?? {}, 'Goal Name')}, index}}).filter(({row}) => allowedIds.has(text(row, idColumn(kind))) && canEditResource(text(row, idColumn(kind))));
   const navigateSection=(next:Section)=>{
     if(section==='plan'&&next!=='plan'&&(draft.profile||draft.goals||JSON.stringify(assignments.goals)!==JSON.stringify((dataset as Workspace|null)?.assignments?.goals??{}))){
       if(!window.confirm('Discard unsaved configuration changes?'))return;

@@ -147,7 +147,8 @@
 .v25-auth-divider::before,.v25-auth-divider::after{content:'';height:1px;flex:1;background:var(--v-line)}
 .v25-sso-login{display:grid;gap:8px}
 .v25-sso-login .v25-button{min-height:38px;padding:8px 12px;font-size:13px!important;font-weight:500;gap:10px;justify-content:center}
-.v25-sso-login .v25-provider-google{background:#131314;color:#e3e3e3;border-color:#8e918f}
+.v25-sso-login .v25-provider-google{background:#fff;color:#1f1f1f;border-color:#747775;box-shadow:0 1px 2px #00000012}
+.v25-sso-login .v25-provider-google:hover:not(:disabled){background:#f2f5fa;border-color:#5f6368}
 .v25-sso-login .v25-provider-microsoft{background:#2f2f2f;color:#fff;border-color:#8c8c8c}
 .v25-sso-login svg{flex:none;width:18px;height:18px}
 .v25-sso-help{font-size:10px;line-height:1.5;color:var(--v-muted);margin-bottom:10px!important}
