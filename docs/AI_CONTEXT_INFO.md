@@ -1,5 +1,11 @@
 # Strategic Plan Dashboard — AI Context Info
 
+## V2.5 security/documentation checkpoint — 29 October 2026
+
+The owner saved the encrypted district Ollama key and confirms working AI responses. Native FastAPI AI is active when `/api/v1/ai/status` reports `nativeReady`; this is stored-configuration status, not a provider health test. Do not retrieve or print the key to verify storage.
+
+Current documentation: [REST contract](../api-v1/docs/API_DOCUMENTATION.md), [51-operation inventory](../api-v1/docs/API_ROUTE_INVENTORY.md), [OpenAPI](../api-v1/docs/openapi-v2.5.json), [outsider security review](V2.5_SECURITY_ARCHITECTURE_REVIEW.md). Confirmed direct-database reporting privacy and legacy OAuth findings block production security approval. Review made no persistent data/policy/application/deployment changes. Existing production remains unchanged.
+
 **Document status:** V2.2 frozen release baseline — 27 Sep 2026
 
 

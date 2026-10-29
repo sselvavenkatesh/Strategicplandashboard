@@ -1,5 +1,11 @@
 # Strategic Plan Dashboard - Technical Architecture
 
+## V2.5 current architecture — 29 October 2026
+
+The V2.5 preview uses React → same-origin FastAPI → restricted PostgreSQL functions/queries for public reporting, authenticated Admin/Super Admin workspaces, user management and native Ollama AI. Provider credentials are stored encrypted in Vault and resolved on the backend. Existing Supabase/Edge and token routes remain compatibility surfaces, so this is not yet a complete retirement of all legacy paths. Multi-district authorization is not implemented.
+
+See [current REST contract](../api-v1/docs/API_DOCUMENTATION.md) and [outsider security review](V2.5_SECURITY_ARCHITECTURE_REVIEW.md). Direct database privacy and legacy OAuth findings block security approval. Sections below describe prior architecture unless superseded by the V2.5 documents. Production remains V2.4.
+
 Architecture version: V2.3 development
 Baseline: V2.2 frozen product remains immutable.
 

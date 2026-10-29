@@ -1,5 +1,11 @@
 # StrategicPlan API V1 Validation Report
 
+## V2.5 review checkpoint — 29 October 2026
+
+Current local API suite: **59 passed, 19 skipped**, one test-client deprecation warning. Skipped live/parity checks were not executed and must not be counted as passes. npm audit reported zero known vulnerabilities across 278 dependency entries; a complete Python vulnerability scan remains outstanding.
+
+Read-only/rollback database security checks identified anonymous reporting privacy bypasses despite passing modern API tests. No persistent probe changes remain. The protected preview was not browser-tested in this review. See [security findings and limitations](../../docs/V2.5_SECURITY_ARCHITECTURE_REVIEW.md), [current API contract](API_DOCUMENTATION.md) and [generated route inventory](API_ROUTE_INVENTORY.md). Historical checks below are not a current production security certification.
+
 Validation date: 2026-09-28
 Reference system: live Supabase PostgreSQL reporting layer
 API branch: api-v1
