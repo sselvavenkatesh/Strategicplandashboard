@@ -25,13 +25,21 @@ begin
  if jsonb_array_length(s->'indicators')<>1 or s->'profile' ? 'Google Auth ID' then raise exception 'Snapshot scope or private config leaked';end if;
  rowdata:=jsonb_build_object('Goal ID',g,'Indicator ID',ind,'Indicator Name','Admin QA Indicator','School Year','2030-31','Category','All','Student Group','All Students','Value 3','7','Target 1','5','Role','All');
  s:=public.v25_admin_save(token,s->>'revision','indicators',jsonb_build_array(rowdata));
+ update public."Indicator_Data" set "Indicator Name"='Legacy QA Indicator' where "Indicator ID"=ind;
  insert into public."Indicator_Target_Preview"(indicator_id,school_year,target_1) values(ind,'2030-31','10');s:=public.v25_admin_snapshot(token);
- select x into rowdata from jsonb_array_elements(s->'indicatorData') x where x->>'Indicator ID'=ind;
+ select x||jsonb_build_object('Indicator Name','Admin QA Indicator') into rowdata from jsonb_array_elements(s->'indicatorData') x where x->>'Indicator ID'=ind;
  s:=public.v25_admin_save(token,s->>'revision','indicators',jsonb_build_array(rowdata||jsonb_build_object('Value 3','8')));
+ if (select "Value 3" from public."Indicator_Data" where "Indicator ID"=ind)<>'8' then raise exception 'Legacy-named indicator edit was not persisted';end if;
  if (select "Target 1" from public."Indicator_Data" where "Indicator ID"=ind)<>'5' then raise exception 'Actual edit overwrote raw target with demo value';end if;
- select x into rowdata from jsonb_array_elements(s->'indicatorData') x where x->>'Indicator ID'=ind;
+ select x||jsonb_build_object('Indicator Name','Admin QA Indicator') into rowdata from jsonb_array_elements(s->'indicatorData') x where x->>'Indicator ID'=ind;
  s:=public.v25_admin_save(token,s->>'revision','indicators',jsonb_build_array(rowdata||jsonb_build_object('Target 1','9')));
  if (select target_1 from public."Indicator_Target_Preview" where indicator_id=ind)<>'9' then raise exception 'Explicit target edit not synchronized';end if;
+ -- Simulate a fresh page load, then an upload with no original key.
+ s:=public.v25_admin_snapshot(token);
+ select x||jsonb_build_object('Indicator Name','Admin QA Indicator') into rowdata from jsonb_array_elements(s->'indicatorData') x where x->>'Indicator ID'=ind;
+ if rowdata->>'Value 3'<>'8' or rowdata->>'Target 1'<>'9' then raise exception 'Reload lost saved indicator values';end if;
+ s:=public.v25_admin_save(token,s->>'revision','indicators',jsonb_build_array((rowdata-'__previewKey')||jsonb_build_object('Value 1','33')));
+ if (select count(*) from public."Indicator_Data" where "Indicator ID"=ind)<>1 or (select "Value 1" from public."Indicator_Data" where "Indicator ID"=ind)<>'33' then raise exception 'Keyless upload duplicated legacy indicator';end if;
  begin
   perform public.v25_admin_save(token,s->>'revision','indicators',jsonb_build_array(rowdata||jsonb_build_object('Value 3','999'),rowdata||jsonb_build_object('Indicator ID',ind_b,'Indicator Name','Admin QA Restricted')));
   raise exception 'Unauthorized batch accepted';
@@ -41,9 +49,16 @@ begin
  begin perform public.v25_admin_save(token,s->>'revision','indicators',jsonb_build_array(rowdata||jsonb_build_object('Role','Admin')));raise exception 'Role tampering accepted';exception when raise_exception then if sqlerrm='Role tampering accepted' then raise;end if;end;
  rowdata:=jsonb_build_object('Goal ID',g,'Initiative ID',ini,'Initiative Name','Admin QA Initiative','Sub Initiative Name','QA Sub','Action Item','QA Action','Status','In Progress','Role','All','Start Date','2026-10-29','Target 1','12');
  s:=public.v25_admin_save(token,s->>'revision','initiatives',jsonb_build_array(rowdata));
- select x into rowdata from jsonb_array_elements(s->'initiativeData') x where x->>'Initiative ID'=ini;
+ update public."Initiative_Data" set "Initiative Name"='Legacy QA Initiative' where "Initiative ID"=ini;
+ s:=public.v25_admin_snapshot(token);
+ select x||jsonb_build_object('Initiative Name','Admin QA Initiative') into rowdata from jsonb_array_elements(s->'initiativeData') x where x->>'Initiative ID'=ini;
  s:=public.v25_admin_save(token,s->>'revision','initiatives',jsonb_build_array(rowdata||jsonb_build_object('Action Item','QA renamed','Status','Done','End Date','2027-01-01','Target 1','15')));
  if (select count(*) from public."Initiative_Data" where "Initiative ID"=ini)<>1 or not exists(select 1 from public."Initiative_Data" where "Initiative ID"=ini and "Action Item"='QA renamed' and "Status"='Done' and "Target 1"='15') then raise exception 'Initiative edit failed or duplicated';end if;
+ s:=public.v25_admin_snapshot(token);
+ select x||jsonb_build_object('Initiative Name','Admin QA Initiative') into rowdata from jsonb_array_elements(s->'initiativeData') x where x->>'Initiative ID'=ini;
+ if rowdata->>'Status'<>'Done' or rowdata->>'End Date'<>'2027-01-01' then raise exception 'Reload lost initiative changes';end if;
+ s:=public.v25_admin_save(token,s->>'revision','initiatives',jsonb_build_array((rowdata-'__previewKey')||jsonb_build_object('Target 2','20')));
+ if (select count(*) from public."Initiative_Data" where "Initiative ID"=ini)<>1 or (select "Target 2" from public."Initiative_Data" where "Initiative ID"=ini)<>'20' then raise exception 'Keyless upload duplicated legacy initiative';end if;
  if (select count(*) from public.fn_indicator_key_values(g,null) where indicator_id=ind)<>1 then raise exception 'Assignments affected public visibility';end if;
  insert into public.v25_indicator_stakeholders values(ind,b);
  begin perform public.v25_admin_save(token,s->>'revision','indicators','[]');raise exception 'Changed assignments accepted';exception when serialization_failure then null;end;
@@ -60,4 +75,4 @@ begin
  if has_function_privilege('anon','public.v25_admin_save(uuid,text,text,jsonb)','execute') then raise exception 'Anonymous write function exposed';end if;
 end $$;
 rollback;
-select 'PASS: existing login, numeric session identity, scoped reads, inherited/subset access, allowed inserts and edits, target preservation, atomic unauthorized rejection, metadata denial, action rename, public visibility, stale assignment rejection, inactive/expired/revoked session denial; all fixtures rolled back' as result;
+select 'PASS: inherited/subset access, legacy-name indicator and initiative saves, fresh reload persistence, keyless uploads without duplicates, target preservation, atomic unauthorized rejection, action rename and session checks; all fixtures rolled back' as result;
