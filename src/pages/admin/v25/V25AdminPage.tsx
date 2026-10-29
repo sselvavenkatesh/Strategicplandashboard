@@ -7,6 +7,7 @@ import type {Assignments, DataRow, Dataset, Kind} from './model';
 import {StakeholderSelect,StakeholderContext} from './StakeholderSelect';
 import {getSuperAdminWorkspace,saveSuperAdminWorkspace,type SuperAdminUser,type Workspace} from './superadminApi';
 import {DataEditor} from './DataEditor';
+import {getAdminWorkspace,saveAdminWorkspace} from './adminApi';
 import {MasterEditor} from './MasterEditor';
 import {MasterTable} from './MasterTable';
 import {DataUpload} from './DataUpload';
@@ -30,7 +31,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
   const [params, setParams] = useSearchParams();
   const requested = params.get('section');
   const section: Section = menus.some(item => item.id === requested) ? requested as Section : 'home';
-  const live=superAdmin && Boolean(authenticatedUser);
+  const live=Boolean(authenticatedUser);
   const [user] = useState(authenticatedUser?.id ?? '');
   const [busy,setBusy]=useState(false);
   const [dataset, setDataset] = useState<Dataset | null>(null);
@@ -50,9 +51,9 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
   const currentUser=authenticatedUser ?? stakeholders.find(person=>person.id===user) ?? {id:'',name:'Admin',email:''};
   useEffect(() => {
     let current = true;
-    (live?getSuperAdminWorkspace():loadDataset()).then(data => {if (current) {setDataset(data); if(live)setDraft({...newDraft(),assignments:(data as Workspace).assignments});setError('')}}).catch(reason => {if (current) setError(reason instanceof Error ? reason.message : 'Unable to load district data.')});
+    (live?(superAdmin?getSuperAdminWorkspace():getAdminWorkspace()):loadDataset()).then(data => {if (current) {setDataset(data); if(live)setDraft({...newDraft(),assignments:(data as Workspace).assignments});setError('')}}).catch(reason => {if (current) setError(reason instanceof Error ? reason.message : 'Unable to load district data.')});
     return () => {current = false};
-  }, [retry,live]);
+  }, [retry,live,superAdmin]);
   useEffect(() => {if(live)return;try {sessionStorage.setItem(draftKey, JSON.stringify(draft))} catch {setNotice('Tab storage is unavailable. Your changes will last until you leave this page.')}}, [draft,live]);
   useEffect(() => {if (!notice) return; const timer = window.setTimeout(() => setNotice(''), 5000); return () => clearTimeout(timer)}, [notice]);
   const profile = draft.profile ?? dataset?.profile ?? {};
@@ -93,9 +94,10 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
     } catch (reason) {setConfigurationError(reason instanceof Error ? reason.message : 'Check the goal count.')}
   }
   async function persist(change:Record<string,unknown>){
-    if(!live||!dataset?.revision)throw new Error('Sign in with your Super Admin account.');
+    if(!live||!dataset?.revision)throw new Error('Sign in with your district account.');
     setBusy(true);setConfigurationError('');
-    try{const fresh=await saveSuperAdminWorkspace(dataset.revision,change);setDataset(fresh);setDraft({...newDraft(),assignments:fresh.assignments});setNotice('Details are saved.');}
+    try{if(!superAdmin&&change.action!=='reporting')throw new Error('Configuration and master definitions are view only.');
+      const fresh=superAdmin?await saveSuperAdminWorkspace(dataset.revision,change):await saveAdminWorkspace(dataset.revision,String(change.kind),change.dataRows as DataRow[]);setDataset(fresh);setDraft({...newDraft(),assignments:fresh.assignments});setNotice('Details are saved.');}
     finally{setBusy(false)}
   }
   async function saveConfiguration(){
@@ -139,7 +141,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
       <div className="v25-sidebar-bottom"><Link to="/summary"><ArrowLeft size={16}/> Public dashboard</Link><div className="v25-person"><span className="v25-avatar">{superAdmin ? 'SA' : currentUser.name.split(' ').map(word => word[0]).join('')}</span><div><b>{superAdmin ? authenticatedUser?.name ?? 'Super Admin' : currentUser.name}</b><span>{superAdmin ? 'District configuration' : 'Assigned data management'}</span></div></div></div>
     </aside>
     <main className="v25-main"><header className="v25-topbar"><div className="v25-breadcrumb">Strategic Plan <ChevronRight size={13}/><span>{superAdmin ? 'Super Admin' : 'Admin'}</span></div><div className="v25-top-actions"><button className="v25-icon" aria-label="Toggle theme" onClick={toggleTheme}>{theme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}</button>{onSignOut&&<button className="v25-button" disabled={signingOut} onClick={onSignOut}>{signingOut?'Signing out…':'Sign Out'}</button>}</div></header>
-      <div className="v25-content"><div className="v25-page-heading"><div><span className="v25-eyebrow">{superAdmin ? 'DISTRICT ADMINISTRATION' : 'YOUR WORKSPACE'}</span><h1>{section === 'home' ? superAdmin ? 'District overview' : `Welcome, ${currentUser.name.split(' ')[0]}` : sectionTitle}</h1></div>{superAdmin && <button className="v25-button" disabled={busy} onClick={()=>{if(window.confirm('Reload saved data and discard unsaved changes?')){setDraft(newDraft());setRetry(value=>value+1)}}}><RotateCcw size={15}/> Reload</button>}</div>
+      <div className="v25-content"><div className="v25-page-heading"><div><span className="v25-eyebrow">{superAdmin ? 'DISTRICT ADMINISTRATION' : 'YOUR WORKSPACE'}</span><h1>{section === 'home' ? superAdmin ? 'District overview' : `Welcome, ${currentUser.name.split(' ')[0]}` : sectionTitle}</h1></div><button className="v25-button" disabled={busy} onClick={()=>{if(window.confirm('Reload saved data and discard unsaved changes?')){setDraft(newDraft());setRetry(value=>value+1)}}}><RotateCcw size={15}/> Reload</button></div>
 
       {error ? <div className="v25-panel v25-error" role="alert"><h2>District data could not be loaded</h2><p>{error}</p><button className="v25-button" onClick={() => {setError(''); setRetry(value => value + 1)}}>Try again</button></div> : !dataset ? <div className="v25-panel v25-loading" role="status">Loading existing district data…</div> : <>
       {section === 'home' && <>
@@ -154,7 +156,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
         {configurationError && <p className="v25-inline-error" role="alert">{configurationError}</p>}
         <div className="v25-section-tabs" role="group" aria-label="Strategic Plan sections"><button aria-pressed={planTab === 'district'} onClick={() => selectTab('district')}>District & Strategic Plan</button><button aria-pressed={planTab === 'goals'} onClick={() => selectTab('goals')}>{superAdmin ? 'Goal Master' : 'Assigned Goals'} <span>{visibleGoals.length}</span></button></div>
         {planTab === 'district' && <section className="v25-panel"><div className="v25-panel-title"><div><h2>District & Strategic Plan</h2></div>{!superAdmin && <span className="v25-badge"><Eye size={14}/> View only</span>}</div>
-          <div className="v25-form-grid">{['School District Name', 'Strategic Plan Name', 'District Logo', 'Strategic Plan Duration', 'Total Goals', 'Admin Signin Method', 'Mission Statement', 'Vision Statement'].map(field => field === 'District Logo' ? <DistrictLogoControl key={field} logo={text(profile, field)} readOnly={!superAdmin} onChange={logo => updateProfile(field, logo)}/> : field === 'Total Goals' ? superAdmin ? <GoalCountControl key={field} count={goals.length} onChange={changeGoalCount} onError={setConfigurationError}/> : <label key={field}>Number of Goals<input readOnly value={goals.length}/></label> : <label key={field} className="">{field}{field.endsWith('Statement') ? <textarea readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/> : field === 'Admin Signin Method' && superAdmin ? <select value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}>{['Userbased', 'Google', 'Microsoft'].map(method => <option key={method}>{method}</option>)}</select> : <input readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/>}</label>)}
+          <div className="v25-form-grid">{['School District Name', 'Strategic Plan Name', 'District Logo', 'Strategic Plan Duration', 'Total Goals', 'Admin Signin Method', 'Mission Statement', 'Vision Statement'].filter(field=>superAdmin||field!=='Admin Signin Method').map(field => field === 'District Logo' ? <DistrictLogoControl key={field} logo={text(profile, field)} readOnly={!superAdmin} onChange={logo => updateProfile(field, logo)}/> : field === 'Total Goals' ? superAdmin ? <GoalCountControl key={field} count={goals.length} onChange={changeGoalCount} onError={setConfigurationError}/> : <label key={field}>Number of Goals<input readOnly value={goals.length}/></label> : <label key={field} className="">{field}{field.endsWith('Statement') ? <textarea readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/> : field === 'Admin Signin Method' && superAdmin ? <select value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}>{['Userbased', 'Google', 'Microsoft'].map(method => <option key={method}>{method}</option>)}</select> : <input readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/>}</label>)}
           {(text(profile, 'Admin Signin Method') === 'Google' ? ['Google Client ID', 'Google Auth ID'] : text(profile, 'Admin Signin Method') === 'Microsoft' ? ['Microsoft Client ID', 'Microsoft Tenant ID', 'Microsoft Auth ID'] : []).map(field => <label key={field}>{field}<input readOnly={!superAdmin} value={text(profile, field)} onChange={event => updateProfile(field, event.target.value)}/></label>)}</div>
           {superAdmin && <div className="v25-panel-footer"><button className="v25-button primary v25-save" onClick={saveConfiguration}><Check size={14}/> Save</button></div>}
         </section>}

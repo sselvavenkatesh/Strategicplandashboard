@@ -229,14 +229,15 @@ def admin_login(body: AdminLogin):
     token=repo.create_admin_session(row.get("user_id"))
     return {"token":token,"name":row.get("user_name") or row.get("user_email"),"email":row.get("user_email")}
 
-def _safe_return_to(value: str | None):
+def _safe_return_to(value: str | None, request: Request | None = None):
     fallback=os.getenv("FRONTEND_URL","https://k12matrix-strategicplan.vercel.app")
     if not value: return fallback
     allowed=[x.rstrip("/") for x in settings.allowed_origins]
+    if request: allowed.append(str(request.base_url).rstrip("/"))
     return value if any(value==x or value.startswith(x+"/") for x in allowed) else fallback
 
-def _oauth_callback(provider: str):
-    base=os.getenv("API_PUBLIC_URL","https://strategicplan-apiv1.vercel.app").rstrip("/")
+def _oauth_callback(provider: str, request: Request | None = None):
+    base=(str(request.base_url) if request else os.getenv("API_PUBLIC_URL","https://strategicplan-apiv1.vercel.app")).rstrip("/")
     return f"{base}/api/v1/auth/admin/oauth/{provider}/callback"
 
 def _form_post(url: str, values: dict):
@@ -249,9 +250,11 @@ def _json_get(url: str, token: str):
     with urllib.request.urlopen(req,timeout=20) as resp: return json.loads(resp.read().decode())
 
 @app.get("/api/v1/auth/admin/oauth/{provider}/start")
-def admin_oauth_start(provider: str, return_to: str | None = None):
+def admin_oauth_start(provider: str, request: Request, return_to: str | None = None):
     provider=provider.lower()
     if provider not in ("google","microsoft"): raise HTTPException(404,"Unsupported SSO provider")
+    workspace_return=bool(return_to and urllib.parse.urlsplit(return_to).netloc==request.url.netloc and urllib.parse.urlsplit(return_to).path.rstrip("/").endswith("/admin"))
+    callback_request=request if workspace_return else None
     cfg=repo.admin_auth_config() or {}
     expected="Google" if provider=="google" else "Microsoft"
     if cfg.get("signin_method")!=expected: raise HTTPException(409,f"{expected} is not the configured district sign-in method")
@@ -260,18 +263,18 @@ def admin_oauth_start(provider: str, return_to: str | None = None):
         client_id=cfg.get("google_client_id")
         if not client_id or not secret: raise HTTPException(503,"Google SSO is not fully configured")
         authorize="https://accounts.google.com/o/oauth2/v2/auth"
-        params={"client_id":client_id,"redirect_uri":_oauth_callback(provider),"response_type":"code","scope":"openid email profile","access_type":"online","prompt":"select_account"}
+        params={"client_id":client_id,"redirect_uri":_oauth_callback(provider,callback_request),"response_type":"code","scope":"openid email profile","access_type":"online","prompt":"select_account"}
     else:
         client_id=cfg.get("microsoft_client_id"); tenant=cfg.get("microsoft_tenant_id")
         if not client_id or not tenant or not secret: raise HTTPException(503,"Microsoft SSO is not fully configured")
         authorize=f"https://login.microsoftonline.com/{urllib.parse.quote(tenant,safe='')}/oauth2/v2.0/authorize"
-        params={"client_id":client_id,"redirect_uri":_oauth_callback(provider),"response_type":"code","scope":"openid profile email User.Read","response_mode":"query"}
-    state=repo.create_admin_oauth_state(provider,_safe_return_to(return_to))
+        params={"client_id":client_id,"redirect_uri":_oauth_callback(provider,callback_request),"response_type":"code","scope":"openid profile email User.Read","response_mode":"query"}
+    state=repo.create_admin_oauth_state(provider,_safe_return_to(return_to,request))
     params["state"]=state
     return RedirectResponse(authorize+"?"+urllib.parse.urlencode(params),status_code=302)
 
 @app.get("/api/v1/auth/admin/oauth/{provider}/callback")
-def admin_oauth_callback(provider: str, code: str | None = None, state: str | None = None, error: str | None = None):
+def admin_oauth_callback(provider: str, request: Request, code: str | None = None, state: str | None = None, error: str | None = None):
     provider=provider.lower()
     if provider not in ("google","microsoft") or not state: raise HTTPException(400,"Invalid OAuth callback")
     try: return_to=repo.consume_admin_oauth_state(state,provider)
@@ -279,16 +282,18 @@ def admin_oauth_callback(provider: str, code: str | None = None, state: str | No
     if not return_to: raise HTTPException(400,"OAuth state is invalid or expired")
     if error or not code:
         return RedirectResponse(return_to+"?"+urllib.parse.urlencode({"authError":error or "oauth_failed"}),status_code=302)
+    workspace_return=urllib.parse.urlsplit(return_to).netloc==request.url.netloc and urllib.parse.urlsplit(return_to).path.rstrip("/").endswith("/admin")
+    callback_request=request if workspace_return else None
     cfg=repo.admin_auth_config() or {}; secret=repo.oauth_secret(provider)
     try:
         if provider=="google":
-            tokens=_form_post("https://oauth2.googleapis.com/token",{"code":code,"client_id":cfg.get("google_client_id"),"client_secret":secret,"redirect_uri":_oauth_callback(provider),"grant_type":"authorization_code"})
+            tokens=_form_post("https://oauth2.googleapis.com/token",{"code":code,"client_id":cfg.get("google_client_id"),"client_secret":secret,"redirect_uri":_oauth_callback(provider,callback_request),"grant_type":"authorization_code"})
             user=_json_get("https://openidconnect.googleapis.com/v1/userinfo",tokens["access_token"])
             email=user.get("email")
             if not user.get("email_verified"): raise ValueError("Google email is not verified")
         else:
             tenant=cfg.get("microsoft_tenant_id")
-            tokens=_form_post(f"https://login.microsoftonline.com/{urllib.parse.quote(str(tenant),safe='')}/oauth2/v2.0/token",{"code":code,"client_id":cfg.get("microsoft_client_id"),"client_secret":secret,"redirect_uri":_oauth_callback(provider),"grant_type":"authorization_code","scope":"openid profile email User.Read"})
+            tokens=_form_post(f"https://login.microsoftonline.com/{urllib.parse.quote(str(tenant),safe='')}/oauth2/v2.0/token",{"code":code,"client_id":cfg.get("microsoft_client_id"),"client_secret":secret,"redirect_uri":_oauth_callback(provider,callback_request),"grant_type":"authorization_code","scope":"openid profile email User.Read"})
             user=_json_get("https://graph.microsoft.com/v1.0/me?$select=displayName,mail,userPrincipalName",tokens["access_token"])
             email=user.get("mail") or user.get("userPrincipalName")
         if not email: raise ValueError("Provider did not return an email address")
@@ -296,6 +301,15 @@ def admin_oauth_callback(provider: str, code: str | None = None, state: str | No
         if not admin:
             return RedirectResponse(return_to+"?"+urllib.parse.urlencode({"authError":"not_authorized"}),status_code=302)
         token=repo.create_admin_session(admin.get("user_id"))
+        if workspace_return:
+            identity=repo.fetch_one('select public.v25_admin_identity(%s::uuid) as data',(token,))
+            if not identity or not identity['data']:
+                repo.revoke_admin_session(token)
+                return RedirectResponse(return_to+'?authError=not_authorized',status_code=302)
+            from .admin import set_session
+            response=RedirectResponse(return_to,status_code=302)
+            set_session(response,token)
+            return response
         params={"adminSession":token,"email":admin.get("user_email") or email,"name":admin.get("user_name") or email}
         return RedirectResponse(return_to+"?"+urllib.parse.urlencode(params),status_code=302)
     except Exception:
@@ -493,3 +507,6 @@ def validation_page():
 
 from .superadmin import router as superadmin_router
 app.include_router(superadmin_router)
+
+from .admin import router as admin_router
+app.include_router(admin_router)

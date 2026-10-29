@@ -10,7 +10,6 @@ import { WelcomePage } from './pages/dashboard/WelcomePage'
 import { AiAssistantPage } from './pages/dashboard/AiAssistantPage'
 
 const SuperAdminWorkspace = lazy(() => import('./pages/admin/v25/SuperAdminWorkspace'));
-const V25AdminPage = lazy(() => import('./pages/admin/v25/V25AdminPage'));
 const v25Preview = import.meta.env.VITE_V25_UI_PREVIEW === 'true';
 
 export default function App() {
@@ -18,8 +17,8 @@ export default function App() {
     <ThemeProvider>
       <Suspense fallback={<main aria-live="polite" style={{padding: 32}}>Loading workspace…</main>}>
       <Routes>
-        <Route path="/superadmin" element={v25Preview ? <SuperAdminWorkspace /> : <SuperAdminPage />} />
-        {v25Preview && <Route path="/admin" element={<V25AdminPage />} />}
+        <Route path="/superadmin" element={v25Preview ? <SuperAdminWorkspace key="superadmin" /> : <SuperAdminPage />} />
+        {v25Preview && <Route path="/admin" element={<SuperAdminWorkspace key="admin" admin />} />}
         <Route element={<AppShell />}>
           <Route path="/" element={<WelcomePage />} />
           <Route path="/summary" element={<SummaryPage />} />
