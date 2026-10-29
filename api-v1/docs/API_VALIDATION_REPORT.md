@@ -2,6 +2,8 @@
 
 ## Security remediation validation — 29 October 2026
 
+Backend commit `8584cb14e159a8519ce09c1841afe555f7aea0e5` is deployed READY as `dpl_ES6C4QSuc11XYxWoHbQupWNQ8pjN`; the existing V2.5 preview alias has been reassigned to it. No production promotion occurred. Vercel build logs confirm Python compilation and both root/branded React builds.
+
 **81 API tests passed, 19 opt-in live/parity checks skipped; 47 frontend tests passed; root/branded React builds passed.** New OAuth tests cover both providers and both Admin paths, S256 proof exchange, browser/state/provider mismatch, expired/replayed state, callback destination validation, provider error/unverified/unmapped identity, no URL token and retired endpoint behavior. Database security fixtures and existing Admin/Super Admin/native-AI transaction suites passed and rolled back.
 
 The guarded migration preserved public latest/history/groups/individual-initiative/achievement hashes and reporting-row fingerprints. Anonymous private-initiative rows changed from 12 exposed to 0; expected public data remains available. Backend grants remain present; the tool cannot impersonate the custom backend login. Deployed-provider verification is still pending because the browser reaches Vercel authentication. See [remediation details](../../docs/V2.5_SECURITY_ARCHITECTURE_REVIEW.md).
