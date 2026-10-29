@@ -23,9 +23,21 @@ begin
  s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','masters','kind','indicators','create',true,'records',jsonb_build_array(jsonb_build_object('Indicator ID',ind,'Indicator Name','Transactional QA Indicator','Goal ID',g,'Indicator Type','Number','KPI Nature','Positive')),'owners',jsonb_build_object(ind,jsonb_build_array(adm::text))));
  rowdata:=jsonb_build_object('Indicator ID',ind,'Goal ID',g,'Indicator Name','Transactional QA Indicator','School Year','2030-31','Category','All','Student Group','All Students','Value 3','7','Target 1','5');
  s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','indicators','dataRows',jsonb_build_array(rowdata)));
+ insert into public."Indicator_Target_Preview"(indicator_id,school_year,target_1) values(ind,'2030-31','10');
+ s:=public.v25_superadmin_snapshot(tok);
  select x into rowdata from jsonb_array_elements(s->'indicatorData')x where x->>'Indicator ID'=ind;
  s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','indicators','dataRows',jsonb_build_array(rowdata||jsonb_build_object('Value 3','8'))));
  if (select count(*) from public."Indicator_Data" where "Indicator ID"=ind and "Value 3"='8')<>1 then raise exception 'Indicator edit did not persist exactly once'; end if;
+ if (select "Target 1" from public."Indicator_Data" where "Indicator ID"=ind)<>'5' or (select target_1 from public."Indicator_Target_Preview" where indicator_id=ind and school_year='2030-31')<>'10' then raise exception 'Actual-only edit copied the demo target'; end if;
+ select x into rowdata from jsonb_array_elements(s->'indicatorData')x where x->>'Indicator ID'=ind;
+ s:=public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','indicators','dataRows',jsonb_build_array(rowdata||jsonb_build_object('Target 1','9'))));
+ if (select "Target 1" from public."Indicator_Data" where "Indicator ID"=ind)<>'9' or (select target_1 from public."Indicator_Target_Preview" where indicator_id=ind and school_year='2030-31')<>'9' then raise exception 'Explicit target edit was not synchronized'; end if;
+ select x into rowdata from jsonb_array_elements(s->'indicatorData')x where x->>'Indicator ID'=ind;
+ begin
+  perform public.v25_superadmin_save(tok,s->>'revision',jsonb_build_object('action','reporting','kind','indicators','dataRows',jsonb_build_array(rowdata||jsonb_build_object('Value 3','999'),jsonb_build_object('Indicator ID','missing-fixture'))));
+  raise exception 'Invalid batch was accepted';
+ exception when raise_exception then if sqlerrm='Invalid batch was accepted' then raise; end if; end;
+ if (select "Value 3" from public."Indicator_Data" where "Indicator ID"=ind)<>'8' then raise exception 'Failed batch partially committed'; end if;
  if (select count(*) from public.fn_indicator_key_values(g,null) where indicator_id=ind)<>1 then raise exception 'Assignments hid a public KPI'; end if;
  select 'IN'||(coalesce(max(substring("Initiative ID" from 3)::int),0)+1) into ini from public."Initiative_master" where "Initiative ID"~'^IN[0-9]+$';
  rowdata:=jsonb_build_object('Initiative ID',ini,'Initiative Name','Transactional QA Initiative','Goal ID',g,'Sub Initiative Name','QA Sub','Action Item','QA action','Status','Not Started');
