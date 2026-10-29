@@ -895,3 +895,33 @@ html[data-theme="light"] .headerPowered{border-left-color:#ccd8e3;color:#687f93}
 html[data-theme="light"] .summaryPage .stack i.not,
 html[data-theme="light"] .goalPage .subBar i.not,
 html[data-theme="light"] .initiativeModal .modalProgressBar i.not{color:#17283a}
+
+/* Readable indicator values and compact multi-year student-group comparisons. */
+.goalPage .yearBars i .barValue{color:#fff;font-style:normal;font-weight:750;text-shadow:0 1px 2px #061728;font-size:10px;line-height:1.15}
+.app-shell:has(.goalPage) .yearBars i b.barValue{color:#fff;font-size:9px;font-style:normal}
+html[data-theme="light"] .goalPage .yearBars i .barValue{color:#071b2d;text-shadow:none}
+.yearChooser{flex-wrap:wrap}
+.yearChooser select:disabled{opacity:.45;cursor:not-allowed}
+.yearChooser .allYearsToggle{margin-left:auto;display:flex;align-items:center;gap:9px;cursor:pointer;position:relative;font-size:11px;font-weight:600}
+.allYearsToggle input{position:absolute;right:0;width:32px;height:18px;opacity:0;cursor:pointer}
+.allYearsToggle>i{width:32px;height:18px;border-radius:20px;background:#53677b;position:relative;pointer-events:none}
+.allYearsToggle>i::after{content:'';position:absolute;width:12px;height:12px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s}
+.allYearsToggle input:checked+i{background:#1672d4}
+.allYearsToggle input:checked+i::after{transform:translateX(14px)}
+.allYearsToggle input:focus-visible+i{outline:2px solid var(--blue);outline-offset:3px}
+.studentYearLegend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--text);margin:-4px 0 18px}
+.studentYearLegend>span{display:flex;align-items:center;gap:6px}
+.studentYearLegend i{width:10px;height:10px;border-radius:2px}
+.studentChartViewport{overflow-x:auto;padding-top:20px;padding-bottom:26px;padding-left:12px}
+.studentBarCluster{height:100%;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.indicatorModal .studentBar b{font-size:10px;font-weight:750;font-style:normal;color:var(--text);white-space:nowrap;line-height:1.2}
+.studentChart.clustered .studentBars{gap:18px}
+.studentChart.clustered .studentBar{width:18px;max-width:22px;min-width:0;flex:1;border-radius:3px 3px 0 0}
+.studentBarMissing{flex:1;max-width:22px}
+.indicatorModal .studentChart.clustered .studentBar b{top:6px;left:50%;width:auto;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);color:#071b2d!important;font-size:10px;letter-spacing:.2px}
+.indicatorModal .studentChart.clustered .studentBar.shortBar b{top:auto;bottom:calc(100% + 4px);color:var(--text)!important}
+.studentChartEmpty,.studentChartError{padding:35px 12px;text-align:center;color:var(--muted);font-size:12px}
+.studentChartError button{margin-left:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:5px;padding:5px 8px;cursor:pointer}
+.studentChartViewport+.xAxisLabel{margin-top:10px}
+html[data-theme="light"] .indicatorModal .studentChart.clustered .studentBar.shortBar b{color:#17283a!important}
+@media(max-width:700px){.yearChooser select{max-width:150px}.yearChooser .allYearsToggle{font-size:10px}.studentYearLegend{font-size:10px;gap:10px}}

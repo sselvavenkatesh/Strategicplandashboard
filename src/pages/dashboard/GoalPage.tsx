@@ -5,6 +5,7 @@ import {useNavigate,useParams} from 'react-router-dom';
 import {getGoals,getIndicators,getInitiatives,getGoalInitiativeProgress,getIndicatorHistory,getStudentGroups,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 import {AchievementProgress} from '../../components/AchievementProgress';
+import {StudentGroupChart} from '../../components/StudentGroupChart';
 import {getAchievementSummary,getIndicatorTarget,numericTarget} from '../../lib/achievement';
 
 type HistoryMap=Record<string,any[]>;
@@ -61,45 +62,6 @@ function InitiativeTimeline({initiative}:{initiative:Initiative}){
   </section>
 }
 
-function indicatorYAxisLabel(k:Indicator){
-  const type=(k.type||'').trim().toLowerCase();
-  if(type==='percent'||k.isPercent)return 'Percent of students proficient';
-  if(type==='number'&&k.shortName.toLowerCase().includes('sat'))return 'SAT score';
-  if(type==='currency'||k.shortName.toLowerCase().includes('fund balance'))return 'Fund balance';
-  if(type==='number')return 'Indicator value';
-  return k.type?String(k.type):'Indicator value';
-}
-
-function chartScale(indicator:Indicator,groups:any[]){
-  const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);
-  const avg=groups.find((r:any)=>r.statewide_value_3_numeric!=null);
-  const values=[...rows.map((r:any)=>Number(r.value_3_numeric)),Number(avg?.statewide_value_3_numeric)].filter(Number.isFinite) as number[];
-  const dataMax=Math.max(0,...values);
-  if(indicator.isPercent){
-    const max=Math.min(100,Math.max(25,Math.ceil(dataMax/25)*25));
-    const step=max<=50?10:25;
-    const ticks=Array.from({length:Math.floor(max/step)+1},(_,i)=>i*step);
-    if(ticks[ticks.length-1]!==max)ticks.push(max);
-    return{max,ticks,format:(n:number)=>n.toFixed(0)+'%'};
-  }
-  const rough=Math.max(1,dataMax/4);
-  const power=Math.pow(10,Math.floor(Math.log10(rough)));
-  const normalized=rough/power;
-  const nice=normalized<=1?1:normalized<=2?2:normalized<=5?5:10;
-  const step=nice*power;
-  const max=Math.max(step,Math.ceil(dataMax/step)*step);
-  const ticks=Array.from({length:Math.round(max/step)+1},(_,i)=>i*step);
-  const fund=indicator.shortName.toLowerCase().includes('fund balance')||indicator.name.toLowerCase().includes('fund balance');
-  const format=(n:number)=>{
-    if(!fund)return n.toLocaleString(undefined,{maximumFractionDigits:1});
-    const currency=String.fromCharCode(36);
-    if(Math.abs(n)>=1000000)return currency+(n/1000000).toFixed(n%1000000===0?0:1)+'M';
-    if(Math.abs(n)>=1000)return currency+(n/1000).toFixed(0)+'K';
-    return currency+n.toFixed(0);
-  };
-  return{max,ticks,format};
-}
-
 function formatIndicatorValue(k:Indicator){
   if(k.numeric==null)return k.value;
   if(k.isPercent)return k.numeric.toFixed(1)+'%';
@@ -123,7 +85,7 @@ export function GoalPage(){
   const goalAchievement=achievement.data?.goals.find(g=>g.goalId===id);
   const[goal,setGoal]=useState<Goal|null>(null),[initiatives,setInitiatives]=useState<Initiative[]>([]),[indicators,setIndicators]=useState<Indicator[]>([]);
   const[histories,setHistories]=useState<HistoryMap>({}),[stateAvgs,setStateAvgs]=useState<AvgMap>({});
-  const[initiative,setInitiative]=useState<Initiative|null>(null),[indicator,setIndicator]=useState<Indicator|null>(null),[history,setHistory]=useState<any[]>([]),[groups,setGroups]=useState<any[]>([]),[selectedYear,setSelectedYear]=useState(''),[indicatorLoading,setIndicatorLoading]=useState(false),[error,setError]=useState('');
+  const[initiative,setInitiative]=useState<Initiative|null>(null),[indicator,setIndicator]=useState<Indicator|null>(null),[history,setHistory]=useState<any[]>([]),[selectedYear,setSelectedYear]=useState(''),[error,setError]=useState('');
 
   const popupYear=selectedYear||indicator?.year||'';
   const popupTarget=useDashboard(async()=>({id:indicator?.id,year:popupYear,value:await getIndicatorTarget(indicator?.id,popupYear)}),[indicator?.id,popupYear]);
@@ -156,13 +118,10 @@ export function GoalPage(){
 
   useEffect(()=>{
     if(!indicator)return;
-    getIndicatorHistory(indicator.id).then(rows=>{setHistory(rows);setSelectedYear(indicator.year)});
-    setIndicatorLoading(true);getStudentGroups(indicator.id,indicator.year).then(setGroups).finally(()=>setIndicatorLoading(false));
+    let live=true;setHistory([]);setSelectedYear(indicator.year);
+    getIndicatorHistory(indicator.id).then(rows=>{if(live)setHistory(rows)}).catch(()=>{if(live)setHistory([])});
+    return()=>{live=false};
   },[indicator]);
-
-  useEffect(()=>{
-    if(indicator&&selectedYear&&selectedYear!==indicator.year){setIndicatorLoading(true);getStudentGroups(indicator.id,selectedYear).then(setGroups).finally(()=>setIndicatorLoading(false))}
-  },[selectedYear]);
 
   useEffect(()=>{
     const esc=(e:KeyboardEvent)=>{if(e.key==='Escape'){setInitiative(null);setIndicator(null)}};
@@ -319,20 +278,7 @@ export function GoalPage(){
             <span role="status">{popupStatus}</span>
           </div>
         </section>
-        <section className="indicatorChartPanel">
-          <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>
-          <div className="yearChooser"><label htmlFor="indicatorYear">Choose Year:</label><select id="indicatorYear" value={selectedYear} onChange={e=>setSelectedYear(e.target.value)}>{[...new Set(history.map((r:any)=>r.school_year))].map((y:any)=><option key={y}>{y}</option>)}</select></div>
-          <div className={'studentChart '+(indicatorLoading?'isLoading':'')}>{indicatorLoading&&<div className="indicatorLoader" role="status" aria-live="polite"><i/><span>Loading data…</span></div>}
-            <div className="yAxisLabel">{indicatorYAxisLabel(indicator)}</div>
-            {(()=>{const scale=chartScale(indicator,groups);return <div className="yAxisTicks" aria-hidden="true">{scale.ticks.map(t=><span key={t} style={{bottom:(t/scale.max*100)+'%'}}>{scale.format(t)}</span>)}</div>})()}
-            <div className="studentBars">
-              {(()=>{const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);const scale=chartScale(indicator,groups);return rows.map((r:any)=><div className="studentBarCol" key={r.student_group}><div className="studentBar" style={{height:Math.max(4,(Number(r.value_3_numeric)||0)/scale.max*100)+'%'}}><b>{r.value_3_display??r.value_3_numeric}</b></div><span>{r.student_group}</span></div>)})()}
-            </div>
-            {(()=>{const avg=groups.find((r:any)=>r.statewide_value_3_numeric!=null);const scale=chartScale(indicator,groups);return avg?<div className="stateAvgLine" style={{bottom:Math.min(100,Math.max(0,(Number(avg.statewide_value_3_numeric)||0)/scale.max*100))+'%'}}><span>Statewide Average: {avg.statewide_value_3_display??avg.statewide_value_3_numeric}</span></div>:null})()}
-          </div>
-          <div className="xAxisLabel">Student Group</div>
-          <p className="chartNote">ⓘ Student-group performance for the selected school year. Statewide Average is shown as a reference line.</p>
-        </section>
+        <StudentGroupChart key={indicator.id} indicator={indicator} history={history} selectedYear={selectedYear} onYearChange={setSelectedYear}/>
       </div>
     </div>}
   </main>;
