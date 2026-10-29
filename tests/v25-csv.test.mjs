@@ -10,7 +10,7 @@ const {parseCsv, csvColumns, validateCsv, prepareUpload} = await import(asUrl(cs
 const goals = [{'Goal ID':'G1', 'Goal Name':'Excellence'}, {'Goal ID':'G2', 'Goal Name':'Equity'}];
 const masters = [{'Indicator ID':'ID1', 'Indicator Name':'Renamed ELA', 'Goal ID':'G1'}];
 const initiativeMasters = [{'Initiative ID':'IN1','Initiative Name':'Teaching','Goal ID':'G1'}];
-const indicator = {'Goal ID':'G1','Goal Name':'Excellence','Indicator ID':'ID1','Indicator Name':'ELA','School Year':'2025-26',Category:'All','Student Group':'All Students','Value 3':'39.53%','Target 1':'40%'};
+const indicator = {'Goal ID':'G1','Goal Name':'Excellence','Indicator ID':'ID1','Indicator Name':'Renamed ELA','School Year':'2025-26',Category:'All','Student Group':'All Students','Value 3':'39.53%','Target 1':'40%'};
 const initiative = {'Goal ID':'G1','Goal Name':'Excellence','Initiative ID':'IN1','Initiative Name':'Teaching','Sub Initiative Name':'Training','Action Item':'Train staff','Start Date':'Sep-2026',Status:'In Progress'};
 const quote = value => '"' + String(value ?? '').replaceAll('"', '""') + '"';
 const csv = (kind, rows) => csvColumns[kind].join(',')+'\r\n'+rows.map(row => csvColumns[kind].map(key => quote(row[key])).join(',')).join('\r\n');
@@ -26,11 +26,11 @@ test('Indicator upload preserves units and adopts current master name', () => {
   assert.equal(row['Indicator Name'],'Renamed ELA'); assert.equal(row['Value 3'],'39.53%'); assert.equal(row['Target 1'],'40%'); assert.equal(row.Role,'All');
 });
 test('Unknown/unassigned items, mismatched goals and blank keys are rejected', () => {
-  assert.throws(() => validateCsv(csv('indicators',[indicator]),'indicators',[],goals), /unknown or unassigned/);
-  assert.throws(() => validateCsv(csv('indicators',[{...indicator,'Goal ID':'G2'}]),'indicators',masters,goals), /goal does not match/);
+  assert.throws(() => validateCsv(csv('indicators',[indicator]),'indicators',[],goals), /is not available/);
+  assert.throws(() => validateCsv(csv('indicators',[{...indicator,'Goal Name':'Equity'}]),'indicators',masters,goals), /not available for this Goal/);
   assert.throws(() => validateCsv(csv('indicators',[{...indicator,'School Year':''}]),'indicators',masters,goals), /School Year is required/);
 });
-test('Templates must retain the existing column order and duplicate upload keys are rejected', () => {
+test('Templates must contain the reporting columns and duplicate upload keys are rejected', () => {
   assert.throws(() => validateCsv('Indicator ID\nID1','indicators',masters,goals), /columns do not match/);
   assert.throws(() => validateCsv(csv('indicators',[indicator,indicator]),'indicators',masters,goals), /duplicate reporting key/);
 });
@@ -47,4 +47,26 @@ test('Initiative upload matches an action item and preserves dates, status and c
 });
 test('Ambiguous existing reporting rows are not silently overwritten', () => {
   assert.throws(() => prepareUpload('indicators',[indicator],[{...indicator,__previewKey:'a'},{...indicator,__previewKey:'b'}]), /matches multiple records/);
+});
+
+test('Downloads contain names and reporting fields without user-facing IDs',()=>{for(const columns of Object.values(csvColumns))assert.ok(columns.every(column=>!column.endsWith(' ID')))});
+test('Names resolve canonical IDs despite case, Unicode spaces and repeated whitespace',()=>{
+ const [row]=validateCsv(csv('indicators',[{...indicator,'Indicator Name':'  renamed\u00a0  ELA  ','Goal Name':'  EXCELLENCE '}]),'indicators',masters,goals);
+ assert.equal(row['Indicator ID'],'ID1');assert.equal(row['Indicator Name'],'Renamed ELA');assert.equal(row['Goal ID'],'G1');
+ const [action]=validateCsv(csv('initiatives',[{...initiative,'Initiative Name':'  TEACHING  '}]),'initiatives',initiativeMasters,goals);assert.equal(action['Initiative ID'],'IN1');
+});
+test('An unmatched initiative gives an actionable name error',()=>assert.throws(()=>validateCsv(csv('initiatives',[{...initiative,'Initiative Name':'Not configured'}]),'initiatives',initiativeMasters,goals),/Initiative .* is not available.*Check the file/));
+test('Duplicate normalized names fail safely, with Goal Name used to disambiguate',()=>{
+ const two=[...masters,{'Indicator ID':'ID2','Indicator Name':'RENAMED  ELA','Goal ID':'G2'}];
+ assert.throws(()=>validateCsv(csv('indicators',[{...indicator,'Goal Name':''}]),'indicators',two,goals),/more than one master/);
+ const [row]=validateCsv(csv('indicators',[{...indicator,'Goal Name':'Equity'}]),'indicators',two,goals);assert.equal(row['Indicator ID'],'ID2');
+ assert.throws(()=>validateCsv(csv('initiatives',[initiative]),'initiatives',[...initiativeMasters,{'Initiative ID':'IN2','Initiative Name':' teaching ','Goal ID':'G1'}],goals),/more than one master/);
+});
+test('Legacy CSV IDs never override the name match',()=>{
+ const header=['Goal ID','Indicator ID',...csvColumns.indicators];const row={...indicator,'Indicator ID':'ID999'};
+ const input=header.join(',')+'\n'+header.map(key=>quote(row[key])).join(',');const [matched]=validateCsv(input,'indicators',masters,goals);assert.equal(matched['Indicator ID'],'ID1');
+});
+test('Re-upload preserves an existing row stakeholder without an ID in the file',()=>{
+ const validated=validateCsv(csv('initiatives',[initiative]),'initiatives',initiativeMasters,goals);
+ const result=prepareUpload('initiatives',validated,[{...initiative,'Stakeholder ID':12,__previewKey:'a'}]);assert.equal(result.rows[0]['Stakeholder ID'],12);
 });

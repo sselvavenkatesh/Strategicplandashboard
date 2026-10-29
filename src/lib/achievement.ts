@@ -25,9 +25,12 @@ export async function getAchievementSummary():Promise<AchievementSummary> {
 export async function getIndicatorTarget(indicatorId:string|undefined,year:string):Promise<string|null> {
   if(!indicatorId||!year)return null;
   if(fastApiReportingEnabled){const result=await apiGet<{target:string|null}>(`/api/v1/indicators/${encodeURIComponent(indicatorId)}/target?school_year=${encodeURIComponent(year)}&preview=${previewTargets}`);return result.target}
-  const request=previewTargets
-    ? supabase.from('Indicator_Target_Preview').select('target_1').eq('indicator_id',indicatorId).eq('school_year',year)
-    : supabase.from('vw_indicator_reporting_normalized').select('target_1').eq('indicator_id',indicatorId).eq('school_year',year).eq('category','All').eq('student_group','All Students').eq('role','All').is('school',null);
+  if(previewTargets){
+    const {data,error}=await supabase.from('Indicator_Target_Preview').select('target_1').eq('indicator_id',indicatorId).eq('school_year',year).maybeSingle();
+    if(error)throw error;
+    if(data?.target_1!=null)return data.target_1;
+  }
+  const request=supabase.from('vw_indicator_reporting_normalized').select('target_1').eq('indicator_id',indicatorId).eq('school_year',year).eq('category','All').eq('student_group','All Students').eq('role','All').is('school',null);
   const {data,error}=await request.maybeSingle();
   if(error)throw error;
   return data?.target_1??null;

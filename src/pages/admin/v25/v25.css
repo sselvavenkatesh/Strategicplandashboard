@@ -127,3 +127,8 @@
 
 .v25-auth-error{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:130;min-height:0;max-width:calc(100% - 24px);padding:10px 16px;border:1px solid #d34d4d;border-radius:6px;background:var(--v-panel);color:#c64040;box-shadow:var(--v-shadow)}
 .v25-auth-status{font-size:12px;color:var(--v-muted)}
+
+.v25-toast{bottom:20px;right:20px;gap:9px;max-width:min(420px,calc(100vw - 32px));padding:10px 12px;background:var(--v-panel);border:1px solid var(--v-line);border-radius:9px;box-shadow:0 4px 18px #102b431c;font-size:12px;line-height:1.4;animation:v25-notice-in .18s ease-out}
+.v25-notice-icon{display:grid;place-items:center;width:28px;height:28px;flex-shrink:0;border-radius:50%;background:#e7f5ee;color:#238059}.v25-toast>.v25-icon{width:24px;height:24px;margin-left:8px}.v25-toast>span:nth-child(2){min-width:0}
+@keyframes v25-notice-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.v25-toast{animation:none}}

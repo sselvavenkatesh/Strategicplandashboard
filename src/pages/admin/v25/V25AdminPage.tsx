@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Link, useLocation, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, ChevronRight, ClipboardList, Eye, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Trash2, Users} from 'lucide-react';
+import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, CheckCircle2, ChevronRight, ClipboardList, Eye, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Trash2, Users, X} from 'lucide-react';
 import {useTheme} from '../../../app/ThemeProvider';
 import {accessibleRows, emptyAssignments, idColumn, loadDataset, text} from './model';
 import type {Assignments, DataRow, Dataset, Kind} from './model';
@@ -95,7 +95,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
   async function persist(change:Record<string,unknown>){
     if(!live||!dataset?.revision)throw new Error('Sign in with your Super Admin account.');
     setBusy(true);setConfigurationError('');
-    try{const fresh=await saveSuperAdminWorkspace(dataset.revision,change);setDataset(fresh);setDraft({...newDraft(),assignments:fresh.assignments});setNotice('Saved to database.');}
+    try{const fresh=await saveSuperAdminWorkspace(dataset.revision,change);setDataset(fresh);setDraft({...newDraft(),assignments:fresh.assignments});setNotice('Details are saved.');}
     finally{setBusy(false)}
   }
   async function saveConfiguration(){
@@ -177,7 +177,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
     </main></div>
     {masterEditing && superAdmin && <MasterEditor kind={masterEditing.kind} row={masterEditing.row} isNew={masterEditing.isNew} goals={goals} records={masterEditing.kind === 'indicators' ? allIndicators : allInitiatives} onClose={() => setMasterEditing(null)} onSave={saveMaster}/>}
     {pendingDeleteGoal && superAdmin && <DeleteGoalDialog goal={pendingDeleteGoal} dependencies={getGoalDependencies(text(pendingDeleteGoal, 'Goal ID'))} lastGoal={goals.length <= 1} onClose={() => setPendingDeleteGoal(null)} onDelete={deleteGoal}/>}
-    {notice && <div className="v25-toast" role="status"><Check size={18}/><span>{notice}</span><button className="v25-icon" aria-label="Dismiss notification" onClick={() => setNotice('')}>×</button></div>}
+    {notice && <div className="v25-toast" role="status" aria-live="polite"><span className="v25-notice-icon"><CheckCircle2 size={17}/></span><span>{notice}</span><button className="v25-icon" aria-label="Dismiss notification" onClick={() => setNotice('')}><X size={14}/></button></div>}
     {busy&&<div className="v25-saving" role="status"><span>Saving…</span></div>}
   </div></StakeholderContext.Provider>;
 }

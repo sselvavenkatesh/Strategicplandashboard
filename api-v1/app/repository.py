@@ -155,10 +155,12 @@ def achievement_summary(preview: bool):
 
 
 def indicator_target(indicator_id: str, school_year: str, preview: bool):
-    if preview:
-        row = fetch_one('select target_1 from public."Indicator_Target_Preview" where indicator_id=%s and school_year=%s', (indicator_id, school_year))
-    else:
-        row = fetch_one("select target_1 from public.vw_indicator_reporting_normalized where indicator_id=%s and school_year=%s and category='All' and student_group='All Students' and role='All' and school is null", (indicator_id, school_year))
+    # A demo overlay is optional. New/uploaded indicators use their real target
+    # for this exact year when no non-null overlay exists.
+    row = fetch_one("""select coalesce(
+        (select target_1 from public."Indicator_Target_Preview" where %s and indicator_id=%s and school_year=%s),
+        (select target_1 from public.vw_indicator_reporting_normalized where indicator_id=%s and school_year=%s and category='All' and student_group='All Students' and role='All' and school is null)
+    ) as target_1""", (preview, indicator_id, school_year, indicator_id, school_year))
     return row.get('target_1') if row else None
 
 

@@ -2,8 +2,8 @@ import {idColumn, text} from './model';
 import type {DataRow} from './model';
 export type ResourceKind = 'indicators' | 'initiatives';
 export const csvColumns = {
-  indicators: ['Goal ID','Goal Name','Indicator ID','Indicator Name','School Year','Category','Student Group','Value 1','Value 2','Value 3','Role','Target 1','Target 2','Target 3','School'],
-  initiatives: ['Goal ID','Goal Name','Initiative ID','Initiative Name','Sub Initiative Name','Start Date','End Date','Action Item','Status','Target 1','Target 2','Target 3','School','Stakeholder ID','Role'],
+  indicators: ['Goal Name','Indicator Name','School Year','Category','Student Group','Value 1','Value 2','Value 3','Role','Target 1','Target 2','Target 3','School'],
+  initiatives: ['Goal Name','Initiative Name','Sub Initiative Name','Start Date','End Date','Action Item','Status','Target 1','Target 2','Target 3','School','Role'],
 };
 
 export function parseCsv(input: string): string[][] {
@@ -37,27 +37,39 @@ export function reportingKey(kind: ResourceKind, row: DataRow): string {
   return JSON.stringify(keys.map(key => text(row, key).trim()));
 }
 
+// Compare complete names, never fuzzy-match a different master. Unicode spaces,
+// repeated whitespace, letter case and equivalent Unicode forms are normalized.
+export const normalizeName = (value: string) => value.normalize('NFKC').replace(/\s+/gu,' ').trim().toLowerCase();
 export function validateCsv(input: string, kind: ResourceKind, masters: DataRow[], goals: DataRow[], allowedRoles:string[]=['All']): DataRow[] {
   const parsed = parseCsv(input);
   const expected = csvColumns[kind];
   if (parsed.length < 2) throw new Error('CSV must contain headers and at least one data row.');
-  if (parsed[0].length !== expected.length || expected.some((column, index) => column !== parsed[0][index].trim())) throw new Error('CSV columns do not match the template.');
+  const headers=parsed[0].map(value=>value.trim());
+  // Old templates are accepted, but their IDs are never used to guess a name.
+  const legacy = ['Goal ID',idColumn(kind),...(kind==='initiatives'?['Stakeholder ID']:[])];
+  if(new Set(headers).size!==headers.length || expected.some(column=>!headers.includes(column)) || headers.some(column=>!expected.includes(column)&&!legacy.includes(column))) throw new Error('CSV columns do not match the template. Download the latest template and check the file again.');
   if (parsed.length > 5001) throw new Error('Upload is limited to 5,000 rows.');
   const seen = new Set<string>();
   const entity = kind === 'indicators' ? 'Indicator' : 'Initiative';
-  const required = kind === 'indicators' ? ['Goal ID','Indicator ID','Indicator Name','School Year','Category','Student Group'] : ['Goal ID','Initiative ID','Initiative Name','Sub Initiative Name','Action Item'];
+  const required = kind === 'indicators' ? ['Indicator Name','School Year','Category','Student Group'] : ['Initiative Name','Sub Initiative Name','Action Item'];
   return parsed.slice(1).map((values, index) => {
     const prefix = `Row ${index + 2}: `;
-    if (values.length !== expected.length) throw new Error(`${prefix}expected ${expected.length} columns.`);
-    const row: DataRow = Object.fromEntries(expected.map((key, i) => [key, values[i].trim() || null]));
+    if (values.length !== headers.length) throw new Error(`${prefix}expected ${headers.length} columns.`);
+    const row: DataRow = Object.fromEntries(headers.map((key, i) => [key, values[i].trim() || null]));
     for (const key of required) if (!text(row, key)) throw new Error(`${prefix}${key} is required.`);
-    const master = masters.find(record => record[idColumn(kind)] === row[idColumn(kind)]);
-    if (!master) throw new Error(`${prefix}unknown or unassigned ${entity.toLowerCase()} ID.`);
-    const goal = goals.find(record => record['Goal ID'] === row['Goal ID']);
-    if (!goal || master['Goal ID'] !== row['Goal ID']) throw new Error(`${prefix}goal does not match the ${entity.toLowerCase()}.`);
+    const name=text(row,`${entity} Name`);
+    const goalName=normalizeName(text(row,'Goal Name'));
+    const candidates=masters.filter(record=>normalizeName(text(record,`${entity} Name`))===normalizeName(name)).filter(record=>!goalName || goals.some(goal=>goal['Goal ID']===record['Goal ID'] && normalizeName(text(goal,'Goal Name'))===goalName));
+    if(!candidates.length) throw new Error(`${prefix}${entity} "${name}" is not available${goalName?' for this Goal':''}. Check the file and upload again.`);
+    if(candidates.length>1) throw new Error(`${prefix}${entity} "${name}" matches more than one master. Check the Goal Name or ask Super Admin to give the masters distinct names, then upload again.`);
+    const master=candidates[0];
+    const goal=goals.find(record=>record['Goal ID']===master['Goal ID']);
+    if(!goal)throw new Error(`${prefix}Goal for this ${entity.toLowerCase()} is not available. Check the file and upload again.`);
     if (!allowedRoles.includes(text(row,'Role')||'All')) throw new Error(`${prefix}this Role is not allowed.`);
-    if (row['Stakeholder ID'] && !/^\d+$/.test(text(row, 'Stakeholder ID'))) throw new Error(`${prefix}Stakeholder ID must be numeric.`);
+    delete row['Stakeholder ID'];
     row.Role = row.Role || 'All';
+    row[idColumn(kind)]=master[idColumn(kind)];
+    row['Goal ID']=master['Goal ID'];
     row[`${entity} Name`] = master[`${entity} Name`];
     row['Goal Name'] = goal['Goal Name'];
     const key = reportingKey(kind, row);
@@ -79,7 +91,7 @@ export function prepareUpload(kind: ResourceKind, uploaded: DataRow[], existing:
     if (candidates.length > 1) throw new Error('A reporting key matches multiple records. Resolve the duplicate before uploading.');
     const previous = candidates[0];
     if (previous) updated++;
-    return {...row, __previewKey: previous?.__previewKey ?? `csv:${kind}:${reportingKey(kind, row)}`};
+    return {...row, ...(previous && 'Stakeholder ID' in previous ? {'Stakeholder ID':previous['Stakeholder ID']} : {}), __previewKey: previous?.__previewKey ?? `csv:${kind}:${reportingKey(kind, row)}`};
   });
   return {rows, updated, added: rows.length - updated};
 }

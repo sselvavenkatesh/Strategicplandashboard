@@ -40,3 +40,15 @@ def test_public_preview_dataset_response_does_not_add_stakeholder_accounts(monke
     expected={'profile':{},'goals':[],'indicators':[],'initiatives':[],'indicatorData':[],'initiativeData':[]}
     monkeypatch.setattr(main.repo,'preview_dataset',lambda: expected)
     assert client.get('/api/v1/preview/dataset').json()==expected
+
+
+def test_target_query_preserves_preview_override_and_exact_year_fallback(monkeypatch):
+    from app import repository
+    calls=[]
+    monkeypatch.setattr(repository,'fetch_one',lambda sql,params:calls.append((sql,params)) or {'target_1':'90%'})
+    assert repository.indicator_target('ID8','2025-26',True)=='90%'
+    sql,params=calls[0]
+    assert 'coalesce(' in sql and 'Indicator_Target_Preview' in sql and 'vw_indicator_reporting_normalized' in sql
+    assert params==(True,'ID8','2025-26','ID8','2025-26')
+    repository.indicator_target('ID8','2024-25',False)
+    assert calls[1][1]==(False,'ID8','2024-25','ID8','2024-25')
