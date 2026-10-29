@@ -704,26 +704,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
           }
         },
-        "x-v25-access": "Legacy authentication"
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
       }
     },
     "/api/v1/auth/admin/oauth/{provider}/start": {
@@ -870,71 +856,26 @@
       "get": {
         "summary": "Admin Session",
         "operationId": "admin_session_api_v1_auth_admin_session_get",
-        "parameters": [
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Token"
-            }
-          }
-        ],
         "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
           }
         },
-        "x-v25-access": "Legacy authentication"
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
       }
     },
     "/api/v1/auth/admin/logout": {
       "post": {
         "summary": "Admin Logout",
         "operationId": "admin_logout_api_v1_auth_admin_logout_post",
-        "parameters": [
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Token"
-            }
-          }
-        ],
         "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
           }
         },
-        "x-v25-access": "Legacy authentication"
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
       }
     },
     "/api/v1/auth/admin/sso/validate": {
@@ -952,26 +893,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
           }
         },
-        "x-v25-access": "Legacy authentication"
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
       }
     },
     "/api/v1/access-log": {
@@ -1047,51 +974,26 @@
       "get": {
         "summary": "Superadmin Configuration",
         "operationId": "superadmin_configuration_api_v1_superadmin_configuration_get",
-        "parameters": [
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Token"
-            }
-          }
-        ],
         "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
           }
         },
-        "x-v25-access": "Legacy token; writes gated"
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
       },
       "put": {
         "summary": "Put Superadmin Configuration",
         "operationId": "put_superadmin_configuration_api_v1_superadmin_configuration_put",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/SuperAdminConfiguration"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {

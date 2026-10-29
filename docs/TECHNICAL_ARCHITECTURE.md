@@ -1,5 +1,9 @@
 # Strategic Plan Dashboard - Technical Architecture
 
+## Security fixes — 29 October 2026
+
+The shared public reporting boundary now enforces row + master + Goal privacy at RLS/view/function levels. The normalized view is security-invoker and public-only even for backend reporting calls. Admin/Super Admin snapshots continue to read authorized private records through validated functions. OAuth uses browser-bound state and S256 PKCE with exact same-origin return destinations; unused URL-token HTTP routes are retired. See [remediation status and remaining limits](V2.5_SECURITY_ARCHITECTURE_REVIEW.md).
+
 ## V2.5 current architecture — 29 October 2026
 
 The V2.5 preview uses React → same-origin FastAPI → restricted PostgreSQL functions/queries for public reporting, authenticated Admin/Super Admin workspaces, user management and native Ollama AI. Provider credentials are stored encrypted in Vault and resolved on the backend. Existing Supabase/Edge and token routes remain compatibility surfaces, so this is not yet a complete retirement of all legacy paths. Multi-district authorization is not implemented.

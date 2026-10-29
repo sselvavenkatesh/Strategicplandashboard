@@ -1,5 +1,9 @@
 # Strategic Plan Dashboard — AI Context Info
 
+## Security remediation checkpoint — 29 October 2026
+
+The shared-database privacy and legacy OAuth blockers have fixes; see [current evidence](V2.5_SECURITY_ARCHITECTURE_REVIEW.md). Do not reintroduce URL session tokens, public OAuth-state RPCs or public reporting functions that ignore parent/master/row privacy. Backend-only Admin/Super Admin functions must retain access to private records and enforce edit assignments. 81 API tests and 47 frontend tests passed, plus rollback database regression suites. Real deployed Google/Microsoft provider acceptance remains pending; no production promotion is authorized by these test results.
+
 ## V2.5 security/documentation checkpoint — 29 October 2026
 
 The owner saved the encrypted district Ollama key and confirms working AI responses. Native FastAPI AI is active when `/api/v1/ai/status` reports `nativeReady`; this is stored-configuration status, not a provider health test. Do not retrieve or print the key to verify storage.

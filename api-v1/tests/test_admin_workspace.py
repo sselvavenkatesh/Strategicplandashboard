@@ -97,7 +97,10 @@ def test_verified_workspace_oauth_sets_cookie_without_query_string_token(monkeyp
     monkeypatch.setattr(main.repo,'validate_sso_admin',lambda *args:{'user_id':6,'user_email':'a@example.invalid'})
     monkeypatch.setattr(main.repo,'create_admin_session',lambda *args:TOKEN)
     monkeypatch.setattr(main.repo,'fetch_one',lambda *args:{'data':{'id':'6'}})
-    response=client().get('/api/v1/auth/admin/oauth/google/callback?code=test&state='+str(uuid4()),follow_redirects=False)
+    c=client(); state=str(uuid4())
+    monkeypatch.setattr(main.repo,'create_admin_oauth_state',lambda *args:state)
+    c.get('/api/v1/auth/admin/oauth/google/start?return_to=https://testserver/strategic-plan/demo/admin',follow_redirects=False)
+    response=c.get('/api/v1/auth/admin/oauth/google/callback?code=test&state='+state,follow_redirects=False)
     assert response.status_code==302
     assert response.headers['location']=='https://testserver/strategic-plan/demo/admin'
     assert 'httponly' in response.headers['set-cookie'].lower()

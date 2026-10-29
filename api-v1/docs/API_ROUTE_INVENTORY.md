@@ -22,15 +22,15 @@ Generated from FastAPI; paths below include the `/api/v1` prefix. See [API docum
 | GET | `/api/v1/goals/{goal_id}/initiatives-full` | Public | goal_id (path, required) | `—` |
 | GET | `/api/v1/admin/signin-config` | Public | — | `—` |
 | PUT | `/api/v1/superadmin/oauth-secrets` | Legacy token; writes gated | — | `OAuthSecrets` |
-| POST | `/api/v1/auth/admin/login` | Legacy authentication | — | `AdminLogin` |
+| POST | `/api/v1/auth/admin/login` | Retired; HTTP 410; use cookie workspace API | — | `AdminLogin` |
 | GET | `/api/v1/auth/admin/oauth/{provider}/start` | OAuth provider flow; current and legacy callbacks | provider (path, required), return_to (query, optional) | `—` |
 | GET | `/api/v1/auth/admin/oauth/{provider}/callback` | OAuth provider flow; current and legacy callbacks | provider (path, required), code (query, optional), state (query, optional), error (query, optional) | `—` |
-| GET | `/api/v1/auth/admin/session` | Legacy authentication | token (query, required) | `—` |
-| POST | `/api/v1/auth/admin/logout` | Legacy authentication | token (query, required) | `—` |
-| POST | `/api/v1/auth/admin/sso/validate` | Legacy authentication | — | `SsoAdminValidation` |
+| GET | `/api/v1/auth/admin/session` | Retired; HTTP 410; use cookie workspace API | — | `—` |
+| POST | `/api/v1/auth/admin/logout` | Retired; HTTP 410; use cookie workspace API | — | `—` |
+| POST | `/api/v1/auth/admin/sso/validate` | Retired; HTTP 410; use cookie workspace API | — | `SsoAdminValidation` |
 | POST | `/api/v1/access-log` | Public | — | `AccessLog` |
 | POST | `/api/v1/superadmin/login` | Public | — | `AdminLogin` |
-| GET | `/api/v1/superadmin/configuration` | Legacy token; writes gated | token (query, required) | `—` |
+| GET | `/api/v1/superadmin/configuration` | Retired; HTTP 410; use cookie workspace API | — | `—` |
 | PUT | `/api/v1/superadmin/configuration` | Legacy token; writes gated | — | `SuperAdminConfiguration` |
 | DELETE | `/api/v1/superadmin/goals/{goal_id}` | Legacy token; writes gated | goal_id (path, required), token (query, required) | `—` |
 | PUT | `/api/v1/superadmin/logo` | Legacy token; writes gated | — | `SuperAdminLogo` |

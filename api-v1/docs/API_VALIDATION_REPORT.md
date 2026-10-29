@@ -1,5 +1,11 @@
 # StrategicPlan API V1 Validation Report
 
+## Security remediation validation — 29 October 2026
+
+**81 API tests passed, 19 opt-in live/parity checks skipped; 47 frontend tests passed; root/branded React builds passed.** New OAuth tests cover both providers and both Admin paths, S256 proof exchange, browser/state/provider mismatch, expired/replayed state, callback destination validation, provider error/unverified/unmapped identity, no URL token and retired endpoint behavior. Database security fixtures and existing Admin/Super Admin/native-AI transaction suites passed and rolled back.
+
+The guarded migration preserved public latest/history/groups/individual-initiative/achievement hashes and reporting-row fingerprints. Anonymous private-initiative rows changed from 12 exposed to 0; expected public data remains available. Backend grants remain present; the tool cannot impersonate the custom backend login. Deployed-provider verification is still pending because the browser reaches Vercel authentication. See [remediation details](../../docs/V2.5_SECURITY_ARCHITECTURE_REVIEW.md).
+
 ## V2.5 review checkpoint — 29 October 2026
 
 Current local API suite: **59 passed, 19 skipped**, one test-client deprecation warning. Skipped live/parity checks were not executed and must not be counted as passes. npm audit reported zero known vulnerabilities across 278 dependency entries; a complete Python vulnerability scan remains outstanding.

@@ -46,6 +46,11 @@ for path, methods in schema['paths'].items():
         if path in {'/api/v1/admin/logout', '/api/v1/superadmin/logout'}:
             op['security'] = [{}, *op.get('security', [])]
             access += ' if present; clears cookie'
+        if path in {'/api/v1/auth/admin/login', '/api/v1/auth/admin/session', '/api/v1/auth/admin/logout', '/api/v1/auth/admin/sso/validate'} or (path == '/api/v1/superadmin/configuration' and method == 'get'):
+            access = 'Retired; HTTP 410; use cookie workspace API'
+            op['deprecated'] = True
+            op.pop('security', None)
+            op['responses'] = {'410': {'description': 'Retired token-based endpoint; use the workspace API.'}}
         op['x-v25-access'] = access
         params = ', '.join(f"{p['name']} ({p['in']}{', required' if p.get('required') else ', optional'})" for p in op.get('parameters', [])) or '—'
         body = op.get('requestBody', {}).get('content', {}).get('application/json', {}).get('schema', {})

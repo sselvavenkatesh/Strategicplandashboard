@@ -209,7 +209,8 @@ def indicator_target(indicator_id: str, school_year: str, preview: bool):
     row = fetch_one("""select coalesce(
         (select target_1 from public."Indicator_Target_Preview" where %s and indicator_id=%s and school_year=%s),
         (select target_1 from public.vw_indicator_reporting_normalized where indicator_id=%s and school_year=%s and category='All' and student_group='All Students' and role='All' and school is null)
-    ) as target_1 where exists(select 1 from public."Indicator_master" m join public."Goal_master" g on g."Goal ID"=m."Goal ID" where m."Indicator ID"=%s and m."Role"='All' and g."Role"='All')""", (preview, indicator_id, school_year, indicator_id, school_year, indicator_id))
+    ) as target_1 where exists(select 1 from public."Indicator_master" m join public."Goal_master" g on g."Goal ID"=m."Goal ID" where m."Indicator ID"=%s and m."Role"='All' and g."Role"='All')
+      and exists(select 1 from public.vw_indicator_reporting_normalized n where n.indicator_id=%s and n.school_year=%s and n.category='All' and n.student_group='All Students' and n.school is null and n.role='All')""", (preview, indicator_id, school_year, indicator_id, school_year, indicator_id, indicator_id, school_year))
     return row.get('target_1') if row else None
 
 
