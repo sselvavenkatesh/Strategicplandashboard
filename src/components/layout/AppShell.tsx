@@ -8,6 +8,7 @@ import {useTheme} from '../../app/ThemeProvider';
 import {apiGet,apiPost,fastApiEnabled} from '../../lib/api';
 import {getAdminSession,loginAdmin,logoutAdmin} from '../../pages/admin/v25/adminApi';
 import {isAiEnabled} from '../../lib/ai';
+import {ProviderIcon} from '../SignInProviderIcon';
 import './publicNavigation.css';
 
 const liveAdmin=import.meta.env.VITE_V25_UI_PREVIEW==='true'&&fastApiEnabled;
@@ -22,6 +23,7 @@ export function AppShell(){
   const[authMessage,setAuthMessage]=useState('');
   const[authBusy,setAuthBusy]=useState(false);
   const[signinMethod,setSigninMethod]=useState<'Userbased'|'Google'|'Microsoft'>('Userbased');
+  const[providers,setProviders]=useState({google:false,microsoft:false});
   const[admin,setAdmin]=useState<AdminProfile|null>(null);
   const p=useDashboard(getProfile),g=useDashboard(getGoals);
   const nav=useNavigate();
@@ -72,7 +74,7 @@ export function AppShell(){
     return()=>window.clearTimeout(timer);
   },[location.pathname]);
 
-  useEffect(()=>{(async()=>{if(fastApiEnabled){try{const config=await apiGet<{signinMethod:'Userbased'|'Google'|'Microsoft'}>('/api/v1/admin/signin-config');setSigninMethod(config.signinMethod)}catch{ /* Keep defaults if stored profile or sign-in settings are unavailable. */ };return}const{data}=await supabase.from('District_Profile').select('"Admin Signin Method"').limit(1).maybeSingle();if(data?.['Admin Signin Method'])setSigninMethod(data['Admin Signin Method'])})()},[]);
+  useEffect(()=>{let live=true;(async()=>{if(fastApiEnabled){try{const config=await apiGet<{signinMethod:'Userbased'|'Google'|'Microsoft';google:{configured:boolean};microsoft:{configured:boolean}}>('/api/v1/admin/signin-config');if(live){setSigninMethod(config.signinMethod);setProviders({google:config.google.configured,microsoft:config.microsoft.configured})}}catch{ /* Email/password remains available if provider settings cannot be loaded. */ };return}const{data}=await supabase.from('District_Profile').select('"Admin Signin Method"').limit(1).maybeSingle();if(live&&data?.['Admin Signin Method'])setSigninMethod(data['Admin Signin Method'])})();return()=>{live=false}},[signInOpen]);
 
   useEffect(()=>{
     if(liveAdmin){const log=(user:AdminProfile|null)=>apiPost('/api/v1/access-log',{sessionId:sessionStorage.getItem('strategic_access_session'),userName:user?.name,userEmail:user?.email,userType:user?'Admin':'Public',pagePath:initialPath.current}).catch(()=>{});getAdminSession().then(user=>{setAdmin(user);void log(user)}).catch(()=>{setAdmin(null);void log(null)});return}
@@ -139,15 +141,11 @@ export function AppShell(){
       <form className="signInCard" onSubmit={submitSignIn}>
         <button type="button" className="signInClose" aria-label="Close sign in" onClick={()=>setSignInOpen(false)}>×</button>
         <img className="signInK12Logo" src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/><small>ADMIN ACCESS</small><h2 id="signInTitle">Sign In</h2><p>Sign in with your administrator account.</p>
-        {signinMethod==='Userbased'?<>
-          <label htmlFor="adminEmail">Email</label><input id="adminEmail" type="email" autoComplete="username" required value={email} onChange={e=>setEmail(e.target.value)}/>
-          <label htmlFor="adminPassword">Password</label><input id="adminPassword" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)}/>
+          <label htmlFor="adminEmail">Email</label><input id="adminEmail" type="email" autoComplete="username" disabled={authBusy} required value={email} onChange={e=>setEmail(e.target.value)}/>
+          <label htmlFor="adminPassword">Password</label><input id="adminPassword" type="password" autoComplete="current-password" disabled={authBusy} required value={password} onChange={e=>setPassword(e.target.value)}/>
           {authMessage&&<div className="signInError" role="alert">{authMessage}</div>}
           <button className="signInSubmit" type="submit" disabled={authBusy}>{authBusy?'Signing in…':'Sign In'}</button>
-        </>:<>
-          {authMessage&&<div className="signInError" role="alert">{authMessage}</div>}
-          <button className="signInSubmit ssoSignIn" type="button" disabled={authBusy} onClick={()=>submitSso(signinMethod==='Google'?'google':'azure')}>Sign in with {signinMethod}</button>
-        </>}
+        {signinMethod!=='Userbased'&&<><div className="signInDivider"><span>or</span></div><button className={'signInProvider '+(signinMethod==='Google'?'google':'microsoft')} type="button" disabled={authBusy||(liveAdmin&&!providers[signinMethod==='Google'?'google':'microsoft'])} onClick={()=>submitSso(signinMethod==='Google'?'google':'azure')}><ProviderIcon provider={signinMethod==='Google'?'google':'microsoft'}/>Sign in with {signinMethod}</button></>}
       </form>
     </div>}
   </div>
