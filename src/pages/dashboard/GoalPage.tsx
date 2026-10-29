@@ -227,7 +227,7 @@ export function GoalPage(){
 
     <div className="goalSectionTitle indicatorTitle">
       <div><small>MEASURING OUTCOMES</small><h3>Key Indicators</h3></div>
-      <span>Latest year performance &amp; trend</span>
+      <span>Click to show indicator details</span>
     </div>
 
     <section className="indicatorGrid">
