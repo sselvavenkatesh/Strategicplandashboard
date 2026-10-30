@@ -1239,6 +1239,53 @@
         "x-v25-access": "Public; validated cookies permit private context"
       }
     },
+    "/api/v1/ai/ask-stream": {
+      "post": {
+        "summary": "Ask Stream",
+        "description": "JSON whitespace heartbeats keep the edge stream active without altering answers.",
+        "operationId": "ask_stream_api_v1_ai_ask_stream_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiQuestion"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "AdminCookie": []
+          },
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Public; validated cookies permit private context"
+      }
+    },
     "/api/v1/validation": {
       "get": {
         "summary": "Validation Json",

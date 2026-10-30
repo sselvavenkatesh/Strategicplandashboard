@@ -8,15 +8,17 @@ from urllib.parse import urlsplit
 from uuid import UUID
 from fastapi import HTTPException, Request
 
+from .proxy_security import public_origin
+
 RETURN_PATHS = {'/admin', '/strategic-plan/demo/admin'}
 
 def return_destination(value: str | None, request: Request) -> str:
-    origin = str(request.base_url).rstrip('/')
+    origin = public_origin(request)
     if value is None:
         return origin + '/strategic-plan/demo/admin'
     try:
         parsed = urlsplit(value)
-        valid = (parsed.scheme == request.url.scheme and parsed.netloc == request.url.netloc
+        valid = (parsed.scheme == urlsplit(origin).scheme and parsed.netloc == urlsplit(origin).netloc
                  and parsed.path in RETURN_PATHS and not parsed.query and not parsed.fragment
                  and not parsed.username and not parsed.password)
     except ValueError:

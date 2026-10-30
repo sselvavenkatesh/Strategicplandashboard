@@ -8,8 +8,15 @@
 [context.production]
   branch = "react-dashboard"
 
-# Public demo uses the same isolated targets and AI service as the approved preview.
+# Retain the approved demo targets; React APIs are FastAPI-only.
 [context.production.environment]
+  VITE_ACHIEVEMENT_PREVIEW = "true"
+  VITE_FASTAPI_ENABLED = "true"
+  VITE_FASTAPI_REPORTING = "true"
+  VITE_V25_UI_PREVIEW = "true"
+  VITE_FASTAPI_V25 = "false"
+
+[context.deploy-preview.environment]
   VITE_ACHIEVEMENT_PREVIEW = "true"
 
 [[headers]]
@@ -17,6 +24,9 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://vznwvenzjzccvtqorhas.supabase.co; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
 
 
 # Stable HTML proxy destination: avoid directory-index canonical redirects.

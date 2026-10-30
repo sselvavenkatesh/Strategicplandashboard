@@ -1,6 +1,3 @@
-export const fastApiEnabled = import.meta.env.VITE_FASTAPI_ENABLED === 'true';
-export const fastApiV25Enabled = fastApiEnabled && import.meta.env.VITE_FASTAPI_V25 === 'true';
-export const fastApiReportingEnabled = fastApiEnabled && (fastApiV25Enabled || import.meta.env.VITE_FASTAPI_REPORTING === 'true');
 const apiBase = String(import.meta.env.VITE_API_BASE_URL || import.meta.env.BASE_URL.replace(/\/$/, '')).replace(/\/$/, '');
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers);
@@ -18,7 +15,9 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
     if (response.status === 204) return undefined as T;
     const type = response.headers.get('Content-Type') ?? '';
     if (!type.includes('application/json')) throw new Error('The API returned a sign-in page instead of data.');
-    return await response.json() as T;
+    const body = await response.json();
+    if (body && typeof body.detail === 'string' && !body.answer) throw new Error(body.detail);
+    return body as T;
   } finally {window.clearTimeout(timeout)}
 }
 export const apiGet = <T>(path: string) => apiRequest<T>(path);

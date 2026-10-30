@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import ts from 'typescript';
 const compile = source => ts.transpileModule(source, {compilerOptions: {module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022}}).outputText;
 const asUrl = source => `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`;
-const model = asUrl(compile(readFileSync(new URL('../src/pages/admin/v25/model.ts', import.meta.url), 'utf8').replace("import {supabase} from '../../../lib/supabase';", 'const supabase = null;').replace("import {apiGet, fastApiEnabled, fastApiV25Enabled} from '../../../lib/api';", 'const fastApiV25Enabled = false; const fastApiEnabled = false; const apiGet = null;')));
+const model = asUrl(compile(readFileSync(new URL('../src/pages/admin/v25/model.ts', import.meta.url), 'utf8').replace("import {apiGet} from '../../../lib/api';", 'const apiGet = null;')));
 const csvCode = compile(readFileSync(new URL('../src/pages/admin/v25/csv.ts', import.meta.url), 'utf8')).replaceAll("'./model'", JSON.stringify(model));
 const {parseCsv, csvColumns, validateCsv, prepareUpload} = await import(asUrl(csvCode));
 const goals = [{'Goal ID':'G1', 'Goal Name':'Excellence'}, {'Goal ID':'G2', 'Goal Name':'Equity'}];

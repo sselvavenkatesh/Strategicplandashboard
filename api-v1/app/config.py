@@ -3,6 +3,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_url: str = ""
+    proxy_shared_key: str = ""
+    abuse_controls_enabled: bool = False
     data_writes_enabled: bool = False
     preview_dataset_enabled: bool = True
     demo_targets: bool = True

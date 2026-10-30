@@ -122,7 +122,7 @@ def audit(session_id, user_id, question, answer, in_scope, sources, ms):
     except Exception as error:
         logging.getLogger(__name__).warning("AI audit write unavailable: %s",type(error).__name__)
 
-def run_ai(question, session_id, user_id=None):
+def _run_ai(question, session_id, user_id=None):
     started = perf_counter()
     question = question.strip()
     if len(question) < 3:
@@ -146,6 +146,12 @@ def run_ai(question, session_id, user_id=None):
     audit(session_id,user_id,question,answer,True,SOURCES,total_ms)
     return {"answer":answer,"sources":SOURCES,"timings":{"dataMs":data_ms,"modelMs":model_ms,"totalMs":total_ms},"modelMetrics":{"promptTokens":output.get("prompt_eval_count"),"generatedTokens":output.get("eval_count"),"promptMs":round(output.get("prompt_eval_duration",0)/1_000_000),"generationMs":round(output.get("eval_duration",0)/1_000_000)}}
 
+def run_ai(question,session_id,user_id=None):
+    from .abuse import acquire_ai_lease,release_ai_lease
+    lease=acquire_ai_lease()
+    try:return _run_ai(question,session_id,user_id)
+    finally:release_ai_lease(lease)
+
 @router.post("/ask")
 def ask(body: AiQuestion, request: Request, response: Response):
     response.headers["Cache-Control"] = "no-store"
@@ -160,3 +166,34 @@ def ask(body: AiQuestion, request: Request, response: Response):
     except Exception as error:
         logging.getLogger(__name__).warning("AI request unavailable: %s",type(error).__name__)
         raise HTTPException(502, "The district AI service is temporarily unavailable.")
+
+@router.post('/ask-stream')
+def ask_stream(body:AiQuestion,request:Request):
+    """JSON whitespace heartbeats keep the edge stream active without altering answers."""
+    import asyncio
+    from fastapi.responses import StreamingResponse
+    checked_origin(request)
+    user_id=audience(request)
+    if not repo.feature_enabled('V2.3','AI Assistant'):
+        raise HTTPException(404,'AI is unavailable.')
+    if not repo.ai_credentials().get('api_key'):
+        raise HTTPException(503,'AI setup is pending. Please contact your Super Admin.')
+    async def output():
+        task=asyncio.create_task(asyncio.to_thread(run_ai,body.question,body.sessionId,user_id))
+        try:
+            yield ' \n'
+            while not task.done():
+                done,_=await asyncio.wait({task},timeout=5)
+                if not done:yield ' \n'
+            yield json.dumps(task.result(),ensure_ascii=False,default=str)
+        except HTTPException as error:
+            yield json.dumps({'detail':error.detail})
+        except Exception as error:
+            logging.getLogger(__name__).warning('AI stream unavailable: %s',type(error).__name__)
+            yield json.dumps({'detail':'The district AI service is temporarily unavailable.'})
+        finally:
+            if not task.done():
+                # The blocking provider call has a bounded 90-second timeout.
+                # Consume its result even after the browser disconnects.
+                task.add_done_callback(lambda result:result.exception() if not result.cancelled() else None)
+    return StreamingResponse(output(),media_type='application/json',headers={'Cache-Control':'no-store','X-Accel-Buffering':'no','Referrer-Policy':'no-referrer'})

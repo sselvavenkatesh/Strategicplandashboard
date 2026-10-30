@@ -36,7 +36,7 @@ for path, methods in schema['paths'].items():
             op['security'] = [{'AdminCookie': []}]
         elif '/auth/admin/' in path:
             access = 'OAuth provider flow; current and legacy callbacks' if '/oauth/' in path else 'Legacy authentication'
-        elif path == '/api/v1/ai/ask':
+        elif path in {'/api/v1/ai/ask','/api/v1/ai/ask-stream'}:
             access = 'Public; validated cookies permit private context'
             op['security'] = [{}, {'AdminCookie': []}, {'SuperAdminCookie': []}]
         elif path in {'/validation', '/api/v1/validation'}:

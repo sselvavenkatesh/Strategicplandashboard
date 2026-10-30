@@ -42,6 +42,35 @@ async def preview_write_guard(request: Request, call_next):
     response.headers["Server-Timing"] = f"app;dur={(perf_counter() - started) * 1000:.1f}"
     return response
 
+@app.middleware('http')
+async def release_boundary(request:Request,call_next):
+    from .proxy_security import proxy_origin
+    from .abuse import request_limits
+    from starlette.concurrency import run_in_threadpool
+    try:
+        proxy_origin(request) # reject invalid proxy assertions even on read-only routes
+        limit=3_100_000 if request.url.path.endswith(('/workspace','/configuration','/logo')) else 16_000
+        if request.method in {'POST','PUT','PATCH'}:
+            length=request.headers.get('content-length')
+            if length and (not length.isdigit() or int(length)>limit):
+                return JSONResponse({'detail':'Upload is too large.'},status_code=413)
+            body=bytearray()
+            async for chunk in request.stream():
+                body.extend(chunk)
+                if len(body)>limit:return JSONResponse({'detail':'Upload is too large.'},status_code=413)
+            request._body=bytes(body)
+        else:body=b''
+        await run_in_threadpool(request_limits,request,bytes(body))
+    except HTTPException as error:
+        return JSONResponse({'detail':error.detail},status_code=error.status_code,headers=error.headers)
+    response=await call_next(request)
+    response.headers['X-Content-Type-Options']='nosniff'
+    response.headers['X-Frame-Options']='DENY'
+    response.headers['Referrer-Policy']='no-referrer'
+    if request.url.path.startswith(('/api/v1/admin','/api/v1/superadmin','/api/v1/auth','/api/v1/ai')):
+        response.headers['Cache-Control']='no-store'
+    return response
+
 @app.get("/api/v1/achievement")
 def get_achievement(preview: bool = False):
     result = repo.achievement_summary(preview)
@@ -232,7 +261,8 @@ def admin_login(body: AdminLogin):
     raise HTTPException(410, "Use the Admin workspace sign-in.")
 
 def _oauth_callback(provider: str, request: Request | None = None):
-    base=(str(request.base_url) if request else os.getenv("API_PUBLIC_URL","https://strategicplan-apiv1.vercel.app")).rstrip("/")
+    from .proxy_security import public_api_base
+    base=public_api_base(request) if request else os.getenv("API_PUBLIC_URL","https://strategicplan-apiv1.vercel.app").rstrip("/")
     return f"{base}/api/v1/auth/admin/oauth/{provider}/callback"
 
 def _form_post(url: str, values: dict):
@@ -326,9 +356,15 @@ def admin_sso_validate(body: SsoAdminValidation):
     raise HTTPException(410,"Use the verified OAuth sign-in flow.")
 
 @app.post("/api/v1/access-log", status_code=204)
-def access_log(body: AccessLog):
+def access_log(body: AccessLog,request:Request):
     try:
-        repo.log_dashboard_access(body.sessionId,body.userId,body.userName,body.userEmail,body.userType,body.region,body.country,body.pagePath,body.userAgent)
+        from .ai import audience
+        from uuid import UUID
+        from .proxy_security import checked_origin
+        checked_origin(request)
+        identity=audience(request)
+        # Ignore browser-asserted names, emails and roles. Keep only validated identity.
+        repo.log_dashboard_access(str(UUID(body.sessionId)),identity,None,None,'Admin' if identity else 'Public',None,None,(body.pagePath or '')[:300],request.headers.get('user-agent','')[:300])
     except Exception:
         # Access telemetry must never make the dashboard unavailable.
         return None

@@ -38,6 +38,7 @@ Generated from FastAPI; paths below include the `/api/v1` prefix. See [API docum
 | POST | `/api/v1/superadmin/initiatives/bulk` | Legacy token; writes gated | — | `SuperAdminBulkData` |
 | GET | `/api/v1/ai/status` | Public | — | `—` |
 | POST | `/api/v1/ai/ask` | Public; validated cookies permit private context | — | `AiQuestion` |
+| POST | `/api/v1/ai/ask-stream` | Public; validated cookies permit private context | — | `AiQuestion` |
 | GET | `/api/v1/validation` | Diagnostic; disabled by default | — | `—` |
 | GET | `/validation` | Diagnostic; disabled by default | — | `—` |
 | GET | `/api/v1/superadmin/session` | Super Admin cookie | — | `—` |
@@ -56,7 +57,7 @@ Generated from FastAPI; paths below include the `/api/v1` prefix. See [API docum
 | POST | `/api/v1/admin/workspace` | Admin cookie | — | `Save` |
 | POST | `/api/v1/admin/logout` | Admin cookie if present; clears cookie | — | `—` |
 
-Total: **51 registered operations**. Includes compatibility and diagnostic operations; this is not a claim that every operation is production enabled.
+Total: **52 registered operations**. Includes compatibility and diagnostic operations; this is not a claim that every operation is production enabled.
 
 ## Request schemas
 

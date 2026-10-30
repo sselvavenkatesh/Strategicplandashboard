@@ -3,7 +3,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {Link, useLocation, useSearchParams} from 'react-router-dom';
 import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, CheckCircle2, ChevronRight, ClipboardList, Eye, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Trash2, Users, X} from 'lucide-react';
 import {useTheme} from '../../../app/ThemeProvider';
-import {accessibleRows, assignedGoalRows, emptyAssignments, idColumn, loadDataset, text} from './model';
+import {accessibleRows, assignedGoalRows, emptyAssignments, idColumn, text} from './model';
 import type {Assignments, DataRow, Dataset, Kind} from './model';
 import {StakeholderSelect,StakeholderContext} from './StakeholderSelect';
 import {getSuperAdminWorkspace,saveSuperAdminWorkspace,type SuperAdminUser,type Workspace} from './superadminApi';
@@ -22,27 +22,22 @@ import './v25.css';
 
 type Section = 'home' | 'plan' | 'indicators' | 'initiatives' | 'users' | 'ai' | 'appearance';
 const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}, {id:'users',label:'User Management',icon:Users},{id:'ai',label:'AI Configuration',icon:ShieldCheck},{id:'appearance',label:'Appearance',icon:Settings2}] as const;
-const draftKey = 'strategic-v25-ui-draft-v1';
 type Draft = {assignments: Assignments; indicatorEdits: Record<string, DataRow>; initiativeEdits: Record<string, DataRow>; profile?: DataRow; goals?: DataRow[]; indicatorMasters?: DataRow[]; initiativeMasters?: DataRow[]; nextGoalNumber?: number};
 function newDraft(): Draft {return {assignments: emptyAssignments(), indicatorEdits: {}, initiativeEdits: {}}}
-function readDraft(): Draft {
-  try {const saved = JSON.parse(sessionStorage.getItem(draftKey) || 'null'); return saved?.assignments?.goals && saved?.assignments?.indicators && saved?.assignments?.initiatives ? {...newDraft(), ...saved} : newDraft()} catch {return newDraft()}
-}
-
-export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=false}:{authenticatedUser?:SuperAdminUser;onSignOut?:()=>void;signingOut?:boolean}) {
+export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=false}:{authenticatedUser:SuperAdminUser;onSignOut:()=>void;signingOut?:boolean}) {
   const location = useLocation();
   const superAdmin = location.pathname.replace(/\/$/, '').endsWith('/superadmin');
   const [params, setParams] = useSearchParams();
   const requested = params.get('section');
   const section: Section = menus.some(item => item.id === requested && (superAdmin || !['users','ai'].includes(item.id))) ? requested as Section : 'home';
-  const live=Boolean(authenticatedUser);
-  const [user] = useState(authenticatedUser?.id ?? '');
+  const live=true;
+  const [user] = useState(authenticatedUser.id);
   const [busy,setBusy]=useState(false);
   const [ssoSaving,setSsoSaving]=useState(false);
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
-  const [draft, setDraft] = useState<Draft>(()=>live?newDraft():readDraft());
+  const [draft, setDraft] = useState<Draft>(newDraft);
   const [notice, setNotice] = useState('');
   const [configurationError, setConfigurationError] = useState('');
   const [pendingDeleteGoal, setPendingDeleteGoal] = useState<DataRow | null>(null);
@@ -56,10 +51,9 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
   const currentUser=authenticatedUser ?? stakeholders.find(person=>person.id===user) ?? {id:'',name:'Admin',email:''};
   useEffect(() => {
     let current = true;
-    (live?(superAdmin?getSuperAdminWorkspace():getAdminWorkspace()):loadDataset()).then(data => {if (current) {setDataset(data); if(live)setDraft({...newDraft(),assignments:(data as Workspace).assignments});setError('')}}).catch(reason => {if (current) setError(reason instanceof Error ? reason.message : 'Unable to load district data.')});
+    (superAdmin?getSuperAdminWorkspace():getAdminWorkspace()).then(data => {if (current) {setDataset(data); if(live)setDraft({...newDraft(),assignments:(data as Workspace).assignments});setError('')}}).catch(reason => {if (current) setError(reason instanceof Error ? reason.message : 'Unable to load district data.')});
     return () => {current = false};
   }, [retry,live,superAdmin]);
-  useEffect(() => {if(live)return;try {sessionStorage.setItem(draftKey, JSON.stringify(draft))} catch {setNotice('Tab storage is unavailable. Your changes will last until you leave this page.')}}, [draft,live]);
   useEffect(() => {if (!notice) return; const timer = window.setTimeout(() => setNotice(''), 5000); return () => clearTimeout(timer)}, [notice]);
   const profile = draft.profile ?? dataset?.profile ?? {};
   const goals = draft.goals ?? dataset?.goals ?? [];

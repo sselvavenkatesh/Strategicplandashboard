@@ -3,15 +3,14 @@ import {FormEvent,useEffect,useRef,useState} from 'react';
 import {Link,NavLink,Outlet,useLocation,useNavigate} from 'react-router-dom';
 import {getGoals,getProfile} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
-import {supabase} from '../../lib/supabase';
 import {useTheme} from '../../app/ThemeProvider';
-import {apiGet,apiPost,fastApiEnabled} from '../../lib/api';
+import {apiGet,apiPost} from '../../lib/api';
 import {getAdminSession,loginAdmin,logoutAdmin} from '../../pages/admin/v25/adminApi';
 import {isAiEnabled} from '../../lib/ai';
 import {ProviderIcon} from '../SignInProviderIcon';
 import './publicNavigation.css';
 
-const liveAdmin=import.meta.env.VITE_V25_UI_PREVIEW==='true'&&fastApiEnabled;
+const liveAdmin=true;
 type AdminProfile={name:string;email:string;role?:string};
 
 export function AppShell(){
@@ -61,11 +60,7 @@ export function AppShell(){
     const key='strategic_access_session';
     let sessionId=sessionStorage.getItem(key);
     if(!sessionId){sessionId=crypto.randomUUID();sessionStorage.setItem(key,sessionId)}
-    if(liveAdmin)return;
-    const saved=sessionStorage.getItem('district360_admin');
-    let userName:string|undefined,userEmail:string|undefined;
-    if(saved){try{const x=JSON.parse(saved);userName=x?.name;userEmail=x?.email}catch{ /* Keep defaults if stored profile or sign-in settings are unavailable. */ }}
-    supabase.functions.invoke('log-dashboard-access',{body:{sessionId,userName,userEmail,userType:saved?'Admin':'Public',pagePath:initialPath.current}}).catch(()=>{});
+
   },[]);
 
   useEffect(()=>{
@@ -74,41 +69,25 @@ export function AppShell(){
     return()=>window.clearTimeout(timer);
   },[location.pathname]);
 
-  useEffect(()=>{let live=true;(async()=>{if(fastApiEnabled){try{const config=await apiGet<{signinMethod:'Userbased'|'Google'|'Microsoft';google:{configured:boolean};microsoft:{configured:boolean}}>('/api/v1/admin/signin-config');if(live){setSigninMethod(config.signinMethod);setProviders({google:config.google.configured,microsoft:config.microsoft.configured})}}catch{ /* Email/password remains available if provider settings cannot be loaded. */ };return}const{data}=await supabase.from('District_Profile').select('"Admin Signin Method"').limit(1).maybeSingle();if(live&&data?.['Admin Signin Method'])setSigninMethod(data['Admin Signin Method'])})();return()=>{live=false}},[signInOpen]);
-
+  useEffect(()=>{let live=true;apiGet<{signinMethod:'Userbased'|'Google'|'Microsoft';google:{configured:boolean};microsoft:{configured:boolean}}>('/api/v1/admin/signin-config').then(config=>{if(live){setSigninMethod(config.signinMethod);setProviders({google:config.google.configured,microsoft:config.microsoft.configured})}}).catch(()=>{});return()=>{live=false}},[signInOpen]);
   useEffect(()=>{
-    if(liveAdmin){const log=(user:AdminProfile|null)=>apiPost('/api/v1/access-log',{sessionId:sessionStorage.getItem('strategic_access_session'),userName:user?.name,userEmail:user?.email,userType:user?'Admin':'Public',pagePath:initialPath.current}).catch(()=>{});getAdminSession().then(user=>{setAdmin(user);void log(user)}).catch(()=>{setAdmin(null);void log(null)});return}
-    const saved=sessionStorage.getItem('district360_admin');
-    if(saved){try{setAdmin(JSON.parse(saved))}catch{sessionStorage.removeItem('district360_admin')}}
-    (async()=>{const{data:{session}}=await supabase.auth.getSession();const ssoEmail=session?.user?.email;if(!saved&&ssoEmail){const{data}=await supabase.rpc('validate_sso_admin',{p_email:ssoEmail});const row=Array.isArray(data)?data[0]:null;if(row){const profile={name:row.user_name||row.user_email,email:row.user_email};sessionStorage.setItem('district360_admin',JSON.stringify(profile));setAdmin(profile)}else{await supabase.auth.signOut();setAuthMessage('This SSO account is not authorized for Admin access.')}}})();
+    const log=()=>apiPost('/api/v1/access-log',{sessionId:sessionStorage.getItem('strategic_access_session'),pagePath:initialPath.current}).catch(()=>{});
+    getAdminSession().then(user=>setAdmin(user)).catch(()=>setAdmin(null)).finally(log);
+    // V2.4 browser profiles never establish V2.5 authorization.
+    sessionStorage.removeItem('district360_admin');
+    sessionStorage.removeItem('strategic_superadmin_token');
   },[]);
 
   async function submitSignIn(e:FormEvent){
     e.preventDefault();setAuthBusy(true);setAuthMessage('');
-    if(liveAdmin){try{const profile=await loginAdmin(email.trim(),password);setAdmin(profile);setPassword('');setSignInOpen(false);nav('/admin')}catch(reason){setAuthMessage(reason instanceof Error?reason.message:'Sign in failed.')}finally{setAuthBusy(false)}return}
-    const {data,error}=await supabase.rpc('validate_admin_login',{p_email:email.trim(),p_password:password});
-    const row=Array.isArray(data)?data[0]:null;
-    if(error||!row){
-      sessionStorage.removeItem('district360_admin');setAdmin(null);
-      setAuthMessage('Sign in failed. Please check your email and password.');
-      setAuthBusy(false);
-      setTimeout(()=>{setSignInOpen(false);setAuthMessage('');nav('/')},1400);
-      return;
-    }
-    const profile={name:row.user_name||row.user_email,email:row.user_email};
-    sessionStorage.setItem('district360_admin',JSON.stringify(profile));
-    setAdmin(profile);setPassword('');setSignInOpen(false);setAuthBusy(false);nav('/');
+    try{const profile=await loginAdmin(email.trim(),password);setAdmin(profile);setPassword('');setSignInOpen(false);nav('/admin')}catch(reason){setAuthMessage(reason instanceof Error?reason.message:'Sign in failed.')}finally{setAuthBusy(false)}
   }
-
   async function submitSso(provider:'google'|'azure'){
     setAuthBusy(true);setAuthMessage('');
-    if(liveAdmin){const base=new URL(import.meta.env.BASE_URL,window.location.origin);window.location.assign(new URL(`api/v1/auth/admin/oauth/${provider==='azure'?'microsoft':'google'}/start?return_to=${encodeURIComponent(new URL('admin',base).href)}`,base).href);return}
-    const options=provider==='azure'?{redirectTo:new URL(import.meta.env.BASE_URL,window.location.origin).href,scopes:'email openid profile',queryParams:{prompt:'select_account'}}:{redirectTo:new URL(import.meta.env.BASE_URL,window.location.origin).href,queryParams:{prompt:'select_account'}};
-    const{error}=await supabase.auth.signInWithOAuth({provider,options});
-    if(error){setAuthMessage('SSO sign in could not be started. Please contact your administrator.');setAuthBusy(false)}
+    const base=new URL(import.meta.env.BASE_URL,window.location.origin);
+    window.location.assign(new URL(`api/v1/auth/admin/oauth/${provider==='azure'?'microsoft':'google'}/start?return_to=${encodeURIComponent(new URL('admin',base).href)}`,base).href);
   }
-
-  async function signOut(){if(liveAdmin){setAuthBusy(true);try{await logoutAdmin();setAdmin(null);setPassword('');setEmail('');setOpen(false);nav('/')}catch(reason){setAuthMessage(reason instanceof Error?reason.message:'Sign out failed.')}finally{setAuthBusy(false)}return}sessionStorage.removeItem('district360_admin');setAdmin(null);supabase.auth.signOut();setOpen(false);nav('/')}
+  async function signOut(){setAuthBusy(true);try{await logoutAdmin();setAdmin(null);setPassword('');setEmail('');setOpen(false);nav('/')}catch(reason){setAuthMessage(reason instanceof Error?reason.message:'Sign out failed.')}finally{setAuthBusy(false)}}
 
   return <div className={'app-shell '+(admin?'hasAccount':'')}>
     {pageLoading&&<div className="pageLoader" role="status" aria-live="polite" aria-label="Loading page"><img className="k12LoaderLogo" src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/><div className="k12LoaderPulse"/><small>Loading strategic plan…</small></div>}

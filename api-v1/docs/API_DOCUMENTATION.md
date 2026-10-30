@@ -119,3 +119,16 @@ Errors normally use `{"detail":"message"}`; Pydantic validation can use a detail
 No application limiter exists for login, AI or telemetry. Upstream limits/WAF settings need separate verification. This is a single-district implementation, with fail-closed credential resolution for ambiguous district selection; schema-per-district authorization is not implemented.
 
 Regenerate inventory/OpenAPI: `python api-v1/scripts/export_api_docs.py` with API dependencies installed; no database connection required. Add typed response models and explicit authentication dependencies next. PostgreSQL portability does not automatically migrate Supabase Vault/auth contracts.
+
+
+## V2.5 Netlify release candidate — 30 October 2026
+
+React calls FastAPI exclusively. The Supabase browser SDK, direct REST/RPC calls, browser Auth path and Edge Function AI fallback have been removed. PostgreSQL/Vault remain on Supabase. Existing REST route contracts are retained.
+
+`POST /api/v1/ai/ask-stream` accepts the same question/sessionId body and returns the same final JSON as `/ai/ask`. Leading JSON whitespace heartbeats allow an authenticated Netlify Edge transport to deliver long AI responses without the ordinary external rewrite timeout. A failure after headers returns a JSON `detail` field; the React API client treats this as an error. This is transport streaming, not changes to model output or training. Session and feature validation occur before streaming. Only verified cookies enable private context.
+
+The Netlify Edge transport has no DB/provider key, business logic or user authorization. A dedicated server-only proxy key authenticates external-origin assertions. Unknown tokens/origins fail closed; arbitrary forwarded hosts are not trusted. Google callbacks use the verified external host plus `/strategic-plan/demo/api/v1/auth/admin/oauth/google/callback`.
+
+Shared PostgreSQL rate limits apply before login/provider initiation, AI and telemetry when ABUSE_CONTROLS_ENABLED=true. Limits: account 15 login attempts/15 minutes, client 120 login/provider starts/15 minutes, client AI 12/minute, district AI 120/hour, telemetry 120/minute. Up to four provider calls may execute concurrently; leases expire after 150 seconds and normally release after the bounded provider call. Limits use keyed hashes; names/emails are not stored in limit tables. Denials return 429 and Retry-After, protection failure returns 503. JSON request bytes are capped before validation. Audit telemetry derives identity from verified cookies, ignoring browser-asserted identity/role fields.
+
+Deployment requires server-only PROXY_SHARED_KEY in Vercel and STRATEGIC_PROXY_KEY in the two Netlify projects (Functions scope), with equal values. Never put either in VITE variables or Git. Production is not released merely by this documentation update; see the release readiness document.

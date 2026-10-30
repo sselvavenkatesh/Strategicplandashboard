@@ -1,7 +1,7 @@
 """Authenticated V2.5 workspace; reuse existing identity and write SQL contracts."""
 import json
 from uuid import UUID
-from urllib.parse import urlsplit
+from .proxy_security import checked_origin,public_api_base
 import psycopg
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, Field
@@ -16,11 +16,6 @@ def token_from(request: Request):
         raise HTTPException(401, 'Sign in with your Super Admin account.')
     try: return str(UUID(token))
     except ValueError: raise HTTPException(401, 'Invalid or expired Super Admin session.')
-
-def checked_origin(request: Request):
-    origin = request.headers.get('origin')
-    if origin and urlsplit(origin).netloc != request.url.netloc:
-        raise HTTPException(403, 'Cross-site changes are not allowed.')
 
 def db_error(error):
     if error.sqlstate == '28000': raise HTTPException(401, 'Invalid or expired Super Admin session.')
@@ -75,7 +70,7 @@ def sso_settings(request:Request,response:Response):
     try:
         if not repo.validate_superadmin_session(token_from(request)): raise HTTPException(401,'Invalid or expired Super Admin session.')
         config=repo.admin_auth_config() or {}
-        base=str(request.base_url).rstrip('/')
+        base=public_api_base(request)
         return {'googleConfigured':bool(config.get('google_configured')),'microsoftConfigured':bool(config.get('microsoft_configured')),'googleSecretSaved':bool(repo.oauth_secret('google')),'microsoftSecretSaved':bool(repo.oauth_secret('microsoft')),'googleCallback':base+'/api/v1/auth/admin/oauth/google/callback','microsoftCallback':base+'/api/v1/auth/admin/oauth/microsoft/callback'}
     except psycopg.Error as error: db_error(error)
 
