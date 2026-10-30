@@ -1,3 +1,4 @@
+import {AppearanceSettings} from './AppearanceSettings';
 import {useEffect, useMemo, useState} from 'react';
 import {Link, useLocation, useSearchParams} from 'react-router-dom';
 import {ArrowLeft, ArrowRight, BarChart3, Building2, Check, CheckCircle2, ChevronRight, ClipboardList, Eye, Goal, Home, Moon, RotateCcw, Settings2, ShieldCheck, Sun, Trash2, Users, X} from 'lucide-react';
@@ -19,8 +20,8 @@ import {DeleteGoalDialog} from './DeleteGoalDialog';
 import {goalDependencies, increaseGoalCount, validateGoalNames} from './goalConfiguration';
 import './v25.css';
 
-type Section = 'home' | 'plan' | 'indicators' | 'initiatives' | 'users' | 'ai';
-const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}, {id:'users',label:'User Management',icon:Users},{id:'ai',label:'AI Configuration',icon:ShieldCheck}] as const;
+type Section = 'home' | 'plan' | 'indicators' | 'initiatives' | 'users' | 'ai' | 'appearance';
+const menus = [{id: 'home', label: 'Overview', icon: Home}, {id: 'plan', label: 'Strategic Plan Configuration', icon: Settings2}, {id: 'indicators', label: 'Indicator Configuration', icon: BarChart3}, {id: 'initiatives', label: 'Initiative Configuration', icon: ClipboardList}, {id:'users',label:'User Management',icon:Users},{id:'ai',label:'AI Configuration',icon:ShieldCheck},{id:'appearance',label:'Appearance',icon:Settings2}] as const;
 const draftKey = 'strategic-v25-ui-draft-v1';
 type Draft = {assignments: Assignments; indicatorEdits: Record<string, DataRow>; initiativeEdits: Record<string, DataRow>; profile?: DataRow; goals?: DataRow[]; indicatorMasters?: DataRow[]; initiativeMasters?: DataRow[]; nextGoalNumber?: number};
 function newDraft(): Draft {return {assignments: emptyAssignments(), indicatorEdits: {}, initiativeEdits: {}}}
@@ -152,6 +153,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
       <div className="v25-content"><div className="v25-page-heading"><div><span className="v25-eyebrow">{superAdmin ? 'DISTRICT ADMINISTRATION' : 'YOUR WORKSPACE'}</span><h1>{section === 'home' ? superAdmin ? 'District overview' : `Welcome, ${currentUser.name.split(' ')[0]}` : sectionTitle}</h1></div><button className="v25-button" disabled={busy} onClick={()=>{if(window.confirm('Reload saved data and discard unsaved changes?')){setDraft(newDraft());setRetry(value=>value+1)}}}><RotateCcw size={15}/> Reload</button></div>
 
       {error ? <div className="v25-panel v25-error" role="alert"><h2>District data could not be loaded</h2><p>{error}</p><button className="v25-button" onClick={() => {setError(''); setRetry(value => value + 1)}}>Try again</button></div> : !dataset ? <div className="v25-panel v25-loading" role="status">Loading existing district data…</div> : <>
+      {section === 'appearance' && <AppearanceSettings readOnly={!superAdmin}/>}
       {section === 'home' && <>
         <section className="v25-district-card"><div className="v25-district-symbol">{profile['District Logo'] ? <img src={text(profile, 'District Logo')} alt="District logo"/> : <Building2 size={32}/>}</div><div><span className="v25-eyebrow">{text(profile, 'Strategic Plan Duration')}</span><h2>{text(profile, 'School District Name')}</h2><p>{text(profile, 'Strategic Plan Name')}</p></div><span className="v25-badge"><ShieldCheck size={14}/>{superAdmin ? 'District Super Admin' : 'District Admin'}</span></section>
         <div className="v25-stat-grid">{[{label: superAdmin ? 'Goals' : 'Assigned goals', value: superAdmin ? visibleGoals.length : assignedGoals.length, icon: Goal, section: 'plan' as Section}, {label: superAdmin ? 'Indicators' : 'Assigned indicators', value: superAdmin ? indicators.length : live ? (editableResources?.indicators ?? []).length : accessibleRows(indicators,'indicators',user,assignments).length, icon: BarChart3, section: 'indicators' as Section}, {label: superAdmin ? 'Initiatives' : 'Assigned initiatives', value: superAdmin ? initiatives.length : live ? (editableResources?.initiatives ?? []).length : accessibleRows(initiatives,'initiatives',user,assignments).length, icon: ClipboardList, section: 'initiatives' as Section}].map(stat => <button className="v25-stat" key={stat.label} onClick={() => stat.section === 'plan' ? setParams({section: 'plan', tab: 'goals'}) : navigateSection(stat.section)}><div><span>{stat.label}</span><stat.icon size={20}/></div><b>{stat.value}</b></button>)}</div>

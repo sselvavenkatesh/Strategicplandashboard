@@ -1,0 +1,5 @@
+export type Appearance={brand:string;goalColor:string;missionColor:string;visionColor:string;goals:'bottom'|'right'|'left';principles:'bottom'|'right'|'left';wallpaper:'existing'|'woodland'|'hills'};
+export const appearanceKey='strategic-appearance-preview-v1';
+export const defaultAppearance:Appearance={brand:'#1597ff',goalColor:'#70bdf3',missionColor:'#1597ff',visionColor:'#1597ff',goals:'bottom',principles:'right',wallpaper:'existing'};
+export const greenAppearance:Appearance={brand:'#55d6a0',goalColor:'#76dfb1',missionColor:'#8fe2ba',visionColor:'#b2e4cd',goals:'right',principles:'bottom',wallpaper:'woodland'};
+export function readAppearance():Appearance|null{try{const x=JSON.parse(localStorage.getItem(appearanceKey)||'null');if(!x)return null;const a={...defaultAppearance,...x};for(const key of ['brand','goalColor','missionColor','visionColor'] as const)if(!/^#[0-9a-f]{6}$/i.test(a[key]))return null;if(!['bottom','right','left'].includes(a.goals)||!['bottom','right','left'].includes(a.principles)||!['existing','woodland','hills'].includes(a.wallpaper))return null;return a}catch{return null}}
