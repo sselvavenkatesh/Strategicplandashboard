@@ -936,3 +936,6 @@ html[data-theme="light"] .indicatorModal .studentChart.clustered .studentBar.sho
 .signInProvider svg{width:18px;height:18px;flex:none}
 .signInProvider:disabled{opacity:.45;cursor:not-allowed}
 .signInProvider:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
+/* Keep AI prose aligned without changing the workspace layout. */
+.aiAnswerText{text-align:left;white-space:normal;font-size:12px;line-height:1.65}.aiAnswerText p{margin:0 0 11px;white-space:pre-line}.aiAnswerText p:last-child{margin-bottom:0}

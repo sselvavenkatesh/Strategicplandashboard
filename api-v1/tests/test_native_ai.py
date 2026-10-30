@@ -74,7 +74,7 @@ def test_provider_payload_reuses_model_settings_and_sends_key_only_as_header(mon
     request,timeout=captured[0];body=json.loads(request.data)
     assert request.full_url=='https://ollama.com/api/chat' and timeout==90
     assert body['model']=='gpt-oss:20b-cloud' and body['think']=='low' and body['stream'] is False
-    assert body['options']=={'temperature':0.1} and body['messages'][0]['content']==ai.SYSTEM_PROMPT
+    assert body['options']=={'temperature':0.1} and body['messages'][0]['content']==ai.SYSTEM_PROMPT+'\n\n'+ai.RESPONSE_GUIDANCE
     assert '\nUSER QUESTION:\n' in body['messages'][1]['content']
     assert 'unit-test-secret' not in request.data.decode() and request.get_header('Authorization')=='Bearer unit-test-secret'
 

@@ -7,6 +7,18 @@ AI_CONTEXT_QUERIES = [
     ('initiatives', '''select m."Initiative ID",m."Initiative Name",m."Initiative_Short_name",m."Goal ID" from public."Initiative_master" m join public."Goal_master" g on g."Goal ID"=m."Goal ID" where (%s or (m."Role"='All' and g."Role"='All')) order by m."Initiative ID"''', True),
     ('indicatorData', '''select d."Goal ID",d."Indicator ID",d."Indicator Name",d."School Year",d."Category",d."Student Group",d."Value 1",d."Value 2",d."Value 3",d."Target 1",d."Target 2",d."Target 3",d."School" from public."Indicator_Data" d join public."Indicator_master" m on m."Indicator ID"=d."Indicator ID" and m."Goal ID"=d."Goal ID" join public."Goal_master" g on g."Goal ID"=m."Goal ID" where (%s or (d."Role"='All' and m."Role"='All' and g."Role"='All')) order by d."Indicator ID",d."School Year",d."Category",d."Student Group" limit 300''', True),
     ('initiativeData', '''select d."Goal ID",d."Initiative ID",d."Initiative Name",d."Sub Initiative Name",d."Start Date",d."End Date",d."Action Item",d."Status",d."Target 1",d."Target 2",d."Target 3",d."School" from public."Initiative_Data" d join public."Initiative_master" m on m."Initiative ID"=d."Initiative ID" and m."Goal ID"=d."Goal ID" join public."Goal_master" g on g."Goal ID"=m."Goal ID" where (%s or (d."Role"='All' and m."Role"='All' and g."Role"='All')) order by d."Initiative ID",d."Sub Initiative Name",d."Action Item" limit 300''', True),
+    ('initiativeProgress', '''select m."Goal ID" as goal_id,m."Initiative ID" as initiative_id,
+      coalesce(nullif(m."Initiative_Short_name",''),m."Initiative Name") as name,
+      count(d."Initiative ID") as total,
+      count(*) filter(where d."Status"='Done') as completed,
+      count(*) filter(where d."Status"='In Progress') as in_progress,
+      count(*) filter(where d."Status" in ('Not Yet Started','Not Started')) as not_started,
+      count(*) filter(where d."Status"='On Hold') as on_hold
+      from public."Initiative_master" m join public."Goal_master" g on g."Goal ID"=m."Goal ID"
+      left join public."Initiative_Data" d on d."Initiative ID"=m."Initiative ID" and d."Goal ID"=m."Goal ID" and (%s or d."Role"='All')
+      where (%s or (m."Role"='All' and g."Role"='All'))
+      group by m."Goal ID",m."Initiative ID",m."Initiative_Short_name",m."Initiative Name"
+      order by m."Goal ID",m."Initiative ID"''', True),
 ]
 
 def ai_credentials():
@@ -20,13 +32,15 @@ def ai_context(include_private: bool = False):
         if cur.fetchone()['count'] != 1:
             raise ValueError('District routing is not configured')
         for name, sql, scoped in AI_CONTEXT_QUERIES:
-            cur.execute(sql, (include_private,) if scoped else ())
+            cur.execute(sql, ((include_private,)*2 if name=='initiativeProgress' else (include_private,)) if scoped else ())
             rows = cur.fetchall()
             result[name] = rows[0] if name == 'profile' and rows else None if name == 'profile' else rows
     # Public counts must not disclose excluded children of otherwise public Goals.
     for goal in result['goals']:
         goal['Total Indicators'] = sum(row['Goal ID'] == goal['Goal ID'] for row in result['indicators'])
         goal['Total Initiatives'] = sum(row['Goal ID'] == goal['Goal ID'] for row in result['initiatives'])
+    from .ai_progress import progress_summary
+    result['progressSummary']=progress_summary(result['goals'],result['initiativeProgress'])
     return result
 
 def log_ai_conversation(session_id, user_id, question, answer, in_scope, sources, ms):
