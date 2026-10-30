@@ -159,3 +159,15 @@
 .v25-table-tools{flex-wrap:wrap}
 
 .themeScope .v25-root.v25-auth-dark{--v-bg:#081523;--v-panel:#102235;--v-text:#e0eaf6;--v-muted:#9aacc2;--v-line:#2b3c52;--v-input:#15273c;--v-soft:#17283d;--v-blue:#71b5ff;--v-blue-soft:#1a3453;--v-shadow:none;color-scheme:dark;background:radial-gradient(ellipse at 50% 35%,#122c43 0%,#081523 70%);min-height:100dvh;padding-bottom:55px}
+
+/* Continue the sidebar through the version area; keep branding compact. */
+.v25-root .v25-workspace-footer{padding:0;min-height:32px;align-items:stretch}
+.v25-footer-version{display:flex;align-items:center;flex:0 0 220px;padding:8px 24px;background:#0a1c30;color:#9fb3c9}
+.v25-footer-brand{display:flex;align-items:center;gap:7px;margin-left:auto;padding:4px 24px}
+.v25-footer-brand img{width:82px;height:23px;object-fit:contain}
+.v25-footer-brand .v25-footer-logo-dark{display:none}
+.themeScope[data-theme=dark] .v25-footer-logo-light{display:none}
+.themeScope[data-theme=dark] .v25-footer-logo-dark{display:block}
+.appearanceSettings .v25-panel-footer{justify-content:flex-start}
+.appearanceSettings .v25-panel-footer>.appearanceNotice{margin:0;width:auto}
+@media(max-width:700px){.v25-footer-version{flex-basis:auto;padding:8px 14px;background:transparent;color:var(--v-muted)}.v25-footer-brand{padding:4px 14px}}

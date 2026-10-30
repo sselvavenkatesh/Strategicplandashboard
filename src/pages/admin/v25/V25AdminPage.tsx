@@ -187,7 +187,7 @@ export default function V25AdminPage({authenticatedUser,onSignOut,signingOut=fal
       </>}
       {superAdmin && section==='users' && <UserManagement onChanged={()=>{setRetry(value=>value+1);setNotice('Details are saved.')}}/>}
       {superAdmin && section==='ai' && <AiSettings/>}
-      <footer className="v25-footer"><span>Strategic Plan · V2.5</span><span>Powered by <b>K12Matrix</b></span></footer>
+      <footer className="v25-footer v25-workspace-footer"><span className="v25-footer-version">Strategic Plan · V2.5</span><span className="v25-footer-brand">Powered by <img className="v25-footer-logo-light" src={`${import.meta.env.BASE_URL}k12matrix-logo-light.svg`} alt="K12Matrix"/><img className="v25-footer-logo-dark" src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/></span></footer>
       </div>
     </main></div>
     {masterEditing && superAdmin && <MasterEditor kind={masterEditing.kind} row={masterEditing.row} isNew={masterEditing.isNew} goals={goals} records={masterEditing.kind === 'indicators' ? allIndicators : allInitiatives} onClose={() => setMasterEditing(null)} onSave={saveMaster}/>}
