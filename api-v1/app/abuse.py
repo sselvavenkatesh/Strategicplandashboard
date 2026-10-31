@@ -9,7 +9,7 @@ from . import repository as repo
 def limited(scope,subject,maximum,seconds):
     settings=get_settings()
     digest=hmac.new(settings.proxy_shared_key.encode(),subject.encode(),hashlib.sha256).hexdigest()
-    try:allowed=repo.fetch_one('select public.v25_take_api_limit(%s,%s,%s,%s) as allowed',(scope,digest,maximum,seconds))['allowed']
+    try:allowed=repo.fetch_one('select v25_take_api_limit(%s,%s,%s,%s) as allowed',(scope,digest,maximum,seconds))['allowed']
     except Exception:raise HTTPException(503,'Request protection is temporarily unavailable.')
     if not allowed:raise HTTPException(429,'Too many requests. Please try again shortly.',headers={'Retry-After':str(seconds)})
 
@@ -36,12 +36,12 @@ def request_limits(request:Request,body:bytes):
 
 def acquire_ai_lease():
     if not get_settings().abuse_controls_enabled:return None
-    try:lease=repo.fetch_one('select public.v25_acquire_ai_lease() as id')['id']
+    try:lease=repo.fetch_one('select v25_acquire_ai_lease() as id')['id']
     except Exception:raise HTTPException(503,'AI request protection is temporarily unavailable.')
     if not lease:raise HTTPException(429,'AI is busy. Please try again shortly.',headers={'Retry-After':'15'})
     return lease
 
 def release_ai_lease(lease):
     if lease:
-        try:repo.fetch_one('select public.v25_release_ai_lease(%s::uuid)',(str(lease),))
+        try:repo.fetch_one('select v25_release_ai_lease(%s::uuid)',(str(lease),))
         except Exception:pass # bounded lease expires even after an instance failure

@@ -24,6 +24,7 @@ def connection():
         row_factory=dict_row,
         connect_timeout=10,
         prepare_threshold=None,
+        options=f"-c search_path=pg_catalog,{get_settings().district_schema},extensions",
     ) as conn:
         global _role_logged
         if not _role_logged:

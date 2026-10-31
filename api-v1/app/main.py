@@ -20,7 +20,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
-    allow_origin_regex=r"https://(?:(?:deploy-preview-[0-9]+--)?k12matrix-strategicplan\.netlify\.app|k12matrix-strategicplan(?:-[a-zA-Z0-9-]+)?\.vercel\.app)",
+    allow_origin_regex=None if settings.public_app_origin else r"https://(?:(?:deploy-preview-[0-9]+--)?k12matrix-strategicplan\.netlify\.app|k12matrix-strategicplan(?:-[a-zA-Z0-9-]+)?\.vercel\.app)",
     allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
@@ -332,7 +332,7 @@ def admin_oauth_callback(provider: str, request: Request, code: str | None = Non
         admin=repo.validate_sso_admin(email,provider)
         if not admin: return failed('not_authorized')
         token=repo.create_admin_session(admin.get("user_id"))
-        identity=repo.fetch_one('select public.v25_admin_identity(%s::uuid) as data',(token,))
+        identity=repo.fetch_one('select v25_admin_identity(%s::uuid) as data',(token,))
         if not identity or not identity['data']:
             repo.revoke_admin_session(token)
             return failed('not_authorized')

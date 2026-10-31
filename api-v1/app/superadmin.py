@@ -37,7 +37,7 @@ def session(request: Request, response: Response):
 @router.get('/workspace')
 def workspace(request: Request, response: Response):
     response.headers['Cache-Control']='no-store'
-    try: return repo.fetch_one('select public.v25_superadmin_snapshot(%s::uuid) as data',(token_from(request),))['data']
+    try: return repo.fetch_one('select v25_superadmin_snapshot(%s::uuid) as data',(token_from(request),))['data']
     except psycopg.Error as error: db_error(error)
 
 class SaveWorkspace(BaseModel):
@@ -47,7 +47,7 @@ class SaveWorkspace(BaseModel):
 @router.get('/users')
 def users(request:Request,response:Response):
     response.headers['Cache-Control']='no-store'
-    try: return repo.fetch_one('select public.v25_superadmin_users(%s::uuid) as data',(token_from(request),))['data']
+    try: return repo.fetch_one('select v25_superadmin_users(%s::uuid) as data',(token_from(request),))['data']
     except psycopg.Error as error: db_error(error)
 
 class SaveUser(BaseModel):
@@ -61,7 +61,7 @@ def save_user(body:SaveUser,request:Request,response:Response):
     payload=json.dumps(body.user)
     if len(payload.encode())>5000: raise HTTPException(413,'User details are too large.')
     response.headers['Cache-Control']='no-store'
-    try: return repo.fetch_one('select public.v25_superadmin_save_user(%s::uuid,%s,%s::jsonb) as data',(token,body.revision,payload))['data']
+    try: return repo.fetch_one('select v25_superadmin_save_user(%s::uuid,%s,%s::jsonb) as data',(token,body.revision,payload))['data']
     except psycopg.Error as error: db_error(error)
 
 @router.get('/sso-settings')
@@ -81,7 +81,7 @@ class SsoSecrets(BaseModel):
 @router.get('/ai-settings')
 def ai_settings(request:Request,response:Response):
     response.headers['Cache-Control']='no-store'
-    try:return repo.fetch_one('select public.v25_superadmin_ai_settings(%s::uuid) as data',(token_from(request),))['data']
+    try:return repo.fetch_one('select v25_superadmin_ai_settings(%s::uuid) as data',(token_from(request),))['data']
     except psycopg.Error as error:db_error(error)
 
 class AiSettings(BaseModel):
@@ -93,7 +93,7 @@ class AiSettings(BaseModel):
 def save_ai_settings(body:AiSettings,request:Request,response:Response):
     token=token_from(request);checked_origin(request)
     response.headers['Cache-Control']='no-store'
-    try:return repo.fetch_one('select public.v25_superadmin_save_ai_settings(%s::uuid,%s,%s) as data',(token,body.model,body.apiKey))['data']
+    try:return repo.fetch_one('select v25_superadmin_save_ai_settings(%s::uuid,%s,%s) as data',(token,body.model,body.apiKey))['data']
     except psycopg.Error as error:db_error(error)
 
 @router.post('/sso-settings')
@@ -113,7 +113,7 @@ def save_workspace(body: SaveWorkspace, request: Request, response: Response):
         raise HTTPException(422,'Unknown save action.')
     payload=json.dumps(body.change)
     if len(payload.encode())>3_000_000: raise HTTPException(413,'Save payload is too large.')
-    try: return repo.fetch_one('select public.v25_superadmin_save(%s::uuid,%s,%s::jsonb) as data',(token,body.revision,payload))['data']
+    try: return repo.fetch_one('select v25_superadmin_save(%s::uuid,%s,%s::jsonb) as data',(token,body.revision,payload))['data']
     except psycopg.Error as error: db_error(error)
 
 @router.post('/logout',status_code=204)
@@ -121,7 +121,7 @@ def logout(request: Request, response: Response):
     checked_origin(request)
     token=request.cookies.get(COOKIE)
     if token:
-        try: repo.fetch_one('select public.v25_superadmin_logout(%s::uuid)',(str(UUID(token)),))
+        try: repo.fetch_one('select v25_superadmin_logout(%s::uuid)',(str(UUID(token)),))
         except ValueError: pass
         except psycopg.Error as error: db_error(error)
     response.delete_cookie(COOKIE,path='/',secure=True,httponly=True,samesite='strict')

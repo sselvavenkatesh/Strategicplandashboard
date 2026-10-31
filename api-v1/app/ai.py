@@ -49,7 +49,7 @@ def audience(request: Request):
             if user:
                 return str(user["user_id"])
         else:
-            result = repo.fetch_one("select public.v25_admin_identity(%s::uuid) as data", (token,))
+            result = repo.fetch_one("select v25_admin_identity(%s::uuid) as data", (token,))
             if result and result["data"]:
                 return str(result["data"]["id"])
     if supplied:

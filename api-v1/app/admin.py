@@ -48,7 +48,7 @@ def login(body:Login,request:Request,response:Response):
 @router.get('/session')
 def session(request:Request,response:Response):
     response.headers['Cache-Control']='no-store'
-    try: result=repo.fetch_one('select public.v25_admin_identity(%s::uuid) as data',(token_from(request),))
+    try: result=repo.fetch_one('select v25_admin_identity(%s::uuid) as data',(token_from(request),))
     except psycopg.Error as error: db_error(error)
     if not result or not result['data']: raise HTTPException(401,'Invalid or expired Admin session.')
     return result['data']
@@ -56,7 +56,7 @@ def session(request:Request,response:Response):
 @router.get('/workspace')
 def workspace(request:Request,response:Response):
     response.headers['Cache-Control']='no-store'
-    try: return repo.fetch_one('select public.v25_admin_snapshot(%s::uuid) as data',(token_from(request),))['data']
+    try: return repo.fetch_one('select v25_admin_snapshot(%s::uuid) as data',(token_from(request),))['data']
     except psycopg.Error as error: db_error(error)
 
 class Save(BaseModel):
@@ -72,7 +72,7 @@ def save(body:Save,request:Request,response:Response):
     payload=json.dumps(body.rows)
     if len(payload.encode())>3_000_000: raise HTTPException(413,'Upload is too large.')
     response.headers['Cache-Control']='no-store'
-    try: return repo.fetch_one('select public.v25_admin_save(%s::uuid,%s,%s,%s::jsonb) as data',(token,body.revision,body.kind,payload))['data']
+    try: return repo.fetch_one('select v25_admin_save(%s::uuid,%s,%s,%s::jsonb) as data',(token,body.revision,body.kind,payload))['data']
     except psycopg.Error as error: db_error(error,body.kind)
 
 @router.post('/logout',status_code=204)

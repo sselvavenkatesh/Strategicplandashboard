@@ -14,16 +14,18 @@ def proxy_origin(request:Request):
     if not configured or not hmac.compare_digest(supplied,configured):
         raise HTTPException(403,'Untrusted application proxy.')
     origin=request.headers.get('x-strategic-public-origin','')
-    if origin not in _ORIGINS and not re.fullmatch(r'https://(?:deploy-preview-\d+|[a-z0-9-]+)--(?:k12matrix|k12matrix-strategicplan)\.netlify\.app',origin):
+    district_origin=get_settings().public_app_origin
+    valid=(origin==district_origin) if district_origin else (origin in _ORIGINS or bool(re.fullmatch(r'https://(?:deploy-preview-\d+|[a-z0-9-]+)--(?:k12matrix|k12matrix-strategicplan)\.netlify\.app',origin)))
+    if not valid:
         raise HTTPException(403,'Untrusted application origin.')
     return origin
 
 def public_origin(request:Request):
-    return proxy_origin(request) or str(request.base_url).rstrip('/')
+    return proxy_origin(request) or get_settings().public_app_origin or str(request.base_url).rstrip('/')
 
 def public_api_base(request:Request):
     origin=public_origin(request)
-    return origin+('/strategic-plan/demo' if proxy_origin(request) else '')
+    return origin+(get_settings().public_app_base_path.rstrip('/') if proxy_origin(request) else '')
 
 def checked_origin(request:Request):
     origin=request.headers.get('origin')
