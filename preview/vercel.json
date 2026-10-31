@@ -1,0 +1,40 @@
+{
+  "rewrites": [
+    {
+      "source": "/strategic-plan/demo/api/v1/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/v1/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/strategic-plan-demo",
+      "destination": "/strategic-plan-demo.html"
+    },
+    {
+      "source": "/strategic-plan/demo",
+      "destination": "/strategic-plan/demo/index.html"
+    },
+    {
+      "source": "/strategic-plan/demo/(.*)",
+      "destination": "/strategic-plan/demo/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "app/**"
+    }
+  },
+  "regions": [
+    "hnd1"
+  ],
+  "framework": "vite",
+  "buildCommand": "cd .. && VITE_FASTAPI_ENABLED=true VITE_FASTAPI_REPORTING=true VITE_ACHIEVEMENT_PREVIEW=true VITE_V25_UI_PREVIEW=true VITE_FASTAPI_V25=false npm run build && cp -R dist preview/dist && cp -R api-v1/app preview/app",
+  "installCommand": "cd .. && npm ci",
+  "outputDirectory": "dist"
+}

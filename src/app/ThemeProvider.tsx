@@ -5,16 +5,16 @@ type ThemeContextValue = { theme: Theme; toggleTheme: () => void }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('district360-theme') as Theme) || 'dark')
+export function ThemeProvider({ children,defaultTheme='dark',storageKey='district360-theme',scoped=false }: { children: ReactNode; defaultTheme?:Theme; storageKey?:string; scoped?:boolean }) {
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(storageKey) as Theme) || defaultTheme)
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    localStorage.setItem('district360-theme', theme)
-  }, [theme])
+    if(!scoped) document.documentElement.dataset.theme = theme
+    localStorage.setItem(storageKey, theme)
+  }, [theme,storageKey,scoped])
 
   const value = useMemo(() => ({ theme, toggleTheme: () => setTheme(t => t === 'dark' ? 'light' : 'dark') }), [theme])
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  return <ThemeContext.Provider value={value}>{scoped?<div className="themeScope" data-theme={theme}>{children}</div>:children}</ThemeContext.Provider>
 }
 
 export function useTheme() {

@@ -9,3 +9,10 @@ dist/
 .vscode/
 .idea/
 coverage/
+
+__pycache__/
+.pytest_cache/
+.venv/
+
+preview/app/
+preview/dist/

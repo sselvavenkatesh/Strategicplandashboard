@@ -16,7 +16,7 @@ const popularQuestions=[
   'What are the most important takeaways from our strategic plan data?'
 ];
 
-function cleanAiText(text:string){return text.replace(/[*#`|]+/g,'').replace(/^\s*[-_=]{3,}\s*$/gm,'').replace(/^\s*[-•]+\s*/gm,'').replace(/\n{3,}/g,'\n\n').trim()}
+function cleanAiText(text:string,question:string){const lines=text.trim().split('\n');while(lines.length&&lines[0].trim().toLowerCase()===question.trim().toLowerCase())lines.shift();return lines.map(line=>line.trim()).join('\n').replace(/[*#`|]+/g,'').replace(/^\s*[-_=]{3,}\s*$/gm,'').replace(/^\s*[-•]+\s*/gm,'').replace(/\n{3,}/g,'\n\n').trim()}
 
 export function AiAssistantPage(){
   const sessionId=useMemo(()=>crypto.randomUUID(),[]);
@@ -28,7 +28,7 @@ export function AiAssistantPage(){
   async function ask(question:string){
     const q=question.trim();if(!q||busy)return;
     setMessages(m=>[...m,{role:'user',text:q}]);setInput('');setBusy(true);
-    try{const r:AiAnswer=await askDistrictAi(q,sessionId);setMessages(m=>[...m,{role:'assistant',text:cleanAiText(r.answer),sources:r.sources}])}
+    try{const r:AiAnswer=await askDistrictAi(q,sessionId);setMessages(m=>[...m,{role:'assistant',text:cleanAiText(r.answer,q),sources:r.sources}])}
     catch{setMessages(m=>[...m,{role:'assistant',text:'I’m unable to review the district data right now. Please try again shortly.'}])}
     finally{setBusy(false)}
   }
@@ -42,7 +42,7 @@ export function AiAssistantPage(){
       <aside className="aiPopular"><div className="aiPopularTitle"><Sparkles size={13}/><b>Popular Questions</b></div><p>Choose a question to get started.</p>{popularQuestions.map((q,i)=><button key={i} type="button" disabled={busy} onClick={()=>ask(q)}><span>{i+1}</span>{q}</button>)}</aside>
       <section className="aiConversation">
         <div className="aiChat" aria-live="polite">
-          {messages.map((m,i)=><article key={i} className={'aiMessage '+m.role}><div className="aiBubble">{m.text}{m.sources&&m.sources.length>0&&<div className="aiSources"><b>District data reviewed</b>{m.sources.map(s=><span key={s}>{s.replaceAll('_',' ')}</span>)}</div>}{m.role==='assistant'&&i>0&&<div className="aiActions"><button onClick={()=>copy(m.text,i)} title="Copy answer">{copied===i?<><Check size={14}/> Copied</>:<><Copy size={14}/> Copy</>}</button><button onClick={()=>download(m.text)} title="Download answer"><Download size={14}/> Download</button></div>}</div></article>)}
+          {messages.map((m,i)=><article key={i} className={'aiMessage '+m.role}><div className="aiBubble">{m.role==='assistant'?<div className="aiAnswerText">{m.text.split(/\n\s*\n/).map((paragraph,index)=><p key={index}>{paragraph}</p>)}</div>:m.text}{m.sources&&m.sources.length>0&&<div className="aiSources"><b>District data reviewed</b>{m.sources.map(s=><span key={s}>{s.replaceAll('_',' ')}</span>)}</div>}{m.role==='assistant'&&i>0&&<div className="aiActions"><button onClick={()=>copy(m.text,i)} title="Copy answer">{copied===i?<><Check size={14}/> Copied</>:<><Copy size={14}/> Copy</>}</button><button onClick={()=>download(m.text)} title="Download answer"><Download size={14}/> Download</button></div>}</div></article>)}
           {busy&&<article className="aiMessage assistant"><div className="aiBubble aiThinking"><span className="aiLoader" aria-hidden="true"/><span><b>K12 AI is reviewing district data…</b><small>Checking the strategic plan, indicators and initiatives.</small></span></div></article>}
         </div>
         <form className="aiComposer" onSubmit={submit}><textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="Ask K12 AI about the district strategic plan…" rows={1} maxLength={1200} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();e.currentTarget.form?.requestSubmit()}}}/><button type="submit" disabled={busy||!input.trim()} aria-label="Send question"><Send size={16}/></button><small>Answers use approved district data only.</small></form>

@@ -1,12 +1,19 @@
+import {formatIndicatorVariance} from '../../lib/indicatorFormatting';
 import {useEffect,useState} from 'react';
+import {FolderOpen,X} from 'lucide-react';
 import {useNavigate,useParams} from 'react-router-dom';
-import {getGoals,getIndicators,getInitiatives,getIndicatorHistory,getStudentGroups,Goal,Indicator,Initiative} from '../../lib/dashboard';
+import {getGoals,getIndicators,getInitiatives,getGoalInitiativeProgress,getIndicatorHistory,getStudentGroups,Goal,Indicator,Initiative} from '../../lib/dashboard';
 import {useDashboard} from '../../hooks/useDashboard';
 import {AchievementProgress} from '../../components/AchievementProgress';
+import {StudentGroupChart} from '../../components/StudentGroupChart';
 import {getAchievementSummary,getIndicatorTarget,numericTarget} from '../../lib/achievement';
 
 type HistoryMap=Record<string,any[]>;
 type AvgMap=Record<string,string>;
+
+function initiativeProgressColor(completion:number){
+  return completion>=100?'var(--green)':`hsl(${Math.round(completion*1.2)} 72% 48%)`;
+}
 
 function InitiativeBars({i}:{i:Initiative}){
   return <div className="subChart">
@@ -55,45 +62,6 @@ function InitiativeTimeline({initiative}:{initiative:Initiative}){
   </section>
 }
 
-function indicatorYAxisLabel(k:Indicator){
-  const type=(k.type||'').trim().toLowerCase();
-  if(type==='percent'||k.isPercent)return 'Percent of students proficient';
-  if(type==='number'&&k.shortName.toLowerCase().includes('sat'))return 'SAT score';
-  if(type==='currency'||k.shortName.toLowerCase().includes('fund balance'))return 'Fund balance';
-  if(type==='number')return 'Indicator value';
-  return k.type?String(k.type):'Indicator value';
-}
-
-function chartScale(indicator:Indicator,groups:any[]){
-  const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);
-  const avg=groups.find((r:any)=>r.statewide_value_3_numeric!=null);
-  const values=[...rows.map((r:any)=>Number(r.value_3_numeric)),Number(avg?.statewide_value_3_numeric)].filter(Number.isFinite) as number[];
-  const dataMax=Math.max(0,...values);
-  if(indicator.isPercent){
-    const max=Math.min(100,Math.max(25,Math.ceil(dataMax/25)*25));
-    const step=max<=50?10:25;
-    const ticks=Array.from({length:Math.floor(max/step)+1},(_,i)=>i*step);
-    if(ticks[ticks.length-1]!==max)ticks.push(max);
-    return{max,ticks,format:(n:number)=>n.toFixed(0)+'%'};
-  }
-  const rough=Math.max(1,dataMax/4);
-  const power=Math.pow(10,Math.floor(Math.log10(rough)));
-  const normalized=rough/power;
-  const nice=normalized<=1?1:normalized<=2?2:normalized<=5?5:10;
-  const step=nice*power;
-  const max=Math.max(step,Math.ceil(dataMax/step)*step);
-  const ticks=Array.from({length:Math.round(max/step)+1},(_,i)=>i*step);
-  const fund=indicator.shortName.toLowerCase().includes('fund balance')||indicator.name.toLowerCase().includes('fund balance');
-  const format=(n:number)=>{
-    if(!fund)return n.toLocaleString(undefined,{maximumFractionDigits:1});
-    const currency=String.fromCharCode(36);
-    if(Math.abs(n)>=1000000)return currency+(n/1000000).toFixed(n%1000000===0?0:1)+'M';
-    if(Math.abs(n)>=1000)return currency+(n/1000).toFixed(0)+'K';
-    return currency+n.toFixed(0);
-  };
-  return{max,ticks,format};
-}
-
 function formatIndicatorValue(k:Indicator){
   if(k.numeric==null)return k.value;
   if(k.isPercent)return k.numeric.toFixed(1)+'%';
@@ -111,10 +79,13 @@ function formatStatewide(raw:string|undefined){
 export function GoalPage(){
   const{goalId:id}=useParams(),nav=useNavigate(),goals=useDashboard(getGoals);
   const achievement=useDashboard(getAchievementSummary);
+  const initiativeProgress=useDashboard(()=>id?getGoalInitiativeProgress(id):Promise.reject(new Error('Goal unavailable')),[id]);
+  const progressReady=!initiativeProgress.loading&&!initiativeProgress.error&&initiativeProgress.data?.goal_id===id;
+  const progressPercent=progressReady?Number(initiativeProgress.data?.done_percent??0):0;
   const goalAchievement=achievement.data?.goals.find(g=>g.goalId===id);
   const[goal,setGoal]=useState<Goal|null>(null),[initiatives,setInitiatives]=useState<Initiative[]>([]),[indicators,setIndicators]=useState<Indicator[]>([]);
   const[histories,setHistories]=useState<HistoryMap>({}),[stateAvgs,setStateAvgs]=useState<AvgMap>({});
-  const[initiative,setInitiative]=useState<Initiative|null>(null),[indicator,setIndicator]=useState<Indicator|null>(null),[history,setHistory]=useState<any[]>([]),[groups,setGroups]=useState<any[]>([]),[selectedYear,setSelectedYear]=useState(''),[indicatorLoading,setIndicatorLoading]=useState(false),[error,setError]=useState('');
+  const[initiative,setInitiative]=useState<Initiative|null>(null),[indicator,setIndicator]=useState<Indicator|null>(null),[history,setHistory]=useState<any[]>([]),[selectedYear,setSelectedYear]=useState(''),[error,setError]=useState('');
 
   const popupYear=selectedYear||indicator?.year||'';
   const popupTarget=useDashboard(async()=>({id:indicator?.id,year:popupYear,value:await getIndicatorTarget(indicator?.id,popupYear)}),[indicator?.id,popupYear]);
@@ -147,13 +118,10 @@ export function GoalPage(){
 
   useEffect(()=>{
     if(!indicator)return;
-    getIndicatorHistory(indicator.id).then(rows=>{setHistory(rows);setSelectedYear(indicator.year)});
-    setIndicatorLoading(true);getStudentGroups(indicator.id,indicator.year).then(setGroups).finally(()=>setIndicatorLoading(false));
+    let live=true;setHistory([]);setSelectedYear(indicator.year);
+    getIndicatorHistory(indicator.id).then(rows=>{if(live)setHistory(rows)}).catch(()=>{if(live)setHistory([])});
+    return()=>{live=false};
   },[indicator]);
-
-  useEffect(()=>{
-    if(indicator&&selectedYear&&selectedYear!==indicator.year){setIndicatorLoading(true);getStudentGroups(indicator.id,selectedYear).then(setGroups).finally(()=>setIndicatorLoading(false))}
-  },[selectedYear]);
 
   useEffect(()=>{
     const esc=(e:KeyboardEvent)=>{if(e.key==='Escape'){setInitiative(null);setIndicator(null)}};
@@ -174,13 +142,20 @@ export function GoalPage(){
     </nav>
 
     <header className="goalHero">
-      <div className="goalHeroCopy"><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
-      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}>Key Resources</button><span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></div>
+      <div className="goalHeroCopy"><small>GOAL {goalIndex+1}</small><h2>{goal.name}<span className="goalHeroIcon" aria-hidden="true">{goalIcon}</span></h2><p>{goal.description}</p></div>
+      <div className="goalHeroActions"><AchievementProgress label={`Goal ${goalIndex+1} Achievement`} score={goalAchievement??null} indicators={goalAchievement?.indicators??[]} loading={achievement.loading} error={achievement.error}/><button className="keyResourcesBtn" type="button" disabled={!keyResourcesUrl} title={keyResourcesUrl?'Open strategic plan resources':'Key Resources link is not configured yet'} onClick={()=>keyResourcesUrl&&window.open(keyResourcesUrl,'_blank','noopener,noreferrer')}><FolderOpen size={16} aria-hidden="true"/><span>Key Resources</span></button></div>
     </header>
 
-    <div className="goalSectionTitle">
+    <div className="goalSectionTitle initiativeSectionTitle">
       <div><small>PROGRESS TOWARD THE GOAL</small><h3>Key Initiatives</h3></div>
-      <span>Click an initiative to view details</span>
+      <div className="goalInitiativeActions">
+        <div className="goalInitiativeProgress" role="group" aria-label="Goal initiative progress" title="Completed action items divided by total action items across this goal's public initiatives">
+          <div className="goalInitiativeProgressLabel"><span>Initiative Progress</span><b>{initiativeProgress.loading?'…':progressReady?progressPercent.toFixed(0)+'%':'—'}</b></div>
+          <div className="goalInitiativeProgressTrack" role="progressbar" aria-label="Initiative completion" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressReady?progressPercent:undefined}><i style={{width:progressPercent+'%',background:initiativeProgressColor(progressPercent)}}/></div>
+          <small>{initiativeProgress.loading?'Loading…':!progressReady?'Progress unavailable':initiativeProgress.data?.total_action_items?`${initiativeProgress.data.done_count} of ${initiativeProgress.data.total_action_items} action items completed`:'No action items'}</small>
+        </div>
+        <span>Click an initiative to view details</span>
+      </div>
     </div>
 
     <section className="initiativeGrid">
@@ -194,7 +169,7 @@ export function GoalPage(){
             <span className="duration">Duration: {i.start||'—'} — {i.end||'—'}</span>
             <div className="donePct"><b>{i.completion.toFixed(0)}%</b> Done</div>
           </div>
-          <div className="gauge" style={{'--pct':i.completion+'%','--progress-color':(i.completion>=100?'var(--green)':`hsl(${Math.round(i.completion*1.2)} 72% 48%)`)} as React.CSSProperties} tabIndex={0} aria-label={`${i.shortName} progress: ${i.completion.toFixed(0)}% completed`}>
+          <div className="gauge" style={{'--pct':i.completion+'%','--progress-color':initiativeProgressColor(i.completion)} as React.CSSProperties} tabIndex={0} aria-label={`${i.shortName} progress: ${i.completion.toFixed(0)}% completed`}>
             <b>{i.completion.toFixed(0)}%</b>
             <div className="initiativeProgressTooltip" role="tooltip">
               <div><span>Initiative Name</span><em>—</em><b>{i.shortName}</b></div>
@@ -212,7 +187,7 @@ export function GoalPage(){
 
     <div className="goalSectionTitle indicatorTitle">
       <div><small>MEASURING OUTCOMES</small><h3>Key Indicators</h3></div>
-      <span>Latest year performance &amp; trend</span>
+      <span>Click an indicator to view details</span>
     </div>
 
     <section className="indicatorGrid">
@@ -229,8 +204,8 @@ export function GoalPage(){
             <div className="indicatorValueWrap">
               <span className="indicatorValue">{formatIndicatorValue(k)}</span>
               {k.variance!=null&&<span className="varianceLine">
-                <span className={'variance '+(favorable?'positive':'negative')} title={`Current year minus last year: ${k.variance.toFixed(1)}${k.isPercent?'%':''}`}>
-                  <span className="trend">{k.variance>=0?'↗':'↘'}</span>{k.variance.toFixed(1)}{k.isPercent?'%':''}
+                <span className={'variance '+(favorable?'positive':'negative')} title={`Current year minus last year: ${formatIndicatorVariance(k)}`}>
+                  <span className="trend">{k.variance>=0?'↗':'↘'}</span>{formatIndicatorVariance(k)}
                 </span>
                 <span className="varianceLabel">LY Var</span>
               </span>}
@@ -249,16 +224,16 @@ export function GoalPage(){
 
     {initiative&&<div className="initiativeModal open" role="dialog" aria-modal="true" aria-label={initiative.shortName} onClick={()=>setInitiative(null)}>
       <div className="modalShell" onClick={e=>e.stopPropagation()}>
-        <button className="modalClose" onClick={()=>setInitiative(null)} aria-label="Close">×</button>
+        <button className="modalClose" type="button" onClick={()=>setInitiative(null)} aria-label="Close initiative details" title="Close"><X size={18} strokeWidth={1.8} aria-hidden="true"/></button>
         <div className="modalGoal">
           <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
         </div>
-        <div className="modalInitiativeHead"><span className="statusDot"/><div><small>INITIATIVE</small><h3>{initiative.shortName} - {initiative.name}</h3></div></div>
+        <div className="modalInitiativeHead"><span className="statusDot" style={{background:initiativeProgressColor(initiative.completion)}} aria-hidden="true"/><div><small>INITIATIVE</small><h3>{initiative.shortName} - {initiative.name}</h3></div></div>
         <InitiativeTimeline initiative={initiative}/>
         <section className="overallPanel">
           <div><small>INITIATIVE OVERALL PROGRESS</small><div className="overallDone"><b>{initiative.completion.toFixed(0)}%</b><span>Done</span></div></div>
-          <div className="modalGauge" style={{'--pct':initiative.completion+'%','--progress-color':(initiative.completion>=100?'var(--green)':`hsl(${Math.round(initiative.completion*1.2)} 72% 48%)`)} as React.CSSProperties}><b>{initiative.completion.toFixed(0)}%</b></div>
+          <div className="modalGauge" style={{'--pct':initiative.completion+'%','--progress-color':initiativeProgressColor(initiative.completion)} as React.CSSProperties}><b>{initiative.completion.toFixed(0)}%</b></div>
         </section>
         <section className="progressPanel">
           <div className="progressTitle"><div><small>SUB-INITIATIVE STATUS</small><h3>Initiative Progress</h3></div><span>Done · In Progress · Not Started</span></div>
@@ -279,7 +254,7 @@ export function GoalPage(){
 
     {indicator&&<div className="indicatorModal open" role="dialog" aria-modal="true" aria-label={indicator.shortName} onClick={()=>setIndicator(null)}>
       <div className="indicatorModalShell" onClick={e=>e.stopPropagation()}>
-        <button className="modalClose" onClick={()=>setIndicator(null)} aria-label="Close">×</button>
+        <button className="modalClose" type="button" onClick={()=>setIndicator(null)} aria-label="Close indicator details" title="Close"><X size={18} strokeWidth={1.8} aria-hidden="true"/></button>
         <div className="indicatorModalGoal">
           <span className="popupGoalIcon" aria-hidden="true">{goalIcon}</span>
           <div><small>GOAL {goalIndex+1}</small><h2>{goal.name}</h2><p>{goal.description}</p></div>
@@ -303,20 +278,7 @@ export function GoalPage(){
             <span role="status">{popupStatus}</span>
           </div>
         </section>
-        <section className="indicatorChartPanel">
-          <div className="indicatorChartTitle"><h3>{indicator.shortName} — Student Group Performance</h3><span title="Chart options and full indicator details">•••</span></div>
-          <div className="yearChooser"><label htmlFor="indicatorYear">Choose Year:</label><select id="indicatorYear" value={selectedYear} onChange={e=>setSelectedYear(e.target.value)}>{[...new Set(history.map((r:any)=>r.school_year))].map((y:any)=><option key={y}>{y}</option>)}</select></div>
-          <div className={'studentChart '+(indicatorLoading?'isLoading':'')}>{indicatorLoading&&<div className="indicatorLoader" role="status" aria-live="polite"><i/><span>Loading data…</span></div>}
-            <div className="yAxisLabel">{indicatorYAxisLabel(indicator)}</div>
-            {(()=>{const scale=chartScale(indicator,groups);return <div className="yAxisTicks" aria-hidden="true">{scale.ticks.map(t=><span key={t} style={{bottom:(t/scale.max*100)+'%'}}>{scale.format(t)}</span>)}</div>})()}
-            <div className="studentBars">
-              {(()=>{const rows=groups.filter((r:any)=>r.category!=='Statewide Average'&&r.value_3_numeric!=null);const scale=chartScale(indicator,groups);return rows.map((r:any)=><div className="studentBarCol" key={r.student_group}><div className="studentBar" style={{height:Math.max(4,(Number(r.value_3_numeric)||0)/scale.max*100)+'%'}}><b>{r.value_3_display??r.value_3_numeric}</b></div><span>{r.student_group}</span></div>)})()}
-            </div>
-            {(()=>{const avg=groups.find((r:any)=>r.statewide_value_3_numeric!=null);const scale=chartScale(indicator,groups);return avg?<div className="stateAvgLine" style={{bottom:Math.min(100,Math.max(0,(Number(avg.statewide_value_3_numeric)||0)/scale.max*100))+'%'}}><span>Statewide Average: {avg.statewide_value_3_display??avg.statewide_value_3_numeric}</span></div>:null})()}
-          </div>
-          <div className="xAxisLabel">Student Group</div>
-          <p className="chartNote">ⓘ Student-group performance for the selected school year. Statewide Average is shown as a reference line.</p>
-        </section>
+        <StudentGroupChart key={indicator.id} indicator={indicator} history={history} selectedYear={selectedYear} onYearChange={setSelectedYear}/>
       </div>
     </div>}
   </main>;

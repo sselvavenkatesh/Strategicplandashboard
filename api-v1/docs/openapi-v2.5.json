@@ -1,0 +1,2225 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "StrategicPlan API",
+    "description": "Provider-neutral REST facade over the StrategicPlan PostgreSQL reporting contract.\nV2.5 documentation snapshot. Cookie security annotations are supplied by the exporter; many responses are untyped at runtime. See API_DOCUMENTATION.md for authorization, legacy routes and errors.",
+    "license": {
+      "name": "MIT",
+      "identifier": "MIT"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/achievement": {
+      "get": {
+        "summary": "Get Achievement",
+        "operationId": "get_achievement_api_v1_achievement_get",
+        "parameters": [
+          {
+            "name": "preview",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Preview"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/indicators/{indicator_id}/target": {
+      "get": {
+        "summary": "Get Target",
+        "operationId": "get_target_api_v1_indicators__indicator_id__target_get",
+        "parameters": [
+          {
+            "name": "indicator_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Indicator Id"
+            }
+          },
+          {
+            "name": "school_year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "School Year"
+            }
+          },
+          {
+            "name": "preview",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Preview"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/indicator-labels": {
+      "get": {
+        "summary": "Get Indicator Labels",
+        "operationId": "get_indicator_labels_api_v1_indicator_labels_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/preview/dataset": {
+      "get": {
+        "summary": "Get Preview Dataset",
+        "operationId": "get_preview_dataset_api_v1_preview_dataset_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public; feature gated"
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/bootstrap": {
+      "get": {
+        "summary": "Get Bootstrap",
+        "operationId": "get_bootstrap_api_v1_bootstrap_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/profile": {
+      "get": {
+        "summary": "Get Profile",
+        "operationId": "get_profile_api_v1_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/goals": {
+      "get": {
+        "summary": "Get Goals",
+        "operationId": "get_goals_api_v1_goals_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/goals/{goal_id}/indicators": {
+      "get": {
+        "summary": "Get Indicators",
+        "operationId": "get_indicators_api_v1_goals__goal_id__indicators_get",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          },
+          {
+            "name": "school",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "School"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/indicators/{indicator_id}/history": {
+      "get": {
+        "summary": "Get Indicator History",
+        "operationId": "get_indicator_history_api_v1_indicators__indicator_id__history_get",
+        "parameters": [
+          {
+            "name": "indicator_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Indicator Id"
+            }
+          },
+          {
+            "name": "school",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "School"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/indicators/{indicator_id}/student-groups": {
+      "get": {
+        "summary": "Get Student Groups",
+        "operationId": "get_student_groups_api_v1_indicators__indicator_id__student_groups_get",
+        "parameters": [
+          {
+            "name": "indicator_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Indicator Id"
+            }
+          },
+          {
+            "name": "school_year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "School Year"
+            }
+          },
+          {
+            "name": "school",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "School"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/goals/{goal_id}/initiative-progress": {
+      "get": {
+        "summary": "Get Goal Progress",
+        "operationId": "get_goal_progress_api_v1_goals__goal_id__initiative_progress_get",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          },
+          {
+            "name": "school",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "School"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/goals/{goal_id}/initiatives": {
+      "get": {
+        "summary": "Get Initiatives",
+        "operationId": "get_initiatives_api_v1_goals__goal_id__initiatives_get",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          },
+          {
+            "name": "school",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "School"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/goals/{goal_id}/initiatives/{initiative_id}/subinitiatives": {
+      "get": {
+        "summary": "Get Subinitiatives",
+        "operationId": "get_subinitiatives_api_v1_goals__goal_id__initiatives__initiative_id__subinitiatives_get",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          },
+          {
+            "name": "initiative_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Initiative Id"
+            }
+          },
+          {
+            "name": "school",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "School"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/features/{version}/{feature}": {
+      "get": {
+        "summary": "Get Feature",
+        "operationId": "get_feature_api_v1_features__version___feature__get",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version"
+            }
+          },
+          {
+            "name": "feature",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/goals/{goal_id}/initiatives-full": {
+      "get": {
+        "summary": "Get Initiatives Full",
+        "operationId": "get_initiatives_full_api_v1_goals__goal_id__initiatives_full_get",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/admin/signin-config": {
+      "get": {
+        "summary": "Get Admin Signin Config",
+        "operationId": "get_admin_signin_config_api_v1_admin_signin_config_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/superadmin/oauth-secrets": {
+      "put": {
+        "summary": "Put Oauth Secrets",
+        "operationId": "put_oauth_secrets_api_v1_superadmin_oauth_secrets_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthSecrets"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Legacy token; writes gated"
+      }
+    },
+    "/api/v1/auth/admin/login": {
+      "post": {
+        "summary": "Admin Login",
+        "operationId": "admin_login_api_v1_auth_admin_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
+          }
+        },
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
+      }
+    },
+    "/api/v1/auth/admin/oauth/{provider}/start": {
+      "get": {
+        "summary": "Admin Oauth Start",
+        "operationId": "admin_oauth_start_api_v1_auth_admin_oauth__provider__start_get",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "return_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Return To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "OAuth provider flow; current and legacy callbacks"
+      }
+    },
+    "/api/v1/auth/admin/oauth/{provider}/callback": {
+      "get": {
+        "summary": "Admin Oauth Callback",
+        "operationId": "admin_oauth_callback_api_v1_auth_admin_oauth__provider__callback_get",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Code"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Error"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "OAuth provider flow; current and legacy callbacks"
+      }
+    },
+    "/api/v1/auth/admin/session": {
+      "get": {
+        "summary": "Admin Session",
+        "operationId": "admin_session_api_v1_auth_admin_session_get",
+        "responses": {
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
+          }
+        },
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
+      }
+    },
+    "/api/v1/auth/admin/logout": {
+      "post": {
+        "summary": "Admin Logout",
+        "operationId": "admin_logout_api_v1_auth_admin_logout_post",
+        "responses": {
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
+          }
+        },
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
+      }
+    },
+    "/api/v1/auth/admin/sso/validate": {
+      "post": {
+        "summary": "Admin Sso Validate",
+        "operationId": "admin_sso_validate_api_v1_auth_admin_sso_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SsoAdminValidation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
+          }
+        },
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
+      }
+    },
+    "/api/v1/access-log": {
+      "post": {
+        "summary": "Access Log",
+        "operationId": "access_log_api_v1_access_log_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessLog"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/superadmin/login": {
+      "post": {
+        "summary": "Superadmin Login",
+        "operationId": "superadmin_login_api_v1_superadmin_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/superadmin/configuration": {
+      "get": {
+        "summary": "Superadmin Configuration",
+        "operationId": "superadmin_configuration_api_v1_superadmin_configuration_get",
+        "responses": {
+          "410": {
+            "description": "Retired token-based endpoint; use the workspace API."
+          }
+        },
+        "deprecated": true,
+        "x-v25-access": "Retired; HTTP 410; use cookie workspace API"
+      },
+      "put": {
+        "summary": "Put Superadmin Configuration",
+        "operationId": "put_superadmin_configuration_api_v1_superadmin_configuration_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuperAdminConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Legacy token; writes gated"
+      }
+    },
+    "/api/v1/superadmin/goals/{goal_id}": {
+      "delete": {
+        "summary": "Delete Superadmin Goal",
+        "operationId": "delete_superadmin_goal_api_v1_superadmin_goals__goal_id__delete",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Legacy token; writes gated"
+      }
+    },
+    "/api/v1/superadmin/logo": {
+      "put": {
+        "summary": "Put Superadmin Logo",
+        "operationId": "put_superadmin_logo_api_v1_superadmin_logo_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuperAdminLogo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Legacy token; writes gated"
+      }
+    },
+    "/api/v1/superadmin/indicators/bulk": {
+      "post": {
+        "summary": "Bulk Indicators",
+        "operationId": "bulk_indicators_api_v1_superadmin_indicators_bulk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuperAdminBulkData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Legacy token; writes gated"
+      }
+    },
+    "/api/v1/superadmin/initiatives/bulk": {
+      "post": {
+        "summary": "Bulk Initiatives",
+        "operationId": "bulk_initiatives_api_v1_superadmin_initiatives_bulk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuperAdminBulkData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Legacy token; writes gated"
+      }
+    },
+    "/api/v1/ai/status": {
+      "get": {
+        "summary": "Status",
+        "operationId": "status_api_v1_ai_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/ai/ask": {
+      "post": {
+        "summary": "Ask",
+        "operationId": "ask_api_v1_ai_ask_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiQuestion"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "AdminCookie": []
+          },
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Public; validated cookies permit private context"
+      }
+    },
+    "/api/v1/ai/ask-stream": {
+      "post": {
+        "summary": "Ask Stream",
+        "description": "JSON whitespace heartbeats keep the edge stream active without altering answers.",
+        "operationId": "ask_stream_api_v1_ai_ask_stream_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiQuestion"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "AdminCookie": []
+          },
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Public; validated cookies permit private context"
+      }
+    },
+    "/api/v1/validation": {
+      "get": {
+        "summary": "Validation Json",
+        "operationId": "validation_json_api_v1_validation_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-v25-access": "Diagnostic; disabled by default"
+      }
+    },
+    "/validation": {
+      "get": {
+        "summary": "Validation Page",
+        "operationId": "validation_page_validation_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Diagnostic; disabled by default"
+      }
+    },
+    "/api/v1/superadmin/session": {
+      "get": {
+        "summary": "Session",
+        "operationId": "session_api_v1_superadmin_session_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      }
+    },
+    "/api/v1/superadmin/workspace": {
+      "get": {
+        "summary": "Workspace",
+        "operationId": "workspace_api_v1_superadmin_workspace_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      },
+      "post": {
+        "summary": "Save Workspace",
+        "operationId": "save_workspace_api_v1_superadmin_workspace_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveWorkspace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      }
+    },
+    "/api/v1/superadmin/users": {
+      "get": {
+        "summary": "Users",
+        "operationId": "users_api_v1_superadmin_users_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      },
+      "post": {
+        "summary": "Save User",
+        "operationId": "save_user_api_v1_superadmin_users_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveUser"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      }
+    },
+    "/api/v1/superadmin/sso-settings": {
+      "get": {
+        "summary": "Sso Settings",
+        "operationId": "sso_settings_api_v1_superadmin_sso_settings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      },
+      "post": {
+        "summary": "Save Sso Settings",
+        "operationId": "save_sso_settings_api_v1_superadmin_sso_settings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SsoSecrets"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      }
+    },
+    "/api/v1/superadmin/ai-settings": {
+      "get": {
+        "summary": "Ai Settings",
+        "operationId": "ai_settings_api_v1_superadmin_ai_settings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      },
+      "post": {
+        "summary": "Save Ai Settings",
+        "operationId": "save_ai_settings_api_v1_superadmin_ai_settings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie"
+      }
+    },
+    "/api/v1/superadmin/logout": {
+      "post": {
+        "summary": "Logout",
+        "operationId": "logout_api_v1_superadmin_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {},
+          {
+            "SuperAdminCookie": []
+          }
+        ],
+        "x-v25-access": "Super Admin cookie if present; clears cookie"
+      }
+    },
+    "/api/v1/admin/login": {
+      "post": {
+        "summary": "Login",
+        "operationId": "login_api_v1_admin_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-v25-access": "Public"
+      }
+    },
+    "/api/v1/admin/session": {
+      "get": {
+        "summary": "Session",
+        "operationId": "session_api_v1_admin_session_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminCookie": []
+          }
+        ],
+        "x-v25-access": "Admin cookie"
+      }
+    },
+    "/api/v1/admin/workspace": {
+      "get": {
+        "summary": "Workspace",
+        "operationId": "workspace_api_v1_admin_workspace_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminCookie": []
+          }
+        ],
+        "x-v25-access": "Admin cookie"
+      },
+      "post": {
+        "summary": "Save",
+        "operationId": "save_api_v1_admin_workspace_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Save"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminCookie": []
+          }
+        ],
+        "x-v25-access": "Admin cookie"
+      }
+    },
+    "/api/v1/admin/logout": {
+      "post": {
+        "summary": "Logout",
+        "operationId": "logout_api_v1_admin_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {},
+          {
+            "AdminCookie": []
+          }
+        ],
+        "x-v25-access": "Admin cookie if present; clears cookie"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccessLog": {
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "title": "Sessionid"
+          },
+          "userId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Userid"
+          },
+          "userName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "userEmail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Useremail"
+          },
+          "userType": {
+            "type": "string",
+            "title": "Usertype",
+            "default": "Public"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "pagePath": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pagepath"
+          },
+          "userAgent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Useragent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessionId"
+        ],
+        "title": "AccessLog"
+      },
+      "AdminLogin": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "AdminLogin"
+      },
+      "AiQuestion": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 1200,
+            "minLength": 3,
+            "title": "Question"
+          },
+          "sessionId": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Sessionid"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "AiQuestion"
+      },
+      "AiSettings": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Model"
+          },
+          "apiKey": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apikey"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "model"
+        ],
+        "title": "AiSettings"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Login": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 1,
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Password"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "Login"
+      },
+      "OAuthSecrets": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "googleClientSecret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Googleclientsecret"
+          },
+          "microsoftClientSecret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Microsoftclientsecret"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "OAuthSecrets"
+      },
+      "Save": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 32,
+            "title": "Revision"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "maxItems": 5000,
+            "title": "Rows"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "revision",
+          "kind",
+          "rows"
+        ],
+        "title": "Save"
+      },
+      "SaveUser": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 32,
+            "title": "Revision"
+          },
+          "user": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "User"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "user"
+        ],
+        "title": "SaveUser"
+      },
+      "SaveWorkspace": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 32,
+            "title": "Revision"
+          },
+          "change": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Change"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "change"
+        ],
+        "title": "SaveWorkspace"
+      },
+      "SsoAdminValidation": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "SsoAdminValidation"
+      },
+      "SsoSecrets": {
+        "properties": {
+          "googleSecret": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Googlesecret"
+          },
+          "microsoftSecret": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Microsoftsecret"
+          }
+        },
+        "type": "object",
+        "title": "SsoSecrets"
+      },
+      "SuperAdminBulkData": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "rows"
+        ],
+        "title": "SuperAdminBulkData"
+      },
+      "SuperAdminConfiguration": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "profile": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Profile"
+          },
+          "goals": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Goals"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "profile",
+          "goals"
+        ],
+        "title": "SuperAdminConfiguration"
+      },
+      "SuperAdminLogo": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "logo": {
+            "type": "string",
+            "title": "Logo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "logo"
+        ],
+        "title": "SuperAdminLogo"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "AdminCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "strategic_admin_session"
+      },
+      "SuperAdminCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "strategic_superadmin_session"
+      }
+    }
+  }
+}

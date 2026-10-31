@@ -1,5 +1,15 @@
 # Strategic Plan Dashboard — AI Context Info
 
+## Security remediation checkpoint — 29 October 2026
+
+The shared-database privacy and legacy OAuth blockers have fixes; see [current evidence](V2.5_SECURITY_ARCHITECTURE_REVIEW.md). Do not reintroduce URL session tokens, public OAuth-state RPCs or public reporting functions that ignore parent/master/row privacy. Backend-only Admin/Super Admin functions must retain access to private records and enforce edit assignments. 81 API tests and 47 frontend tests passed, plus rollback database regression suites. Real deployed Google/Microsoft provider acceptance remains pending; no production promotion is authorized by these test results.
+
+## V2.5 security/documentation checkpoint — 29 October 2026
+
+The owner saved the encrypted district Ollama key and confirms working AI responses. Native FastAPI AI is active when `/api/v1/ai/status` reports `nativeReady`; this is stored-configuration status, not a provider health test. Do not retrieve or print the key to verify storage.
+
+Current documentation: [REST contract](../api-v1/docs/API_DOCUMENTATION.md), [51-operation inventory](../api-v1/docs/API_ROUTE_INVENTORY.md), [OpenAPI](../api-v1/docs/openapi-v2.5.json), [outsider security review](V2.5_SECURITY_ARCHITECTURE_REVIEW.md). Confirmed direct-database reporting privacy and legacy OAuth findings block production security approval. Review made no persistent data/policy/application/deployment changes. Existing production remains unchanged.
+
 **Document status:** V2.2 frozen release baseline — 27 Sep 2026
 
 
@@ -579,6 +589,8 @@ V2.3 is developed only on `v2.3`, created from immutable `v2.2-frozen`. Do not m
 K12 AI Assistant is feature-gated by `Product_Feature_Flags` using V2.3 / AI Assistant. The React route is `/ai`; the global header shows a compact AI icon only when enabled. The page includes a left Popular Questions pane with ten strategic-plan prompts and a conversational area with free-text entry, Copy/Download and processing feedback.
 
 AI backend: Supabase Edge Function `district-ai` -> approved Supabase district data -> Ollama Cloud. `OLLAMA_API_KEY` is a Supabase secret. AI access to strategic-plan business data is read-only. `AI_Conversation_Log` provides audit records. Responses must be parent/general-public friendly, evidence-grounded and district-scope only. Formatting cleanup removes Markdown decoration/filler. AI chart generation is intentionally excluded to keep latency and model usage low.
+
+V2.5 preview update: native FastAPI now implements the same model/prompt flow. Shared `District_AI_Config` stores per-district model settings and a Supabase Vault reference; the key is never returned to the browser. Super Admin manages it under AI Configuration. After a district key is saved, the frontend uses `/api/v1/ai/ask` automatically. Until then it preserves the working preview Edge flow. Public context excludes private goals/masters/reporting rows, while validated Admin and Super Admin sessions may include them. See `docs/V2.5_AI_FASTAPI.md` for rollout, tests and future tenant-routing limits. Production remains on the existing Edge flow.
 
 Detailed architecture: `docs/TECHNICAL_ARCHITECTURE.md`.
 

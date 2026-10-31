@@ -8,8 +8,15 @@
 [context.production]
   branch = "react-dashboard"
 
-# Public demo uses the same isolated targets and AI service as the approved preview.
+# Retain the approved demo targets; React APIs are FastAPI-only.
 [context.production.environment]
+  VITE_ACHIEVEMENT_PREVIEW = "true"
+  VITE_FASTAPI_ENABLED = "true"
+  VITE_FASTAPI_REPORTING = "true"
+  VITE_V25_UI_PREVIEW = "true"
+  VITE_FASTAPI_V25 = "false"
+
+[context.deploy-preview.environment]
   VITE_ACHIEVEMENT_PREVIEW = "true"
 
 [[headers]]
@@ -17,9 +24,25 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://vznwvenzjzccvtqorhas.supabase.co; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
 
 
 # Stable HTML proxy destination: avoid directory-index canonical redirects.
+[[redirects]]
+  from = "/strategic-plan/demo/api/v1/*"
+  to = "https://k12matrix-strategicplan.vercel.app/api/v1/:splat"
+  status = 200
+  force = true
+
+# Existing public FastAPI service; preview routes never publish an API credential.
+[[redirects]]
+  from = "/api/v1/*"
+  to = "https://k12matrix-strategicplan.vercel.app/api/v1/:splat"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/strategic-plan-demo"
   to = "/strategic-plan-demo.html"
@@ -43,4 +66,11 @@
 
 # Restore the reviewed demonstration data and services for Netlify PR #14 only.
 [context."preview/release-check-20261022".environment]
+  VITE_ACHIEVEMENT_PREVIEW = "true"
+
+# V2.5 UI review only. The production branch and its configuration are unchanged.
+[context."v2.5-ui".environment]
+  VITE_FASTAPI_ENABLED = "true"
+  VITE_FASTAPI_V25 = "false"
+  VITE_V25_UI_PREVIEW = "true"
   VITE_ACHIEVEMENT_PREVIEW = "true"

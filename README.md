@@ -72,3 +72,13 @@ Release separation is explicit: **V2.2 remains the frozen non-AI release; V2.3 i
 ## V2.4 — Responsive Branding Maintenance Release
 
 V2.4 is a focused UI maintenance release based on V2.3. It preserves existing dashboard and AI functionality while correcting two branding issues: the Powered By K12Matrix header treatment remains visible and responsive on mobile, and the canonical K12Matrix dark/light SVG assets include additional spacing between “K12” and “Matrix” to prevent glyph overlap on some laptop/browser rendering combinations.
+
+## V2.5 — FastAPI preview
+
+V2.5 is isolated on `v2.5-ui`. Public reporting, Admin reporting edits, Super Admin configuration/users, OAuth and native AI now have FastAPI implementations. Modern workspace saves write to the existing database with session/assignment validation and optimistic revisions. Production V2.4 remains unchanged; registered legacy paths still require review.
+
+- [REST API documentation](api-v1/docs/API_DOCUMENTATION.md), [all 51 operations](api-v1/docs/API_ROUTE_INVENTORY.md), and [OpenAPI export](api-v1/docs/openapi-v2.5.json).
+- [Outsider security architecture review](docs/V2.5_SECURITY_ARCHITECTURE_REVIEW.md): privacy/OAuth fixes and evidence, remaining hardening work, and deployed-provider verification still required before production approval.
+- [Native AI configuration and privacy](docs/V2.5_AI_FASTAPI.md).
+
+Earlier UI-only review documents are historical milestones, not the current integration status.

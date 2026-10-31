@@ -1,0 +1,14 @@
+/* Placement only: Welcome cards share the original theme and icon styles. */
+.uxWelcome.appearanceWelcome{grid-template-areas:"intro principles" "goals goals";gap:25px 5%;align-content:center}
+.appearanceIntro{grid-area:intro;align-self:center;min-width:0}
+.appearanceGoals{grid-area:goals;min-width:0;display:grid;gap:10px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.appearanceSectionLabel{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.16em;font-weight:750;color:var(--muted);margin-bottom:4px}
+.appearanceWelcome.goals-right .appearanceGoals{grid-template-columns:minmax(0,1fr)}
+.appearanceWelcome .appearanceGoals>.welcomeGoal{width:100%}
+.appearanceWelcome.goals-right .welcomeGoal{min-height:0}
+.appearancePrinciples{grid-area:principles;min-width:0;align-content:center}
+.appearancePrinciples article>div{min-width:0}
+.appearanceNotice{margin-right:auto;color:var(--v-muted);font-size:10px}
+@media(max-width:1000px){.uxWelcome.appearanceWelcome{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}.appearanceGoals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.uxWelcome.appearanceWelcome{display:flex;flex-direction:column;padding:85px 17px 35px;gap:24px}.appearanceIntro{align-self:stretch}.appearanceWelcome .appearanceGoals{width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}.appearanceWelcome .appearancePrinciples{width:100%;grid-template-columns:1fr!important;margin-top:0}.appearanceSettings .v25-panel-footer{flex-wrap:wrap}}
+@media(max-width:450px){.appearanceWelcome .appearanceGoals{grid-template-columns:minmax(0,1fr)}}
