@@ -1,0 +1,1 @@
+Deno.serve(() => new Response(JSON.stringify({detail:"This endpoint is retired. Use the Strategic Plan V2.5 FastAPI service."}), {status:410,headers:{"Content-Type":"application/json","Cache-Control":"no-store","Access-Control-Allow-Origin":"*"}}));
