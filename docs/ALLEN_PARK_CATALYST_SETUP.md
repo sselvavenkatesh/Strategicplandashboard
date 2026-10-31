@@ -97,3 +97,11 @@ The owner reported a blank normal-browser window and confirmed the same URL work
 Unguarded localStorage/sessionStorage accesses were found in theme initialization and optional access telemetry. Storage access now fails safely, invalid stored theme values fall back to the default, and a top-level React recovery screen prevents runtime render errors from leaving an empty background. The initial HTML also includes a visible loading state. The Python static host sends no-store for all HTML entry routes and immutable caching for hashed assets. Successful dashboard layout and authorization are unchanged.
 
 Validation: blocked-storage rendering/effect regression test passed; frontend TypeScript and Vite build passed; four focused backend tests passed, including HTML cache headers and district write isolation. These changes are deployed only to Allen Park; Riverside V2.5 remains frozen. A normal-browser hard refresh may be needed once to replace previously cached HTML.
+
+## Allen Park public branding
+
+The public shell identifies the Allen Park profile by district ID and applies an isolated forest-green palette. The supplied logo is displayed unchanged on a compact white panel. Welcome uses an official Allen Park High School exterior photograph with a dark green contrast overlay; asset provenance is in `public/districts/allen-park/ASSETS.md`. Existing layout, welcome text placement, goal icons, and optional goal/mission/vision placement are retained. Buttons and achievement accents use green; progress status colors retain their meanings. Branding is removed when the public shell unmounts, so Admin and Super Admin keep the standard theme.
+
+Only the Allen Park profile logo and strategic-plan image paths were updated in the database. Sample goals and metrics were not changed. Riverside was not deployed or modified.
+
+Validation: TypeScript, Vite production build with achievement overlays, 52 existing Node tests and whitespace checks passed. Live public welcome branding and summary achievement styling were checked after deployment.

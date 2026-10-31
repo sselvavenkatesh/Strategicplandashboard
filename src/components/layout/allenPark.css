@@ -1,0 +1,32 @@
+/* Public district branding only. Workspace colors and status semantics stay independent. */
+html[data-public-district="allen-park"]{--blue:#6bd59b;--bg:#071810;--panel:#0b2119;--panel2:#112c22;--line:rgba(145,188,160,.19)}
+html[data-public-district="allen-park"] body{background:radial-gradient(circle at 18% 0,#123b2a 0,transparent 30%),var(--bg)}
+html[data-public-district="allen-park"] .allenParkPublic .allenParkBrand{gap:16px;min-width:0}
+html[data-public-district="allen-park"] .allenParkPublic .districtWordmark{width:192px;height:43px;padding:5px 9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fbfdfb;border:1px solid #c5d9cb;border-radius:5px}
+html[data-public-district="allen-park"] .allenParkPublic .districtWordmark img{display:block;width:100%;height:auto;max-height:33px;object-fit:contain;border-radius:0}
+html[data-public-district="allen-park"] .allenParkPublic .topbar{background:transparent}
+html[data-public-district="allen-park"] .allenParkPublic .signInBtn,html[data-public-district="allen-park"] .allenParkPublic .primaryBtn,html[data-public-district="allen-park"] .allenParkPublic .signInSubmit{background:#137c47;color:#fff}
+html[data-public-district="allen-park"] .allenParkPublic .signInBtn:hover,html[data-public-district="allen-park"] .allenParkPublic .primaryBtn:hover,html[data-public-district="allen-park"] .allenParkPublic .signInSubmit:hover{background:#0b6336}
+html[data-public-district="allen-park"] .allenParkPublic .uxWelcome .welcomeCopy h1 span,html[data-public-district="allen-park"] .allenParkPublic .uxWelcome .welcomeCopy h2{color:#79dba2}
+html[data-public-district="allen-park"] .allenParkPublic .uxWelcome .welcomeGoal,html[data-public-district="allen-park"] .allenParkPublic .uxWelcome .principles article{background:rgba(8,32,23,.88);border-color:rgba(143,193,158,.27)}
+html[data-public-district="allen-park"] .allenParkPublic .uxWelcome .welcomeGoal:hover{background:rgba(13,54,35,.94);border-color:#6cba87}
+html[data-public-district="allen-park"] .allenParkPublic .uxWelcome .goalIcon,html[data-public-district="allen-park"] .allenParkPublic .uxWelcome .principles i{color:#80d9a4;border-color:rgba(112,192,141,.3);background:rgba(25,80,49,.3)}
+html[data-public-district="allen-park"] .allenParkPublic .summaryPage,html[data-public-district="allen-park"] .allenParkPublic .goalPage{background:radial-gradient(circle at 18% 0,#123323,#081712 58%)}
+html[data-public-district="allen-park"] .allenParkPublic .summaryGoal,html[data-public-district="allen-park"] .allenParkPublic .goalPage .indicatorCard,html[data-public-district="allen-park"] .allenParkPublic .goalPage .initiativeCard.detailed{background:#0b2019;border-color:#28483a}
+html[data-public-district="allen-park"] .allenParkPublic .summaryGoal:hover,html[data-public-district="allen-park"] .allenParkPublic .summaryGoal:focus-visible,html[data-public-district="allen-park"] .allenParkPublic .goalPage .indicatorCard:hover,html[data-public-district="allen-park"] .allenParkPublic .goalPage .initiativeCard:hover{border-color:#65b789;box-shadow:0 5px 18px #1b7b3c14}
+html[data-public-district="allen-park"] .allenParkPublic .kpi{background:#10291f;border-color:#294737}
+html[data-public-district="allen-park"] .allenParkPublic .goalPage .initiativeIntro{background:linear-gradient(90deg,#18392a,#10291f)}
+html[data-public-district="allen-park"] .allenParkPublic .goalPage .initiativeSummary{background:#0c241b;border-color:#294737}
+html[data-public-district="allen-park"] .allenParkPublic .goalPage .goalTab.active{border-bottom-color:#69d295}
+html[data-public-district="allen-park"] .allenParkPublic .goalPage .goalHeroIcon{color:#7ed9a2;background:#123426;border-color:#38634b}
+html[data-public-district="allen-park"] .allenParkPublic .goalPage .goalHero small,html[data-public-district="allen-park"] .allenParkPublic .goalPage .goalSectionTitle small,html[data-public-district="allen-park"] .allenParkPublic .sectionLabel a,html[data-public-district="allen-park"] .allenParkPublic .sectionLabel span:last-child{color:#7ccc9b}
+html[data-public-district="allen-park"] .allenParkPublic .goalPage .yearBars i{background:#3bb979}
+html[data-public-district="allen-park"] .allenParkPublic .keyResourcesBtn{color:#b7e5c6;border-color:#3a6b4b;background:#173b29}
+html[data-public-district="allen-park"] .allenParkPublic .aiHeaderBtn{color:#b3e8c8;background:#123426;border-color:#30533e}
+html[data-public-district="allen-park"] .allenParkPublic .menuBtn,html[data-public-district="allen-park"] .allenParkPublic .themeBtn{background:#102b20;border-color:#284b38}
+html[data-public-district="allen-park"][data-theme="light"]{--blue:#117342;--bg:#f5f9f5;--panel:#fff;--panel2:#edf5ef;--line:#d2e2d6}
+html[data-public-district="allen-park"][data-theme="light"] body{background:#f5f9f5}
+html[data-public-district="allen-park"][data-theme="light"] .summaryPage,html[data-public-district="allen-park"][data-theme="light"] .goalPage{background:#f5f9f5}
+html[data-public-district="allen-park"][data-theme="light"] :is(.summaryGoal,.kpi,.goalPage .indicatorCard,.goalPage .initiativeCard.detailed,.goalPage .initiativeIntro,.goalPage .initiativeSummary){background:#fff;border-color:#d2e2d6}
+@media(max-width:700px){html[data-public-district="allen-park"] .allenParkPublic .districtWordmark{width:153px;height:38px;padding:4px 7px}html[data-public-district="allen-park"] .allenParkPublic .headerPowered{display:none}html[data-public-district="allen-park"] .allenParkPublic .allenParkBrand{gap:6px}}
+@media(max-width:380px){html[data-public-district="allen-park"] .allenParkPublic .districtWordmark{width:133px;height:34px}html[data-public-district="allen-park"] .allenParkPublic .tools{gap:5px}}

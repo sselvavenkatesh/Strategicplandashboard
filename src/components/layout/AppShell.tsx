@@ -9,6 +9,7 @@ import {getAdminSession,loginAdmin,logoutAdmin} from '../../pages/admin/v25/admi
 import {isAiEnabled} from '../../lib/ai';
 import {ProviderIcon} from '../SignInProviderIcon';
 import './publicNavigation.css';
+import './allenPark.css';
 
 const liveAdmin=true;
 type AdminProfile={name:string;email:string;role?:string};
@@ -25,6 +26,12 @@ export function AppShell(){
   const[providers,setProviders]=useState({google:false,microsoft:false});
   const[admin,setAdmin]=useState<AdminProfile|null>(null);
   const p=useDashboard(getProfile),g=useDashboard(getGoals);
+  const isAllenPark=p.data?.districtId==='allen-park';
+  useEffect(()=>{
+    if(!isAllenPark)return;
+    document.documentElement.dataset.publicDistrict='allen-park';
+    return()=>{delete document.documentElement.dataset.publicDistrict;};
+  },[isAllenPark]);
   const nav=useNavigate();
   const location=useLocation();
   const initialPath=useRef(location.pathname);
@@ -98,10 +105,10 @@ export function AppShell(){
   }
   async function signOut(){setAuthBusy(true);try{await logoutAdmin();setAdmin(null);setPassword('');setEmail('');setOpen(false);nav('/')}catch(reason){setAuthMessage(reason instanceof Error?reason.message:'Sign out failed.')}finally{setAuthBusy(false)}}
 
-  return <div className={'app-shell '+(admin?'hasAccount':'')}>
+  return <div className={'app-shell '+(isAllenPark?'allenParkPublic ':'')+(admin?'hasAccount':'')}>
     {pageLoading&&<div className="pageLoader" role="status" aria-live="polite" aria-label="Loading page"><img className="k12LoaderLogo" src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/><div className="k12LoaderPulse"/><small>Loading strategic plan…</small></div>}
     <header className="topbar">
-      <Link to="/" className="brand"><span className="districtLogo" aria-hidden="true">{p.data?.logo?<img src={p.data.logo} alt=""/>:<svg viewBox="0 0 48 48"><path d="M8 17c6 0 11 2 16 6 5-4 10-6 16-6v20c-6 0-11 2-16 5-5-3-10-5-16-5V17Z"/><path d="M24 23v19M13 13l3 3M35 13l-3 3M24 7v5M17 9l2 4M31 9l-2 4"/><path d="M17 17a8 8 0 0 1 14 0"/></svg>}</span><b>{p.data?.districtName||'District'}</b><span className="headerPowered"><span>Powered By</span><img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/></span></Link>
+      <Link to="/" className={isAllenPark?'brand allenParkBrand':'brand'}>{isAllenPark?<span className="districtWordmark"><img src={p.data?.logo||`${import.meta.env.BASE_URL}districts/allen-park/allen-park-logo.png`} alt="Allen Park Public Schools"/></span>:<><span className="districtLogo" aria-hidden="true">{p.data?.logo?<img src={p.data.logo} alt=""/>:<svg viewBox="0 0 48 48"><path d="M8 17c6 0 11 2 16 6 5-4 10-6 16-6v20c-6 0-11 2-16 5-5-3-10-5-16-5V17Z"/><path d="M24 23v19M13 13l3 3M35 13l-3 3M24 7v5M17 9l2 4M31 9l-2 4"/><path d="M17 17a8 8 0 0 1 14 0"/></svg>}</span><b>{p.data?.districtName||'District'}</b></>}<span className="headerPowered"><span>Powered By</span><img src={`${import.meta.env.BASE_URL}k12matrix-logo.svg`} alt="K12Matrix"/></span></Link>
       <div className="tools">
         {admin?<><div className="headerAccount" aria-label={`Signed in as ${admin.name}, ${role}`}><span className="accountAvatar" aria-hidden="true">{initials}</span><span className="accountCopy"><b title={admin.name}>{admin.name}</b><small>{role}</small></span></div></>:<button className="signInBtn" onClick={()=>{setAuthMessage('');setSignInOpen(true)}}>Sign In</button>}
         {aiEnabled&&<button className="aiHeaderBtn" onClick={()=>nav('/ai')} aria-label="Open K12 AI Assistant" title="K12 AI Assistant"><span className="aiMarkText">AI</span><Sparkles className="aiMarkSpark" size={10}/></button>}
