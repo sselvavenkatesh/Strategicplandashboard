@@ -2,6 +2,7 @@ import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter} from 'react-router-dom';
 import App from './App';
+import {DashboardErrorBoundary} from './app/DashboardErrorBoundary';
 import './styles/global.css';
 
 // Keep existing root URLs working alongside the branded demo path.
@@ -11,8 +12,10 @@ const basename = pathname === demoPath || pathname.startsWith(`${demoPath}/`) ? 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <DashboardErrorBoundary>
     <BrowserRouter basename={basename}>
       <App/>
     </BrowserRouter>
+    </DashboardErrorBoundary>
   </StrictMode>
 )

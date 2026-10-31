@@ -57,9 +57,11 @@ export function AppShell(){
   useEffect(()=>{isAiEnabled().then(setAiEnabled).catch(()=>setAiEnabled(false))},[]);
 
   useEffect(()=>{
+    try {
     const key='strategic_access_session';
     let sessionId=sessionStorage.getItem(key);
     if(!sessionId){sessionId=crypto.randomUUID();sessionStorage.setItem(key,sessionId)}
+    } catch { /* Optional telemetry must not prevent the dashboard from rendering. */ }
 
   },[]);
 
@@ -71,11 +73,18 @@ export function AppShell(){
 
   useEffect(()=>{let live=true;apiGet<{signinMethod:'Userbased'|'Google'|'Microsoft';google:{configured:boolean};microsoft:{configured:boolean}}>('/api/v1/admin/signin-config').then(config=>{if(live){setSigninMethod(config.signinMethod);setProviders({google:config.google.configured,microsoft:config.microsoft.configured})}}).catch(()=>{});return()=>{live=false}},[signInOpen]);
   useEffect(()=>{
-    const log=()=>apiPost('/api/v1/access-log',{sessionId:sessionStorage.getItem('strategic_access_session'),pagePath:initialPath.current}).catch(()=>{});
+    const log=()=>{
+      try {
+        const sessionId=sessionStorage.getItem('strategic_access_session');
+        if(sessionId)return apiPost('/api/v1/access-log',{sessionId,pagePath:initialPath.current}).catch(()=>{});
+      } catch { /* Storage can be unavailable in privacy-restricted browsers. */ }
+    };
     getAdminSession().then(user=>setAdmin(user)).catch(()=>setAdmin(null)).finally(log);
     // V2.4 browser profiles never establish V2.5 authorization.
-    sessionStorage.removeItem('district360_admin');
-    sessionStorage.removeItem('strategic_superadmin_token');
+    try {
+      sessionStorage.removeItem('district360_admin');
+      sessionStorage.removeItem('strategic_superadmin_token');
+    } catch { /* Authorization uses server cookies, not these obsolete browser keys. */ }
   },[]);
 
   async function submitSignIn(e:FormEvent){

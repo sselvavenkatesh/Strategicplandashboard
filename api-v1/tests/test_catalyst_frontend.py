@@ -14,7 +14,9 @@ def test_react_routes_do_not_mask_api_errors_or_serve_outside_build(tmp_path):
     install_frontend(app,build)
     client=TestClient(app)
     for path in ['/','/admin','/superadmin','/goals/G1']:
-        assert 'React shell' in client.get(path).text
+        response=client.get(path)
+        assert 'React shell' in response.text
+        assert response.headers['cache-control']=='no-store, max-age=0'
     assert client.get('/api/v1/profile').json()['districtName']=='Allen Park Public Schools'
     assert client.get('/api/v1/missing').status_code==404
     assert client.get('/missing.js').status_code==404
