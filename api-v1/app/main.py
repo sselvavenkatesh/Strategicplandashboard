@@ -36,6 +36,8 @@ async def confidential_validation_error(request:Request,error:RequestValidationE
 async def preview_write_guard(request: Request, call_next):
     started = perf_counter()
     path = request.url.path
+    if settings.district_schema != 'public' and not settings.data_writes_enabled and request.method in {'POST','PUT','PATCH','DELETE'} and path.startswith(('/api/v1/admin/','/api/v1/superadmin/')) and path not in {'/api/v1/admin/login','/api/v1/admin/logout','/api/v1/superadmin/login','/api/v1/superadmin/logout'}:
+        return JSONResponse(status_code=503,content={'detail':'Editing is not enabled for this district yet.'})
     if not settings.data_writes_enabled and request.method in {"POST", "PUT", "PATCH", "DELETE"} and path.startswith("/api/v1/superadmin/") and path not in {"/api/v1/superadmin/login", "/api/v1/superadmin/workspace", "/api/v1/superadmin/logout", "/api/v1/superadmin/users", "/api/v1/superadmin/sso-settings", "/api/v1/superadmin/ai-settings"}:
         return JSONResponse(status_code=503, content={"detail": "Data writes remain disabled until V2.5 authenticated storage is integrated."})
     response = await call_next(request)
@@ -92,7 +94,7 @@ def get_preview_dataset():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "apiVersion": settings.api_version, "dataWritesEnabled": settings.data_writes_enabled,"superAdminWritesEnabled":True}
+    return {"status": "ok", "apiVersion": settings.api_version, "dataWritesEnabled": settings.data_writes_enabled,"superAdminWritesEnabled":settings.data_writes_enabled if settings.district_schema != 'public' else True}
 
 @app.get("/api/v1/bootstrap")
 def get_bootstrap():
